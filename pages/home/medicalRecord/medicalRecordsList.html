@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="心脏高精度动力学分析系统" />
+    <meta name="author" content="" />
+    <title>病案列表-心脏高精度电动力学分析系统</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/systemManage.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.js"></script>
+    <!--引入qrcode插件-->
+    <script src="/assets/js/qrcode.js"></script>
+
+</head>
+<body class="page-body">
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <!--相应的顶部导航区相应的内容-->
+        <div id="nav-content-inner"></div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">病案列表</h1>
+                <p class="description">Medical Records View</p>
+            </div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <i class="fa-home"></i>Home
+                    </li>
+                    <li>
+                        Medical Record
+                    </li>
+                    <li class="active">
+                        <strong>Medical Records View</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <script>
+                  jQuery(document).ready(function($)
+                  {
+                    let classification = sessionStorage.getItem('classification');
+                    //根据不同的角色，返回不同位置值，比如目前是医生，只返回医生界面，如果是用户反回相应的用户界面
+                    if(classification == 2)
+                    {
+                      //加载相应的公共项，页头和侧边栏
+                      loadFromWS("Home/menu/LeftSideMenu.template", "Item=个人信息$^@^$item=病历查询$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+                    }
+                    else if(classification ==1)
+                    {
+                      loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=病历查询$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+                    }else if (classification ==4){
+                      loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=病案列表$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+                    }
+
+                    loadFromWS("Home/menu/topNavContent.template", "userName=" + sessionStorage.getItem('userName'), "nav-content-inner");
+
+                    //加载病历表
+                    loadFromWS("Home/medicalRecord/loadClientRecords.template", "doctorId="+sessionStorage.getItem('loginId'), "medicalRecordTable");
+
+                    console.log(sessionStorage.getItem('loginId'));
+
+                    var obj_databaseNum = new Array();
+                    var databaseNum;
+                    var processResult_databaseNum = function() {
+                      databaseNum = obj_databaseNum[0];
+                    };
+                    getFromWS("Home/medicalRecord/databaseChanged.template", "", obj_databaseNum,processResult_databaseNum);
+
+                    /**
+                     * 每隔一段时间检查一次数据库，若有新数据则重新加载列表
+                     */
+                    var obj_databaseChange = new Array();
+                    var processResult_databaseChange = function(){
+                      if (databaseNum != obj_databaseChange[0]) {
+                        loadFromWS("Home/medicalRecord/loadClientRecords.template", "doctorId="+sessionStorage.getItem('loginId'), "medicalRecordTable");
+                        getFromWS("Home/medicalRecord/databaseChanged.template", "", obj_databaseNum,processResult_databaseNum);
+                      }
+                    };
+                    getFromWS("Home/medicalRecord/databaseChanged.template", "", obj_databaseChange,processResult_databaseChange);
+//                    setInterval( function (){
+//                      getFromWS("Home/medicalRecord/databaseChanged.template", "", obj_databaseChange,processResult_databaseChange);
+//console.log(databaseNum + "      " + obj_databaseChange[0]);
+//                    },1000)
+                  });
+
+                </script>
+                <div class="panel-body" id="medicalRecordTable"></div>
+            </div>
+        </div>
+
+        <footer class="main-footer sticky footer-type-1">
+            <div class="footer-inner">
+                <div class="footer-text">
+                    &copy; 2018
+                    <strong>heart</strong>
+                    </a> 心脏高精度电动力学分析系统 - Collect from <a href="http://sdev.whu.edu.cn/" title="网页模板" target="_blank">武汉大学</a>
+                </div>
+                <div class="go-up">
+                    <a href="#" rel="go-top">
+                        <i class="fa-angle-up"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteMedicalRecord" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">删除病历</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-info" onclick="delMR()">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--monitor点击生成二维码-弹出层-->
+<div class="modal fade" id="produceqrcode" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">二维码</h4>
+            </div>
+            <div class="modal-body">
+                <div id="qrcode" style="display: flex;align-items: center;justify-content:center;margin: 0 auto;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  //存储对应的病历ID
+  var medicalRecordId = "";
+
+  /**
+   * 加载检查的病人信息
+   */
+  function editClientRecord(clientId,id){
+    medicalRecordId = id;
+    sessionStorage.setItem('medicalRecordId',medicalRecordId);
+    sessionStorage.setItem('clientId', clientId);
+    var obj_editMedicalRecord = new Array();
+    var processResult_editMedicalRecord = function(){
+      if (obj_editMedicalRecord[0] == "ok") {
+
+        /**
+         * 存储相应病例的详细信息
+         */
+        sessionStorage.setItem('clientRecord_clientName',obj_editMedicalRecord[1]);
+        sessionStorage.setItem('clientRecord_hospital',obj_editMedicalRecord[2]);
+        sessionStorage.setItem('clientRecord_doctorName',obj_editMedicalRecord[3]);
+        sessionStorage.setItem('clientRecord_checkTime',obj_editMedicalRecord[4]);
+        sessionStorage.setItem('clientRecord_number',obj_editMedicalRecord[5]);
+        sessionStorage.setItem('clientRecord_height',obj_editMedicalRecord[6]);
+        sessionStorage.setItem('clientRecord_weight',obj_editMedicalRecord[7]);
+        sessionStorage.setItem('clientRecord_smoking',obj_editMedicalRecord[8]);
+        sessionStorage.setItem('clientRecord_drinking',obj_editMedicalRecord[9]);
+        sessionStorage.setItem('clientRecord_hypertension',obj_editMedicalRecord[10]);
+        sessionStorage.setItem('clientRecord_diabetes',obj_editMedicalRecord[11]);
+
+        window.location.href = "medicalRecordDetail.html";
+      }
+      else {
+        toastr.error("查看失败或数据已更改！请重试！", "查看失败");
+      }
+    };
+    var isUpdate = "true";
+    getFromWS("Home/medicalRecord/editMedicalRecord.template", "id="  + medicalRecordId + "$^@^$clientId=" + clientId + "$^@^$isUpdate=" + isUpdate , obj_editMedicalRecord, processResult_editMedicalRecord);
+  }
+
+
+  ///monitor登录，点击生成二维码，此方法的激活事件在LeftSideMenu.template
+  function produceQRCode() {
+    let register_url = `http://${document.domain}/pages/home/medicalRecord/clientSignUp.html?monitorId=${sessionStorage.getItem('loginId')}`;
+    ///解决模态框缓存的问题：若已经生成了一次二维码，则不需要再生成了，不然弹窗中会显示两个二维码
+    if($("#qrcode").find("img").length == 0){
+      new QRCode(document.getElementById('qrcode'), register_url);
+    }
+    $('#produceqrcode').modal('show');
+  }
+</script>
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/uikit/js/uikit.min.js"></script>
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/assets/js/selectboxit/jquery.selectBoxIt.min.js"></script>
+<script src="/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<script src="/assets/js/select2/select2.min.js"></script>
+
+</body>
+</html>

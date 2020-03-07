@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="renderer" content="webkit|ie-comp|ie-stand" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Xenon Boostrap Admin Panel" />
+  <meta name="author" content="" />
+
+  <title>心脏高清度电动力学分析系统</title>
+
+  <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+  <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/css/xenon-core.css">
+  <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+  <link rel="stylesheet" href="/assets/css/xenon-components.css">
+  <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/component.css">
+  <script src="/assets/js/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9] -->
+  <script src="/assets/js/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="/assets/js/respond/1.4.2/respond.min.js"></script>
+  <!--[endif]-->
+  <script src="https://pv.sohu.com/cityjson?ie=utf-8"></script>
+  <!--framework-->
+  <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+
+
+</head>
+
+<body>
+  <div class="login-header" style="text-align: center;">
+    <p style="font-size: 16px;">心脏高清度电动力学分析系统</p>
+    <p style="font-size: 16px;">Cardiac HD Electrodynamic Analysis System</p>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label" for="re_username">登录账号</label>
+    <input type="text" class="form-control" name="re_userame" id="re_username" autocomplete="off" />
+  </div>
+
+  <div class="form-group">
+    <label class="control-label" for="re_password">新密码</label>
+    <input type="password" class="form-control" name="re_password" id="re_password" autocomplete="off" />
+  </div>
+
+  <div class="form-group">
+    <label class="control-label" for="check_password">确认密码</label>
+    <input type="password" class="form-control" name="check_password" id="check_password" autocomplete="off" />
+  </div>
+
+  <div class="form-actions">
+    <span class="pull-left"><a href="try.html" class="flip-link btn btn-success" id="to-login">&laquo; 返回登录</a></span>
+    <span class="pull-left"><button onclick="myFunction()">重置密码</button></span>
+  </div>
+<script>
+  function myFunction()
+  { var nwlogin_name = $("#re_username").val();
+    var nwpasswd = $("#re_password").val();
+    var ckpasswd = $("#check_password").val();
+    var result = new Array();
+
+    var processResult = function(){
+      console.log(result)
+      alert(result[0]);
+    };
+
+    if(nwpasswd == ckpasswd){
+      setTimeout(getFromWS("examples/repasswd.template", "passwd="+nwpasswd+"$^@^$login_name="+nwlogin_name, result, processResult), 5000);
+      // alert("ok");
+    }
+    else{
+      alert("两次输入密码不正确");
+    }
+
+  }
+</script>
+
+</body>
+</html>

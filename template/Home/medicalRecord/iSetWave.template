@@ -1,0 +1,26 @@
+<%
+    ///相应的没有对应的view信息哪么就是空白
+    If :waveViewId == __error__
+        :waveViewId = ""
+    EndIf
+    ///相应的没有对应的waveFilterId信息哪么就是空白
+    If :waveFilterId == __error__
+        :waveFilterId = :waveFormId
+    EndIf
+
+    :sql_setWave="UPDATE medical_record SET waveFormId=?,waveFilterId=?,waveDataId=?,waveViewId=? WHERE id=?"
+    :result_setWave = changeRecordSet(:sql_setWave,S(:waveFormId),S(:waveFilterId),S(:waveDataId),S(:waveViewId),S(:id))
+debugMsg("result_setWave=============="#:result_setWave)
+    If :result_setWave == "ok"
+        ///判断主体
+       :isChecked="true"
+
+       :sql_setIsChecked="UPDATE medical_record SET ischecked=? WHERE id=?"
+       :result_setIsChecked = changeRecordSet(:sql_setIsChecked,S(:isChecked),S(:id))
+       :recordNum = recordCount()
+    EndIf
+
+    :result_callback = ""
+    :result_callback = jsonAddItem(:result_callback,"status",S(:result_setWave))
+    =:result_callback
+%>

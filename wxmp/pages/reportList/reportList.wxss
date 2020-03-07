@@ -1,0 +1,54 @@
+/* pages/reportList/reportList.wxss */
+
+.btn-and-search {
+    position: fixed;
+    top: 0rpx;
+    width: 750rpx;
+    z-index: 999;
+    background: #EFEFF4;
+    /* border: 1rpx solid red; */
+}
+
+.btns {
+    width: 700rpx;
+    display: flex;
+    justify-content: space-around;
+    font-size: 30rpx;
+    margin: 6px auto 0 auto;
+    padding-bottom: 6rpx;
+}
+
+.btns-bg {
+    width: 200rpx;
+    height: 80rpx;
+    margin: 0 auto;
+}
+/* 管理员、医生 */
+.page__bd {
+    padding-top: 186rpx;
+}
+/* 病人 */
+.page__bd_client{
+    padding-top: 186rpx;
+}
+
+.check {
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/wave-btn.png?sign=7515a9c0ae49e64950aee840189e0958&t=1562588593");
+    background-size: 200rpx;
+}
+
+.checked {
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/info-btn.png?sign=aea20ef5515f582e20f839f534fa8f66&t=1562588772");
+    background-size: 200rpx;
+}
+
+.btns-text {
+    height: 80rpx;
+    line-height: 74rpx;
+    margin: 0 54rpx;
+    color: #faf8f8;
+}
+
+.loadmore .text {
+    font-size: 26rpx
+}

@@ -1,0 +1,18 @@
+<%
+    /// 文 件 名：getWaveFormId
+    /// 描    述：获取对应的格式化数据id(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/3/23 21:34  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+    debugMsg("[DEBUGMSG]:getWaveFormId.template 位置:12:"+"id："+:id)
+
+    :sql_Records = "SELECT waveformid FROM medical_record WHERE id = ?"
+    :result_Records = changeRecordSet(:sql_Records,S(:id))
+    debugMsg("[DEBUGMSG]:getWaveFormId.template 位置:16:"+":result_Records======="+:result_Records)
+    =waveformid
+%>

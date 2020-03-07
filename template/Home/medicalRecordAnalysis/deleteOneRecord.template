@@ -1,0 +1,5 @@
+<%
+    :sql_delrecord = "DELETE FROM medical_record_analysis WHERE ID = ?"
+    :resultRecord = changeRecordSet(:sql_delrecord,S(:id))
+    =:resultRecord
+%>

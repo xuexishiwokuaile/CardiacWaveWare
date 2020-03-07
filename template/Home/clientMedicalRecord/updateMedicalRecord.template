@@ -1,0 +1,8 @@
+<%
+    ///更新病历信息
+    :sql_saveMedicalRecord="UPDATE medical_record SET clientName=?,hospital=?,doctorName=?,checkTime=?,checkResult=? WHERE id=?"
+    :result_saveMedicalRecord=changeRecordSet(:sql_saveMedicalRecord,S(:clientName),S(:hospital),S(:doctorName),S(:checkTime),S(:checkResult),S(:id))
+    :recordNum = recordCount()
+
+    =:result_saveMedicalRecord
+%>

@@ -1,0 +1,43 @@
+<view class="outer">
+    <view class="tuxing">
+        <image src="https://img.vim-cn.com/ac/f2b356889d58b5a4251defe9ba279480b3a450.png" />
+    </view>
+    <view class="btns-data">
+        <view class="start bg-contorl">
+            <text class="btn-text">开始监测</text>
+        </view>
+        <view class="connect bg-contorl">
+            <text class="btn-text">连接设备</text>
+        </view>
+        <view class="check bg-contorl">
+            <text class="btn-text">查看报告</text>
+        </view>
+        <view class="play-back bg-contorl">
+            <text class="btn-text">波形回放</text>
+        </view>
+        <view class="gain">
+            <view>
+                <text class="data-text">增益值</text>
+            </view>
+            <view class="gain-data-outer">
+                <text class="gain-data">10mm/mv</text>
+            </view>
+        </view>
+        <view class="speed">
+            <view>
+                <text class="data-text">速度值</text>
+            </view>
+            <view class="speed-data-outer">
+                <text class="speed-data">25mm/s</text>
+            </view>
+        </view>
+        <view class="bmp">
+            <view>
+                <text class="data-text">BMP值</text>
+            </view>
+            <view class="bmp-data-outer">
+                <text class="bmp-data">74</text>
+            </view>
+        </view>
+    </view>
+</view>

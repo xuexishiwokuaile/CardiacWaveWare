@@ -1,0 +1,37 @@
+<%
+    /// 文 件 名：getDataAnalysis
+    /// 描    述：读取所有的金标数据(用一句话描述该文件做什么)  
+    /// 项目名称：out_cardic      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/22 14:24  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+    /// 读取MEDICAL_RECORD表中，标记为金标的所有数据
+    :sql = "SELECT * FROM MEDICAL_RECORD WHERE ISUSEFUL = ?"
+    :resultRecord = changeRecordSet(:sql,S(1))
+    debugMsg("[DEBUGMSG]:getDataAnalysis.template 位置:16:"+":resultRecord="+:resultRecord)
+    :recordNum = recordCount()
+    If :resultRecord == "ok"
+        Repeat
+          ///获取2048个点
+          debugMsg("[DEBUGMSG]:getDataAnalysis.template 位置:21:"+"WAVEFORMID===="+WAVEFORMID)
+          :txt = executeRemoteService("127.0.0.1","/one/downloadFile.spe?dtype=Sqldb&mode=attachment&fileid="+WAVEFORMID,"",80)
+          :result_records_item = jsonAddItem("", "name", S(CLIENTNAME))
+          :result_records_item = jsonAddItem(:result_records_item,"checkTime",S(CHECKTIME))
+          :result_records_item = jsonAddItem(:result_records_item,"dots",S(:txt))
+          :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+        EndRepeat
+        ///成功 返回状态码0
+        :code = 0
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+        =:result_records_items
+    Else
+        ="bad"
+    EndIf
+
+%>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="心脏高精度动力学分析系统" />
+    <meta name="author" content="" />
+
+    <title>用户登录</title>
+
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/component.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9] -->
+    <script src="/assets/js/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="/assets/js/respond/1.4.2/respond.min.js"></script>
+    <!--[endif]-->
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <!--framework-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+
+</head>
+
+<body class="page-body login-page login-light">
+<div class="container">
+    <div class="main">
+        <ul id="cbp-bislideshow" class="cbp-bislideshow">
+            <li><img src="/images/1.jpg" alt="image01"/></li>
+            <li><img src="/images/2.jpg" alt="image02"/></li>
+            <li><img src="/images/3.jpg" alt="image03"/></li>
+            <li><img src="/images/4.jpg" alt="image04"/></li>
+            <li><img src="/images/5.jpg" alt="image05"/></li>
+        </ul>
+        <div id="cbp-bicontrols" class="cbp-bicontrols">
+            <span class="cbp-biprev"></span>
+            <span class="cbp-bipause"></span>
+            <span class="cbp-binext"></span>
+        </div>
+    </div>
+</div>
+
+<div class="login-container">
+
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+
+            <script type="text/javascript">
+
+              var obj= new Array();
+
+              /**
+               * 返回参数验证函数,验证相应的开发结果
+               **/
+              function passResult(results){
+                console.log(obj);
+                console.log(results);
+
+                  sessionStorage.setItem('userId',results[0]);
+                  sessionStorage.setItem('userToken',results[1]);
+                  sessionStorage.setItem('classification',results[2]);
+                  sessionStorage.setItem('loginName',results);
+                  console.log(results+"results");
+                  getFromWS("Home/medicalRecord/getClient.template","login_name="+results,obj,getCheckNumber);
+
+              }
+
+              function getCheckNumber() {
+                if (obj[0] == "ok") {
+                  /**
+                   * 获取当前时间
+                   */
+                  var date = new Date();
+                  var year = date.getFullYear();
+                  var month = date.getMonth()+1;
+                  var day = date.getDate();
+                  var hours = date.getHours();
+                  var minutes = date.getMinutes();
+                  var seconds = date.getSeconds();
+                  if (month < 10){
+                    month = "0" + month;
+                  }
+                  if (day < 10){
+                    day = "0" + day;
+                  }
+                  if (hours < 10){
+                    hours = "0" + hours;
+                  }
+                  if (minutes < 10){
+                    minutes = "0" + minutes;
+                  }
+                  if (seconds < 10){
+                    seconds = "0" + seconds;
+                  }
+
+                  var checkTime = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+                  /**
+                   * 向病历表中插入新的数据
+                   **/
+
+                  /**
+                   * 根据时间获取检查号码
+                   */
+                  var checkNumber = "";
+                  var date = new Date();
+                  var year = date.getFullYear();
+                  var month = date.getMonth()+1;
+                  if (month < 10){
+                    month = "0" + month;
+                  }
+                  var day = date.getDate();
+                  if (day < 10){
+                    day = "0" + day;
+                  }
+                  var checkDay = year*10000 + month*100 + day;
+                  var number = checkDay + "0001";
+
+                  var obj_number = new Array();
+                  function getNumber(){
+                    if (obj_number[0] == "ok") {
+                      checkNumber = parseInt(obj_number[1]);
+                      checkNumber +=1;
+
+                      sessionStorage.setItem('clientRecord_number', checkNumber);
+                      document.getElementById("checkNumber").innerText = sessionStorage.getItem('clientRecord_number');
+
+                      var obj_insertMedicalRecord = new Array();
+                      function insertMedicalRecord(){
+                      }
+                      console.log("checkNumber===" + checkNumber);
+                      getFromWS("/Home/medicalRecord/insertMedicalRecord.template","number=" + checkNumber +"$^@^$login_name=" + sessionStorage.getItem('loginName') +"$^@^$doctorId=" + sessionStorage.getItem('doctorId') + "$^@^$checkTime=" + checkTime +"$^@^$monitor_id="+sessionStorage.getItem('monitorId'), obj_insertMedicalRecord,insertMedicalRecord);
+                    }
+                    else {
+                      checkNumber = parseInt(obj_number[1]);
+                      sessionStorage.setItem('clientRecord_number', checkNumber);
+                      document.getElementById("checkNumber").innerText = sessionStorage.getItem('clientRecord_number');
+
+                      var obj_insertMedicalRecord = new Array();
+                      function insertMedicalRecord(){
+                      }
+                      console.log("checkNumber===" + checkNumber);
+                      getFromWS("/Home/medicalRecord/insertMedicalRecord.template","number=" + checkNumber +"$^@^$login_name=" + sessionStorage.getItem('loginName') +"$^@^$doctorId=" + sessionStorage.getItem('doctorId') + "$^@^$checkTime=" + checkTime+"$^@^$monitor_id="+sessionStorage.getItem('monitorId'), obj_insertMedicalRecord,insertMedicalRecord);
+                    }
+                  }
+                  getFromWS("/Home/medicalRecord/getCheckNumber.template","number=" + number,obj_number,getNumber);
+
+                  /**
+                   * 弹出提示框并显示检查号码
+                   **/
+
+                  $('#getCheckNumber').modal('show');
+                }
+                else{
+                  alert("手机号不存在，请重新输入");
+                }
+              }
+
+              jQuery(document).ready(function($)
+              {
+                var Request=new QueryString();
+                console.log(Request);
+                var doctorId = Request['doctorId'];
+                var monitorId = Request['monitorId'];
+                //如果有相应的传递信息，哪么将相应的doctor或monitor记入相应的缓存当中
+                if (typeof(doctorId) != 'undefined' && doctorId != '') {
+                  sessionStorage.setItem('doctorId', doctorId);
+                }
+                if (typeof(monitorId) != 'undefined' && monitorId != '') {
+                  sessionStorage.setItem('monitorId', monitorId);
+                }
+                console.log('doctorId===' +  sessionStorage.getItem('doctorId'));
+                console.log('monitorId===' +  sessionStorage.getItem('monitorId'));
+
+
+                cbpBGSlideshow.init();
+                setTimeout(function(){ $(".fade-in-effect").addClass('in'); }, 1);
+
+                //启动进行相应的检查
+                if($.cookie('cookiesjqsavepwd') == "1")
+                {
+                  $("#isSavaPasswd").attr("checked","checked");
+                  $("#username").attr("value", $.cookie('cookiesjqname'));
+                  $("#passwd").attr("value", $.cookie('cookiesjqpwd'));
+                }
+
+                if($.cookie('cookiesjqsavepwd') == "2")
+                {
+                  $("#username").attr("value", $.cookie('cookiesjqname'));
+                }
+
+                $("form#login").validate({
+                  rules: {
+                    username: {
+                      required: true
+                    },
+                    passwd: {
+                      required: true
+                    }
+                  },
+                  messages: {
+                    username: {
+                      required: '请输入你的用户名'
+                    },
+                    passwd: {
+                      required: '请输入你的密码'
+                    }
+                  },
+                  // Form Processing via AJAX
+                  submitHandler: function(form)
+                  {
+                    show_loading_bar(70); // Fill progress bar to 70% (just a given value)
+                    var loginName = $(form).find('#username').val();//用户名
+                    var password = $(form).find('#passwd').val();//密码
+                    console.log(loginName,password);
+
+                    //是否进行本地密码保存
+                    // if($(form).find('#isSavaPasswd')[0].checked)
+                    // {
+                    //   //保存用户名密码
+                    //   $.cookie('cookiesjqname', loginName, { expires: 7 });
+                    //   $.cookie('cookiesjqpwd', password, { expires: 7 });
+                    //   $.cookie('cookiesjqsavepwd', 1, { expires: 7 });
+                    // }
+                    // else
+                    // {
+                    //   //不保存密码，仅保存用户名
+                    //   $.removeCookie('cookiesjqpwd');
+                    //   $.cookie('cookiesjqname', loginName, { expires: 7 });
+                    //   $.cookie('cookiesjqsavepwd', 2, { expires: 7 });
+                    //
+                    // }
+                    //计算补允用户名
+                    console.log(loginName,password);
+                    // login(loginName,password,passResult);	//登录login
+                    passResult(loginName);
+                  }
+                });
+                // Set Form focus
+                $("form#login .form-group:has(.form-control):first .form-control").focus();
+              });
+
+              /**
+               * 点击取消按钮返回至初始页面
+               */
+              // function goTransfer() {
+              //   location.href="/pages/Home/medicalRecord/transfer.html?doctorId="+sessionStorage.getItem('doctorId');
+              // }
+
+              /**
+               * 获取doctorId
+               */
+              function QueryString()
+              {
+                //构造参数对象并初始化
+                var name,value,i;
+                var str=location.href;//获得浏览器地址栏URL串
+                var num=str.indexOf("?")
+                str=str.substr(num+1);//截取“?”后面的参数串
+                var arrtmp=str.split("&");//将各参数分离形成参数数组
+                for(i=0;i < arrtmp.length;i++){
+                  num=arrtmp[i].indexOf("=");
+                  if(num>0){
+                    name=arrtmp[i].substring(0,num);//取得参数名称
+                    value=arrtmp[i].substr(num+1);//取得参数值
+                    this[name]=value;//定义对象属性并初始化
+                  }
+                }
+              }
+
+            </script>
+
+            <!-- Errors container -->
+            <div class="errors-container">
+
+            </div>
+
+            <!-- Add class "fade-in-effect" for login form effect -->
+            <form method="post" role="form" id="login" class="login-form fade-in-effect">
+
+                <div class="login-header" style="text-align: center;">
+                    <p style="font-size: 16px;">获取检查码</p>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="control-label" for="username">用户名</label>
+                    <input type="text" class="form-control" name="username" id="username" autocomplete="off" />
+                </div>
+
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label" for="passwd">密码</label>-->
+                    <!--<input type="password" class="form-control" name="passwd" id="passwd" autocomplete="off" />-->
+                <!--</div>-->
+                <!--<div class="checkbox">-->
+                    <!--<label>-->
+                        <!--<input type="checkbox" id="isSavaPasswd">保存密码-->
+                    <!--</label>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary  btn-block text-left">
+                        <i class="fa-lock"></i>
+                        获取
+                    </button>
+                </div>
+                <!--<div class="form-group">-->
+                    <!--<button type="submit" class="btn btn-primary  btn-block text-left" onclick="goTransfer()">-->
+                        <!--<i class="fa-lock"></i>-->
+                        <!--取消-->
+                    <!--</button>-->
+                <!--</div>-->
+                <div class="login-footer">
+                    <div class="info-links" style="font-size: 13px;">
+                        <a href="#">武汉大学开发</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="getCheckNumber">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header noborder">
+                <h4 class="modal-title" style="color: black;">获取成功，您的检查号码为：</h4>
+            </div>
+            <div class="modal-footer noborder" style="text-align: center">
+                <label style="font-size: 30px;color: black;" id="checkNumber"></label>
+                <script type="text/javascript"> </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/jquery-validate/jquery.validate.min.js"></script>
+<script src="/assets/js/toastr/toastr.min.js"></script>
+
+
+<!-- JavaScripts initializations and stuff -->
+<script src="/assets/js/xenon-custom.js"></script>
+<script src="/assets/js/modernizr.custom.js"></script>
+
+<script src="/assets/js/jquery.imagesloaded.min.js"></script>
+<script src="/assets/js/cbpBGSlideshow.min.js"></script>
+</body>
+</html>

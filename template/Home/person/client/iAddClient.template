@@ -1,0 +1,85 @@
+<%
+    /// 文 件 名：addClientForMiniApp
+    /// 描    述：微信小程序的  用户注册(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/5/8 14:01  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    ///传入：姓名、性别、密码、手机号、身高。体重。吸烟、饮酒、糖尿病、高血压、年龄、机构
+    debugMsg("==addClientFroMiniApp.template=="#"==:name="#:name#"==:phone="#:phone#"==:height="#:height#"==:weight="#:weight#"==:gender="#:gender#"==:drinking="#:drinking#"==:smoking="#:smoking#"==:hypertension="#:hypertension#"==:diabetes="#:diabetes#"==:department="#:department)
+    ///先判断用户名是否重复（手机号）
+    :sql_insertClient="SELECT * FROM ST_PASSPORTS WHERE LOGIN_NAME=?"
+    :result_insertClient=changeRecordSet(:sql_insertClient,S(:login_name))
+    :recordNum = recordCount()
+
+    If :recordNum == 0
+        ///用户名没有重复,开始注册
+        ///获取ID
+        :clientId = tuid()
+        ///获取number 用于排序
+        :sql_max="SELECT CAST(max(CAST(number AS int)) AS VARCHAR) AS NUM FROM ST_PASSPORTS"
+        :resultRecord = changeRecordSet(:sql_max)
+        If :resultRecord == "ok"
+            :num = num+10
+        Else
+            :num=0
+        EndIf
+
+        ///向client中插入新的数据
+        :sql_insertClient="INSERT INTO client(id,phone,height,weight,gender,drinking,smoking,hypertension,diabetes,age,name,number) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
+        :result_insertClient=execSQL(:sql_insertClient,S(:clientId),S(:phone),S(:height),S(:weight),S(:gender),S(:drinking),S(:smoking),S(:hypertension),S(:diabetes),S(:age),S(:name),S(:num))
+
+        ///向st_passports中插入新的数据
+        :sql_insertStPassports="INSERT INTO st_passports(id,login_name,passwd,classification,name,number) VALUES(?,?,md5(?),?,?,?)"
+        :result_insertStPassports=execSQL(:sql_insertStPassports,S(:clientId),S(:phone),S(:passwd),S(:classification),S(:name),S(:num))
+
+        ///ok$^@^$UPDATED=
+        If :result_insertStPassports=="ok$^@^$UPDATED=" && :result_insertClient=="ok$^@^$UPDATED="
+            ///注册成功
+            ///获取检查码,向dedical_record插入数据
+            :startDate = serverDate("yyyyMMdd")
+            :start = "0001"
+            :number = :startDate+L(:start)  ///这里其实是想做个拼接，但是zoolina提供的函数，我虚拟机上测试有问题  :number=20190509L
+            :checkNumber = mid(:number,0,strlen(:number)-1)   ///将最后的L去掉。就是检查码
+
+            ///查询当前的检查码是否重复，如果是，查询数据库中已有的检查码+1，就是新的检查码
+            :sql_selectCheckNumber = "SELECT number FROM medical_record WHERE number=?"
+            :result_selectCheckNumber = changeRecordSet(:sql_selectCheckNumber,S(:checkNumber))
+            If :result_selectCheckNumber == "ok"
+                ///检查码重复，从数据库查找最大的+1
+                :percentSign="%"
+                :likeTemp = :startDate+L(:percentSign)
+                :like = mid(:likeTemp,0,strlen(:likeTemp)-1)
+                :sql_getMaxNumber = "SELECT max(number) AS maxNumber FROM medical_record WHERE number LIKE ?"
+                :result_getMaxNumber = changeRecordSet(:sql_getMaxNumber,S(:like))
+                :checkNumber = maxNumber +1
+            EndIf
+            ///向medical_record插入数据
+            :recordId = tuid()
+            :sql_getHospitalId = "select id from doctor where hospital=?"
+            :result_getHospitalId = changeRecordSet(:sql_getHospitalId,S(:department))
+            :doctorId = id
+            :serverDate = serverDate("yyyy-MM-dd hh:mm:ss")
+            :sql_insertMedicalRecord = "INSERT INTO medical_record(id,clientId,clientName,doctorId,doctorName,hospital,checkTime,number,isUpdate,isChecked) VALUES(?,?,?,?,?,?,?,?,'false','false')"
+            :result_insertMedicalRecord = execSQL(:sql_insertMedicalRecord,S(:recordId),S(:clientId),S(:name),S(:doctorId),S(:department),S(:department),S(:serverDate),S(:checkNumber))
+            If :result_insertMedicalRecord == "ok$^@^$UPDATED="
+                ///插入成功，向用户返回检查码
+                =:checkNumber
+            Else
+                ="checkNumber bad"
+            EndIf
+        Else
+            ="register bad"
+        EndIf
+    Else
+        ///用户名重复
+        ="rpt"
+    EndIf
+
+%>

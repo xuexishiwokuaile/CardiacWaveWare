@@ -1,0 +1,35 @@
+<%
+    :sqlStr="select st.*,cl.classification as classname from st_passports st,cardiac_classification cl where st.id=? and st.classification=cl.id"
+    :x=changeRecordSet(:sqlStr,S(:id))
+
+    :curclassification = classification
+    :result_callback = jsonAddItem("", "login_name", S(login_name))
+    :result_callback = jsonAddItem(:result_callback, "name", S(name))
+    :result_callback = jsonAddItem(:result_callback, "classname", S(classname))
+    :result_callback = jsonAddItem(:result_callback, "classification", S(classification))
+    :result_callback = jsonAddItem(:result_callback, "id", S(:id))
+
+    ///判断说明：
+    If (:curclassification == 2)
+        ///医生
+        :sqlDoc="select doc.* from doctor doc,st_passports st where st.id=? and st.id=doc.id"
+        :resultRecord = changeRecordSet(:sqlDoc,S(:id))
+        :result_callback = jsonAddItem(:result_callback, "hospital", S(hospital))
+        :result_callback = jsonAddItem(:result_callback, "department", S(department))
+        :result_callback = jsonAddItem(:result_callback, "position", S(position))
+        :result_callback = jsonAddItem(:result_callback, "token", S(token))
+        :result_callback = jsonAddItem(:result_callback, "phone", S(phone))
+        =:result_callback
+    Else
+        If (:curclassification == 3)
+            ///客户
+           :sqlClient="select cli.* from client cli,st_passports st where st.id=? and st.id=cli.id"
+           :resultRecord = changeRecordSet(:sqlClient,S(:id))
+           :result_callback = jsonAddItem(:result_callback, "phone", S(phone))
+           =:result_callback
+        Else
+            =:result_callback
+        EndIf
+    EndIf
+%>
+

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+	<head>
+		<meta charset="utf-8">
+		<title>心脏数字孪生检测报告</title>
+		<!--<meta name=" viewport" content="width=device-width   initial-scale=1.0  minimum-scale=1.0  miximum=1.0  user-scalable=yes"/>-->
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<script src="/assets/js/jquery-1.11.1.min.js"></script>
+		<script src="/Scripts/common/jquery.httpPromise.whu.plug.js" ></script>
+		<script type="text/javascript">
+          jQuery(document).ready(function() {
+            var Request=new QueryString();
+            var medicalRecordId = Request["medicalRecordId"];
+
+            var param = {};
+            param.medicalRecordId = medicalRecordId
+			$.request("/Home/medicalRecord/getMedicalRecordReport.template", param).then(res=>{
+			  $("#checkTime").text(res.data[0].time);
+              $("#personName").text(res.data[0].personName);
+              $("#personSex").text(res.data[0].personSex);
+			  $("#personName").text(res.data[0].personName)
+			  $("#peronPhone").text(res.data[0].peronPhone)
+			  $("#personSex").text(res.data[0].personSex)
+			  $("#personHeight").text(res.data[0].personHeight)
+			  $("#personWeight").text(res.data[0].personWeight)
+			  $("#personDrinking").text(res.data[0].personDrinking)
+			  $("#personSmoking").text(res.data[0].personSmoking)
+			  $("#personHypertension").text(res.data[0].personHypertension)
+			  $("#personDiabetes").text(res.data[0].personDiabetes)
+			  $("#totalPeak").text(res.data[0].totalPeak)
+			  $("#quantitativePeak").text(res.data[0].quantitativePeak)
+			  $("#distributionone").text(res.data[0].distributionone)
+			  $("#distributiontwo").text(res.data[0].distributiontwo)
+			  $("#distributionthree").text(res.data[0].distributionthree)
+			  $("#distributionfour").text(res.data[0].distributionfour)
+			  $("#distributionfive").text(res.data[0].distributionfive)
+			  $("#distributionsix").text(res.data[0].distributionsix)
+			  $("#time").text(res.data[0].time)
+			  $("#number").text(res.data[0].number)
+
+
+			  const numberPeak = res.data[0].quantitativePeak;
+			  let resultPeak = "阴性";
+//              console.log(resultPeak > 0?"真":"假");
+			  if(numberPeak > 150000){
+                resultPeak = "阳性。冠脉粥样硬化，冠脉血流状态50%以下改变高度风险";
+			  }else if(numberPeak <= 150000 && numberPeak >100000){
+                resultPeak = "阳性。输出冠脉粥样硬化风险";
+			  }else if(numberPeak <= 100000 && numberPeak > 60000){
+            	resultPeak = "阳性。心肌疲劳预警";
+			  }else {
+			    console.log("阴性。")
+			  }
+			  $("#resultPeak").text(resultPeak);
+
+              let resultDistribution = "阴性";
+              if(res.data[0].distributionfour > 0.17 || res.data[0].distributionfive > 0.15 || res.data[0].distributionsix > 0.09){
+                resultDistribution = "阳性。心肌组织状态不佳";
+			  }
+              $("#resultDistribution").text(resultDistribution);
+
+              const picture = (res.data[0].picture).substring(0, (res.data[0].picture).lastIndexOf(','));
+              if(picture == "" || picture == ",")
+			  {
+				$("#medicalrecord-content").hide();
+			  }
+			  else{
+                let pictureArray = picture.split(",")
+				$.each(pictureArray, function(index, picture) {
+				  $("#content-list-image").append("<img src=\"/one/downloadFile.spe?dtype=Sqldb&mode=html&fileid="+picture+"\">")
+                })
+			  }
+
+			});
+          });
+
+
+          /**
+           * 获取doctorId
+           */
+          function QueryString()
+          {
+            //构造参数对象并初始化
+            var name,value,i;
+            var str=location.href;//获得浏览器地址栏URL串
+            var num=str.indexOf("?")
+            str=str.substr(num+1);//截取“?”后面的参数串
+            var arrtmp=str.split("&");//将各参数分离形成参数数组
+            for(i=0;i < arrtmp.length;i++){
+              num=arrtmp[i].indexOf("=");
+              if(num>0){
+                name=arrtmp[i].substring(0,num);//取得参数名称
+                value=arrtmp[i].substr(num+1);//取得参数值
+                this[name]=value;//定义对象属性并初始化
+              }
+            }
+          }
+
+		</script>
+	</head>
+	<body>
+		<div class="outer">
+			<div class="header">
+				<div class="header-top">
+					<div class="barcode">
+						<img src="imgs/201900001.png">
+					</div>
+					<div class="date">
+						检查时间：<label id="checkTime">2019.02.11&nbsp;13:00</label>
+					</div>
+				</div>
+				<div class="header-title">
+					心脏数字孪生检测报告
+				</div>
+				<div class="header-info">
+					<div class="name">
+						姓名：<label id="personName">张三</label>
+					</div>
+					<div class="sex">
+						性别：<label id="personSex">男</label>
+					</div>
+					<div class="tel">
+						电话：<label id="peronPhone">13312344321</label>
+					</div>
+					<div class="number">
+						编号：<label id="number">201900001</label>
+					</div>
+				</div>
+				<div class="header-line">
+					<!-- 横线 -->
+				</div>
+			</div>
+			<div class="container">
+				<div class="basic-situation">
+					<div class="basic-info">
+						<div class="basic">
+							用户基本情况：
+						</div>
+						<div class="height">
+							身高：<label id="personHeight">175</label>CM
+						</div>
+						<div class="weight">
+							体重：<label id="personWeight">65</label>KG
+						</div>
+						<div class="smoking">
+							吸烟：<label id="personSmoking">否</label>
+						</div>
+						<div class="diabetes">
+							糖尿病：<label id="personDiabetes">否</label>
+						</div>
+					</div>
+					<div class="detection-parameter">
+						高血压：<label id="personHypertension">否</label>
+					</div>
+				</div>
+				<div class="peak-situation">
+					<div class="peak-situation-title">
+						峰值情况：
+					</div>
+					<div class="quantitative-peak">
+						定量峰值：<label id="quantitativePeak">8624</label>
+					</div>
+					<div class="total-peak">
+						总峰值：<label id="totalPeak">1865953</label>
+					</div>
+					<div class="report-conclusion">
+						报告结论：<label id="resultPeak">阴性</label>
+					</div>
+				</div>
+				<div class="peak-conclusion">
+					<div class="peak-conclusion-title">
+						根据峰值检测情况会出现以下结论（<span style="color:#ec001e;">数据确认取值当日8:00&nbsp;13:00&nbsp;18:00，相同结论中大于等于2次报告为参考依据</span>）
+					</div>
+					<div class="peak-conclusion-item">
+						①阴性；
+					</div>
+					<div class="peak-conclusion-item">
+						②阳性，心脏疲劳预警；
+					</div>
+					<div class="peak-conclusion-item">
+						③冠状粥样硬化风险；
+					</div>
+					<div class="peak-conclusion-item">
+						④冠状粥样硬化，冠脉血液状态50%以下改变，高风险；
+					</div>
+				</div>
+				<div class="polarity-distribution">
+					<div class="polarity-distribution-title">
+						极性分布情况（<span style="color:#ec001e;">数据确认取值当日8:00&nbsp;13:00&nbsp;18:00，相同结论中大于等于2次相同报告为参考依据</span>）
+					</div>
+					<div class="polarity-distribution-item1">
+						<div class="polarity-distribution-item">
+							极性分布1:&nbsp;&nbsp;<label id="distributionone">30%</label>
+						</div>
+						<div class="polarity-distribution-item">
+							极性分布2:&nbsp;&nbsp;<label id="distributiontwo">30%</label>
+						</div>
+						<div class="polarity-distribution-item">
+							极性分布3:&nbsp;&nbsp;<label id="distributionthree">20%</label>
+						</div>
+					</div>
+					<div class="polarity-distribution-item2">
+						<div class="polarity-distribution-item">
+							极性分布4:&nbsp;&nbsp;<label id="distributionfour">15%</label>
+						</div>
+						<div class="polarity-distribution-item">
+							极性分布5:&nbsp;&nbsp;<label id="distributionfive">10%</label>
+						</div>
+						<div class="polarity-distribution-item">
+							极性分布6:&nbsp;&nbsp;<label id="distributionsix">5%</label>
+						</div>
+					</div>
+					<div class="report-conclusion">
+						报告结论：<label id="resultDistribution">阴性</label>
+					</div>
+				</div>
+				<div class="polarity-conclusion">
+					<div class="polarity-conclusion-title">
+						根据极性分布检测情况会出现以下结论：
+					</div>
+					<div class="polarity-conclusion-item">
+						①阴性；
+					</div>
+					<div class="polarity-conclusion-item">
+						②阳性，心肌组织可能出现炎症细胞浸润风险；
+					</div>
+				</div>
+				<div class="remarks">
+					备注：以上数据结论依据META分析及武汉三甲医院临床数据循证，确诊请关注微信平台或者APP平台推荐正规医院预约CTA及冠脉DSA检查
+				</div>
+
+			</div>
+			<div class="header-line">
+				<!-- 横线 -->
+			</div>
+
+			<div id="medicalrecord-content">
+				<!--病历-->
+				<div class="content-imgs">
+					<div class="content-imgs-title">
+						病历记录：
+					</div>
+					<!--<img src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2019048404230000001">-->
+					<div id="content-list-image"></div>
+				</div>
+
+				<div class="header-line">
+					<!-- 横线 -->
+				</div>
+			</div>
+
+			<div class="footer">
+				<div class="text">
+					<div class="yanfa">
+						<span class="footer-spacing">研发单位</span>：武汉大学国家网络安全学院
+					</div>
+					<div class="jishu1">
+						<span class="footer-spacing">技术支持</span>：武汉意念云科技有限责任公司
+					</div>
+					<div class="jishu2">
+						<span class="footer-spacing">技术支持</span>：武汉樱顶网络安全技术中心
+					</div>
+					<div class="linchuang">
+						临床数据支持：华中科技大学同济医院协和附属医院
+					</div>
+				</div>
+				<div class="qrcode">
+					<img src="imgs/qrcode.jpg">
+					<div class="attention-text">
+						更多心电信息请关注
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

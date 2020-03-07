@@ -1,0 +1,20 @@
+<%
+    debugMsg("---------")
+    debugMsg(:columnsId)
+    :sql_module_insert = "SELECT NAME FROM MODULE_COLUMNS WHERE PARENT_ID != '0' AND ID = ?"
+    :result_module_insert = changeRecordSet(:sql_module_insert,S(:columnsId))
+    ///查询结果为ok
+    If :result_module_insert == "ok"
+        :result_isFather = "false"
+    Else
+        :result_isFather = "true"
+    EndIf
+
+    debugMsg("------------")
+    debugMsg(:result_isFather)
+
+    :result_json = jsonAddItem("","isFather",S(:result_isFather))
+    :result_json_Array = jsonAddArrayItem("",:result_json)
+
+    Exit :result_json_Array
+%>

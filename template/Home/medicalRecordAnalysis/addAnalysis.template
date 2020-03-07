@@ -1,0 +1,6 @@
+<%
+      :ln = tuid()
+      :sql_addAnalysis="INSERT into medical_record_analysis(id,clientId,clientName,time,totalpeak,quantitativePeak,distributionone,distributiontwo,distributionthree,distributionfour,distributionfive,distributionsix) values(?,?,?,?,?,?,?,?,?,?,?,?)"
+      :resultRecord=execSQL(:sql_addAnalysis,S(:ln),S(:clientId),S(:clientName),S(:time),S(:totalPeak),S(:quantitativePeak),S(:distributionone),S(:distributiontwo),S(:distributionthree),S(:distributionfour),S(:distributionfive),S(:distributionsix))
+      =:resultRecord
+%>

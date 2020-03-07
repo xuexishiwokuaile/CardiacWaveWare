@@ -1,0 +1,36 @@
+<%
+    debugMsg(:columnsId)
+    :sql_delete_module = "DELETE FROM MODULE_COLUMNS WHERE ID = ?"
+    :resultModule = execSQL(:sql_delete_module,S(:columnsId))
+    :sql_delete_module_role = "UPDATE MODULE_ROLE SET MODULE_ID = REPLACE(MODULE_ID,?,'')"
+    :resultModuleRole = execSQL(:sql_delete_module_role,S(","+:columnsId))
+
+
+    ///检测父模块是否还存在子模块，如果不存在，则连同父模块一同删除
+    :sql_fatherIsClear = "SELECT ID FROM MODULE_COLUMNS WHERE PARENT_ID = ?"
+    ///获取所有父模块的id
+    :sql_getFatherId = "SELECT ID FROM MODULE_COLUMNS WHERE PARENT_ID = '0'"
+    :result_fatherId = changeRecordSet(:sql_getFatherId)
+    ///将获取到的id存储在数组中
+    :i = 1
+    :ArrayAllFatherId[0] = '0'
+    Repeat
+        :ArrayAllFatherId[:i] = ID
+        :i = :i + 1
+    EndRepeat
+
+    :j = 0
+    While :j < :i
+        :result_fatherIsClear = changeRecordSet(:sql_fatherIsClear,S(:ArrayAllFatherId[:j])
+        ///id为空
+        If :result_fatherIsClear == "bad"
+            ///删除该父模块
+            :resultModule = execSQL(:sql_delete_module,S(:ArrayAllFatherId[:j])
+            :resultModuleRole = execSQL(:sql_delete_module_role,S(","+:ArrayAllFatherId[:j]))
+        EndIf
+        :j = :j + 1
+    EndWhile
+
+
+    =:resultModule
+%>

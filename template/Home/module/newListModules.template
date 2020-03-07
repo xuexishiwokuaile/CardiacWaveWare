@@ -1,0 +1,261 @@
+<%
+    debugMsg("----------")
+    debugMsg("[DEBUGMSG]:testListModules.template 位置:16:"+"classification:"+:classification)
+
+    ///预先定义变量i，k用于记录数组
+    :i = 0
+    :j = 0
+
+    :result_module_type = ""
+    :result_modules_Array = ""
+
+    ///如果身份为管理员
+    If :classification == 1
+        ///如果父模块中包含子模块
+        ///查询父模块的信息
+        :sql_fatherModule0 = "SELECT ID,NAME,ENGNAME,ICON FROM MODULE_COLUMNS WHERE PARENT_ID = '0' AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '管理员') LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+        :result_fatherModule0 = changeRecordSet(:sql_fatherModule0)
+        :q = 0
+        Repeat
+            :ArrayAllFatherId[:q] = ID
+            :ArrayAllFatherName[:q] = NAME
+            :ArrayAllFatherEngname[:q] = ENGNAME
+            :ArrayAllFatherIcon[:q] = ICON
+            :q = :q + 1
+        EndRepeat
+        ///查询结果为ok
+        If :result_fatherModule0 == "ok"
+            ///获取并存储信息
+            :i = 0
+            :result_module_type0 = ""
+            While :i < :q
+                ///每次循环加载一条信息
+                :result_module_type0 = jsonAddItem("", "moduleName", S(:ArrayAllFatherEngname[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleTitle", S(:ArrayAllFatherName[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIcoClass", S(:ArrayAllFatherIcon[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIsOpen", 1)
+
+                ///查询子模块
+                :sql_roleModule0 = "SELECT NAME,ENGNAME,PATH FROM MODULE_COLUMNS WHERE PARENT_ID = ? AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '管理员')  LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+                :result_Module0 = changeRecordSet(:sql_roleModule0,S(:ArrayAllFatherId[:i]))
+                :s = 0
+                Repeat
+                    ///存储获取到的信息
+                    :ArrayAllChildName[:s] = NAME
+                    :ArrayAllChildEngname[:s] = ENGNAME
+                    :ArrayAllChildPath[:s] = PATH
+                    :s = :s + 1
+                EndRepeat
+
+                ///查询结果为ok
+                If :result_Module0 == "ok"
+                    ///获取并存储信息
+                    :j = 0
+                    :result_module_type0_Array = ""
+                    While :j < :s
+                        ///每次循环加载一条信息
+                        :result_module_child_type0 = jsonAddItem("", "moduleName", S(:ArrayAllChildEngname[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleTitle", S(:ArrayAllChildName[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleIsOpen", 0)
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "modulePath", S(:ArrayAllChildPath[:j]))
+                        :result_module_type0_Array = jsonAddArrayItem(:result_module_type0_Array, :result_module_child_type0)
+                        :j = :j + 1
+                    EndWhile
+                    ///初始化
+                    :result_module_type = ""
+                    :result_module_type = jsonAddItem(:result_module_type0,"modules",:result_module_type0_Array)
+                    :result_modules_Array = jsonAddArrayItem(:result_modules_Array,:result_module_type)
+                EndIf
+                :i = :i + 1
+            EndWhile
+        EndIf
+    EndIf
+
+    ///如果身份为监测机构
+    If :classification == 2
+        ///如果父模块中包含子模块
+        ///查询父模块的信息
+        :sql_fatherModule0 = "SELECT ID,NAME,ENGNAME,ICON FROM MODULE_COLUMNS WHERE PARENT_ID = '0' AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '监测机构') LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+        :result_fatherModule0 = changeRecordSet(:sql_fatherModule0)
+        :q = 0
+        Repeat
+            :ArrayAllFatherId[:q] = ID
+            :ArrayAllFatherName[:q] = NAME
+            :ArrayAllFatherEngname[:q] = ENGNAME
+            :ArrayAllFatherIcon[:q] = ICON
+            :q = :q + 1
+        EndRepeat
+        ///查询结果为ok
+        If :result_fatherModule0 == "ok"
+            ///获取并存储信息
+            :i = 0
+            :result_module_type0 = ""
+            While :i < :q
+                ///每次循环加载一条信息
+                :result_module_type0 = jsonAddItem("", "moduleName", S(:ArrayAllFatherEngname[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleTitle", S(:ArrayAllFatherName[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIcoClass", S(:ArrayAllFatherIcon[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIsOpen", 1)
+
+                ///查询子模块
+                :sql_roleModule0 = "SELECT NAME,ENGNAME,PATH FROM MODULE_COLUMNS WHERE PARENT_ID = ? AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '监测机构')  LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+                :result_Module0 = changeRecordSet(:sql_roleModule0,S(:ArrayAllFatherId[:i]))
+                :s = 0
+                Repeat
+                    ///存储获取到的信息
+                    :ArrayAllChildName[:s] = NAME
+                    :ArrayAllChildEngname[:s] = ENGNAME
+                    :ArrayAllChildPath[:s] = PATH
+                    :s = :s + 1
+                EndRepeat
+
+                ///查询结果为ok
+                If :result_Module0 == "ok"
+                    ///获取并存储信息
+                    :j = 0
+                    :result_module_type0_Array = ""
+                    While :j < :s
+                        ///每次循环加载一条信息
+                        :result_module_child_type0 = jsonAddItem("", "moduleName", S(:ArrayAllChildEngname[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleTitle", S(:ArrayAllChildName[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleIsOpen", 0)
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "modulePath", S(:ArrayAllChildPath[:j]))
+                        :result_module_type0_Array = jsonAddArrayItem(:result_module_type0_Array, :result_module_child_type0)
+                        :j = :j + 1
+                    EndWhile
+                    ///初始化
+                    :result_module_type = ""
+                    :result_module_type = jsonAddItem(:result_module_type0,"modules",:result_module_type0_Array)
+                    :result_modules_Array = jsonAddArrayItem(:result_modules_Array,:result_module_type)
+                EndIf
+                :i = :i + 1
+            EndWhile
+        EndIf
+    EndIf
+
+    ///如果身份为监测员
+    If :classification == 3
+        ///如果父模块中包含子模块
+        ///查询父模块的信息
+        :sql_fatherModule0 = "SELECT ID,NAME,ENGNAME,ICON FROM MODULE_COLUMNS WHERE PARENT_ID = '0' AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '监测员') LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+        :result_fatherModule0 = changeRecordSet(:sql_fatherModule0)
+        :q = 0
+        Repeat
+            :ArrayAllFatherId[:q] = ID
+            :ArrayAllFatherName[:q] = NAME
+            :ArrayAllFatherEngname[:q] = ENGNAME
+            :ArrayAllFatherIcon[:q] = ICON
+            :q = :q + 1
+        EndRepeat
+        ///查询结果为ok
+        If :result_fatherModule0 == "ok"
+            ///获取并存储信息
+            :i = 0
+            :result_module_type0 = ""
+            While :i < :q
+                ///每次循环加载一条信息
+                :result_module_type0 = jsonAddItem("", "moduleName", S(:ArrayAllFatherEngname[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleTitle", S(:ArrayAllFatherName[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIcoClass", S(:ArrayAllFatherIcon[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIsOpen", 1)
+
+                ///查询子模块
+                :sql_roleModule0 = "SELECT NAME,ENGNAME,PATH FROM MODULE_COLUMNS WHERE PARENT_ID = ? AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '监测员')  LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+                :result_Module0 = changeRecordSet(:sql_roleModule0,S(:ArrayAllFatherId[:i]))
+                :s = 0
+                Repeat
+                    ///存储获取到的信息
+                    :ArrayAllChildName[:s] = NAME
+                    :ArrayAllChildEngname[:s] = ENGNAME
+                    :ArrayAllChildPath[:s] = PATH
+                    :s = :s + 1
+                EndRepeat
+
+                ///查询结果为ok
+                If :result_Module0 == "ok"
+                    ///获取并存储信息
+                    :j = 0
+                    :result_module_type0_Array = ""
+                    While :j < :s
+                        ///每次循环加载一条信息
+                        :result_module_child_type0 = jsonAddItem("", "moduleName", S(:ArrayAllChildEngname[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleTitle", S(:ArrayAllChildName[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleIsOpen", 0)
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "modulePath", S(:ArrayAllChildPath[:j]))
+                        :result_module_type0_Array = jsonAddArrayItem(:result_module_type0_Array, :result_module_child_type0)
+                        :j = :j + 1
+                    EndWhile
+                    ///初始化
+                    :result_module_type = ""
+                    :result_module_type = jsonAddItem(:result_module_type0,"modules",:result_module_type0_Array)
+                    :result_modules_Array = jsonAddArrayItem(:result_modules_Array,:result_module_type)
+                EndIf
+                :i = :i + 1
+            EndWhile
+        EndIf
+    EndIf
+
+    ///如果身份为用户
+    If :classification == 4
+        ///如果父模块中包含子模块
+        ///查询父模块的信息
+        :sql_fatherModule0 = "SELECT ID,NAME,ENGNAME,ICON FROM MODULE_COLUMNS WHERE PARENT_ID = '0' AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '用户') LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+        :result_fatherModule0 = changeRecordSet(:sql_fatherModule0)
+        :q = 0
+        Repeat
+            :ArrayAllFatherId[:q] = ID
+            :ArrayAllFatherName[:q] = NAME
+            :ArrayAllFatherEngname[:q] = ENGNAME
+            :ArrayAllFatherIcon[:q] = ICON
+            :q = :q + 1
+        EndRepeat
+        ///查询结果为ok
+        If :result_fatherModule0 == "ok"
+            ///获取并存储信息
+            :i = 0
+            :result_module_type0 = ""
+            While :i < :q
+                ///每次循环加载一条信息
+                :result_module_type0 = jsonAddItem("", "moduleName", S(:ArrayAllFatherEngname[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleTitle", S(:ArrayAllFatherName[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIcoClass", S(:ArrayAllFatherIcon[:i]))
+                :result_module_type0 = jsonAddItem(:result_module_type0, "moduleIsOpen", 1)
+
+                ///查询子模块
+                :sql_roleModule0 = "SELECT NAME,ENGNAME,PATH FROM MODULE_COLUMNS WHERE PARENT_ID = ? AND (SELECT MODULE_ID FROM MODULE_ROLE WHERE ROLE = '用户')  LIKE CONCAT('%,',ID,'%') ORDER BY SORT ASC"
+                :result_Module0 = changeRecordSet(:sql_roleModule0,S(:ArrayAllFatherId[:i]))
+                :s = 0
+                Repeat
+                    ///存储获取到的信息
+                    :ArrayAllChildName[:s] = NAME
+                    :ArrayAllChildEngname[:s] = ENGNAME
+                    :ArrayAllChildPath[:s] = PATH
+                    :s = :s + 1
+                EndRepeat
+
+                ///查询结果为ok
+                If :result_Module0 == "ok"
+                    ///获取并存储信息
+                    :j = 0
+                    :result_module_type0_Array = ""
+                    While :j < :s
+                        ///每次循环加载一条信息
+                        :result_module_child_type0 = jsonAddItem("", "moduleName", S(:ArrayAllChildEngname[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleTitle", S(:ArrayAllChildName[:j]))
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "moduleIsOpen", 0)
+                        :result_module_child_type0 = jsonAddItem(:result_module_child_type0, "modulePath", S(:ArrayAllChildPath[:j]))
+                        :result_module_type0_Array = jsonAddArrayItem(:result_module_type0_Array, :result_module_child_type0)
+                        :j = :j + 1
+                    EndWhile
+                    ///初始化
+                    :result_module_type = ""
+                    :result_module_type = jsonAddItem(:result_module_type0,"modules",:result_module_type0_Array)
+                    :result_modules_Array = jsonAddArrayItem(:result_modules_Array,:result_module_type)
+                EndIf
+                :i = :i + 1
+            EndWhile
+        EndIf
+    EndIf
+
+    Exit :result_modules_Array
+%>

@@ -1,0 +1,12 @@
+<%
+    :sqlStr="select * from st_passports where login_name=?"
+    :x=changeRecordSet(:sqlStr,S(:login_name))
+    If :x == "bad"
+    :sqlStr="insert into st_passports(id,login_name,passwd,classification,name,number) values(?,?,md5(?),?,?,?)"
+    :x=execSQL(:sqlStr,S(:id),S(:login_name),S(:passwd),S(:classification),S(:name),S(:number))
+    =:x
+    Else
+    :x="rpt"
+    =:x
+    EndIf
+%>

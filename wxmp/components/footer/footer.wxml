@@ -1,0 +1,16 @@
+<view class="outer">
+    <view class="footer">
+        <view class="item">
+            <view class="item-title">研发单位</view>
+            <view class="item-content">武汉大学国家网络安全学院</view>
+        </view>
+        <view class="item">
+            <view class="item-title">技术支持</view>
+            <view class="item-content">武汉意念云科技有限责任公司</view>
+        </view>
+        <view class="item">
+            <view class="item-title"></view>
+            <view class="item-content">武汉樱顶网络安全技术中心</view>
+        </view>
+    </view>
+</view>

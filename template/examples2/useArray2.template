@@ -1,0 +1,23 @@
+<%#include "examples2/userArray2Dao.template"%>
+
+<%
+  :i[0]=5
+  :i[1]=6
+  debugMsg("!!!!!!!!!!!!1======================i0:"+:i[0])
+  :strTableName = "st_passports"
+  debugMsg("========"+arrayLength(&i)+"==============")
+%>
+<html >
+<head>
+<meta charset="UTF-8">
+<title>HTML5的标题</title>
+</head>
+<body>
+结果是：<br />
+<%
+///  =getValueFromTable("name","st_passports","WHRJGC00058939")
+=add("5","7")
+=getValueFromTable("name,gender","st_passports","WHRJGC00058939")
+%>
+</body>
+</html>

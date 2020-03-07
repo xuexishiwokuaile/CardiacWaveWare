@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>心脏高清度电动力学分析系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/login.css" media="all">
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
+
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/jquery.system.whu.plugin.js"></script>
+    <script type="text/javascript" src="../js/login.js"></script>
+
+    <!--    layui基础配置-->
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var Request = new QueryString();
+        var code = Request['code'];
+        var state = Request['state'];
+
+        var objCode = new Array();
+        var processResult = function() {
+          console.log(objCode[0])
+          let transformJson = $.parseJSON(objCode[0])
+          //如果没有结果
+          if(transformJson.result == 0){
+            alert("请您绑定相应的用户名和密码，您的openid为 "+ transformJson.openId)
+            sessionStorage.setItem($.config._local_ADDR_in_session, transformJson.openId);
+          }
+          //登录成功直接进入后台
+          else if(transformJson.result == 1){
+            sessionStorage.setItem('userId', transformJson.userId);
+            sessionStorage.setItem('userToken', transformJson.userToken);
+            sessionStorage.setItem('classification', transformJson.classification);
+            sessionStorage.setItem('userName', transformJson.userName);
+            sessionStorage.setItem('loginName', transformJson.loginName);
+            sessionStorage.setItem('loginId', transformJson.loginId);
+
+            localStorage.setItem('userId',transformJson.userId);
+            localStorage.setItem('userToken',transformJson.userToken);
+            localStorage.setItem('classification',transformJson.classification);
+            localStorage.setItem('loginName',transformJson.loginName);
+
+            _loginPage(transformJson.classification)
+          }
+        }
+        getFromWS('Home/wx/wxAuthorizeReturn.template', 'code='+code+'$^@^$state='+state, objCode, processResult);
+      });
+
+      //初始化layui
+      layui.config({
+        base: '../../layuiadmin/', //静态资源所在路径
+      }).extend({
+        index: 'lib/index', //主入口模块
+      }).use(['index', 'user'], function() {
+        var $ = layui.$, form = layui.form;
+        form.render();
+        //提交
+        form.on('submit(LAY-user-login-submit)', function(obj) {
+          //回调相应的_loginResult修改对应的登录信息
+          login(obj.field.username, obj.field.password, _loginResult);	//登录login
+        });
+      });
+
+    </script>
+</head>
+<body>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>心脏高清度电动力学分析系统</h2>
+            <p>Cardiac HD Electrodynamic Analysis System</p>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username"
+                       for="LAY-user-login-username"></label>
+                <input type="text" name="username" id="LAY-user-login-username" lay-verify="required" placeholder="用户名"
+                       class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"
+                       for="LAY-user-login-password"></label>
+                <input type="password" name="password" id="LAY-user-login-password" lay-verify="required"
+                       placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">绑定帐户</button>
+            </div>
+        </div>
+    </div>
+    <div class="layui-trans layadmin-user-login-footer">
+        <p><a href="http://www.layui.com/" target="_blank">武汉大学开发</a></p>
+    </div>
+</div>
+</body>
+</html>

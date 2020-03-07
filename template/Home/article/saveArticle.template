@@ -1,0 +1,190 @@
+///新增文章
+<%If :operation=="newArticle" %>
+	<%:insertSql = "insert into article(id,article_type,on_top,title,publisher,count,content,pic_id,appendix_id,pics,content_text,on_public,publish_date,modify_date) values(?,?,?,?,?,?,?,?,?,?,?,?,now(),now())"%>
+	<%
+	:count =0;
+	:aid = tuid();
+	:x=changeRecordSet(:insertSql,S(:aid),S(:type),S(:top),S(:title),S(:publisher),S(:count),S(:content),S(:picId),S(:appendixId),S(:picIds),S(:content_text),S(:publics))
+	%>
+	<%Exit(:x)%>
+<%EndIf%>
+
+
+
+///编辑文章的保存方法
+<%If :operation=="editArticle"
+  :selectSql = "select pics from article where id=?"
+  :result=changeRecordSet(:selectSql,S(:id))
+  :picIds_old = pics
+  :updateSql = "update article set title=?,article_type=?, modify_date=now(),pics=?,content=?, content_text=?, pic_id=?, on_top=?, on_public=? where id= ?"
+  If :picIds_old==""
+  	    :x=changeRecordSet(:updateSql,S(:title),S(:type),S(:picIds),S(:content),S(:content_text),S(:picId),:top,:publics,S(:id))
+  Else
+        :x=changeRecordSet(:updateSql,S(:title),S(:type),S(:picIds_old#";"#:picIds),S(:content),S(:content_text),S(:picId),:top,:publics,S(:id))
+  EndIf
+  Exit(:x)
+EndIf%>
+
+
+///上传附件
+<%If :operation=="updateAppendixId"
+	:updateSql = "update article set appendix_id=? where id= ?"
+	:x=changeRecordSet(:updateSql,S(:appendixId),S(:articleId))
+	Exit(:x)
+EndIf%>
+
+
+///获取附件名字
+<% If :operation=="getPicAndAppendixName"
+	If :picId !=0
+		:selectSql = "select filename from uploadedfiles where filetuid=?"
+		:result=changeRecordSet(:selectSql,S(:picId))
+		:index = indexOf(:result,"=")
+		:picName = mid(:result,:index+1)
+	Else
+		:picName = "";
+	EndIf
+	If :appendixId !=""
+		:appendixName="";
+		split(:appendixId,";",&appendixIdArray)
+		:i=0;
+		While :i<arrayLength(&appendixIdArray)
+			:selectSql = "select filename from uploadedfiles where filetuid=?"
+			:result=changeRecordSet(:selectSql,S(:appendixIdArray[:i]))
+			If :appendixName == ""
+				:appendixName = filename
+			Else
+				:appendixName = :appendixName#";"#filename		///将多个附件的名字用；分隔
+			EndIf
+			:i = :i+1
+		EndWhile
+	Else
+		:appendixName = "";
+	EndIf
+	Exit :picName#"|"#:appendixName
+EndIf%>
+
+
+///删除附件
+<%If :operation=="deleteAppendix"
+	:deleteSql = "delete from uploadedfiles  where filetuid= ?"
+	changeRecordSet(:deleteSql,S(:id))
+	///更新article表的appendix_id 字段
+	:selectSql = "select appendix_id from article where id=? "
+	changeRecordSet(:selectSql,S(:articleId))
+  ///此时查出来的appendix_id是一连串，例如11111;22222;3333,先分割
+  :allAppendix_id = appendix_id
+  ///分割
+  split(:allAppendix_id,";",&appendixIdsArray)
+  ///去除已删除的附件id
+	:i=0
+	:newAppendixIds = "";
+  While :i<arrayLength (&appendixIdsArray)
+		If :newAppendixIds == ""
+			If :id != :appendixIdsArray[:i]
+				:newAppendixIds = :appendixIdsArray[:i];
+			EndIf
+		Else
+			If :id != :appendixIdsArray[:i]
+				:newAppendixIds = :newAppendixIds #";"# :appendixIdsArray[:i];
+			EndIf
+		EndIf
+		:i = :i+1
+	EndWhile
+  ///更新到article
+	:updateSql = "update article set appendix_id=?  where id = ?"
+	:x=changeRecordSet(:updateSql,S(:newAppendixIds),S(:articleId))
+	Exit :newAppendixIds
+EndIf%>
+
+<%If :operation=="deletePic"	///删除图片
+	:deleteSql = "delete from uploadedfiles  where filetuid= ?"
+  changeRecordSet(:deleteSql,S(:id))
+	:updateSql = "update article set pic_id=0  where pic_id = ?"
+	:x=changeRecordSet(:deleteSql,S(:id))
+	Exit :x
+EndIf%>
+
+
+///删除文章(单)
+<%If :operation=="deleteArticle"changeRecordSet
+  ///先删除文章里面的图片所在的表
+	:selectSql = "select pics from article where id=?"
+	:result=changeRecordSet(:selectSql,S(:id))
+  :picIds = pics
+	split(:picIds,";",&picIdsArray)
+	:i=0
+	While :i<arrayLength(&picIdsArray)
+		:deletePicSql = "delete from uploadedfiles where filetuid= ?"
+		:x=changeRecordSet(:deletePicSql,S(:picIdsArray[:i]))
+		:i = :i+1
+	EndWhile
+  ///删除附件
+	:selectSql = "select appendix_id from article where id=?"
+	:result=changeRecordSet(:selectSql,S(:id))
+	:appendixIds = appendix_id
+	split(:appendixIds,";",&appendixIdsArray)
+	:i=0
+	While :i<arrayLength(&appendixIdsArray)
+		:deleteAppendixSql = "delete from uploadedfiles  where filetuid= ?"
+		:x=execSQL(:deleteAppendixSql,S(:appendixIdsArray[:i]))
+		:i = :i+1
+	EndWhile
+  ///删除文章
+	:deleteSql = "delete from article  where id= ?"
+	:x=changeRecordSet(:deleteSql,S(:id))
+	Exit(:x)
+EndIf%>
+
+
+///批量复制
+<%If :operation=="bitchCopy"
+	split(:articleIds,",",&articleIdsArray)
+	:i=0
+	debugMsg("=======length===="#arrayLength(&articleIdsArray));
+	While :i<arrayLength(&articleIdsArray)-1
+	    :selectSql = "select id,article_type,on_top,title,publisher,count,content,pic_id,appendix_id,pics,content_text,on_public,publish_date,modify_date from article where id=?"
+	    changeRecordSet(:selectSql, S(:articleIdsArray[:i]))
+	    ///changeRecordSet执行之后，查出来的东西会丢失，先保存起来
+	    :saveOnTop = on_top
+	    :saveTitle = title
+	    debugMsg("==title=="#:saveTitle)
+	    :savePublisher = publisher
+	    :saveCount = count
+	    :saveContent = content
+	    :savePicId = pic_id
+	    :saveAppendixId = appendix_id
+	    :savePics = pics
+	    :saveContentText = content_text
+	    :saveOnPublic = on_public
+      :aid = tuid();
+    :insertSql = "insert into article(id,article_type,on_top,title,publisher,count,content,pic_id,appendix_id,pics,content_text,on_public,publish_date,modify_date) values(?,?,?,?,?,?,?,?,?,?,?,?,now(),now())"
+    :x=changeRecordSet(:insertSql, S(:aid),S(:articleType),S(:saveOnTop),S(:saveTitle),S(:savePublisher),S(:saveCount),S(:saveContent),S(:savePicId),S(:saveAppendixId),S(:savePics),S(:saveContentText)  ,S(:saveOnPublic))
+		:i = :i+1
+	EndWhile
+EndIf%>
+
+
+///批量删除文章
+<%If :operation=="batchDelete"
+	split(:ids,";",&idsArray)
+	:i=0
+	While :i<arrayLength(&idsArray)-1
+		:deleteSql = "delete from article where id= ?"
+		:x=changeRecordSet(:deleteSql,S(:idsArray[:i]))
+		:i = :i+1
+	EndWhile
+	Exit(:x)
+EndIf%>
+
+///批量编辑(移动)
+<%If :operation=="bitchEdit"
+	split(:articleIds,",",&articleIdsArray)
+	:i=0
+	While :i<arrayLength(&articleIdsArray)-1
+		:updateSql = "update article set article_type=? where id=?"
+		:x=execSQL(:updateSql,S(:articleType), S(:articleIdsArray[:i]))
+		:i = :i+1
+	EndWhile
+EndIf%>
+

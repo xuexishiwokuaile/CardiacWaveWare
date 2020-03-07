@@ -1,0 +1,14 @@
+<%
+      :sql_setBloodInfo = "UPDATE medical_record SET blood=? WHERE id=?"
+      :result_sql_setBloodInfo = changeRecordSet(:sql_setBloodInfo,S(:blood),S(:id))
+      ///更新ok或bad：
+      If :result_sql_setBloodInfo == "ok"
+          ///ok
+          =:result_sql_setBloodInfo
+      Else
+          ///bad
+          :result = "bad"
+          =:result
+      EndIf
+
+%>

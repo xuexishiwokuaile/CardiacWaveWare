@@ -1,0 +1,7 @@
+�������е�SVN�ĵ�
+svn co http://192.168.10.64:8433/svn/whu/html_salary html
+
+����ĵ��������ļ�������Ӧ��SVN���й���
+svn add . --no-ignore --force
+
+raml2html api.raml > index.html

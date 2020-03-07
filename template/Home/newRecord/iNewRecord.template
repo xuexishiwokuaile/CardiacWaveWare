@@ -1,0 +1,8 @@
+<%
+  ///插入用户信息
+  :id = tuid()
+  :insertSql = "insert into record(id,rtime,IP,operater,longitude,latitude,operate,address) values(?,?,?,?,?,?,?,?)"
+  :resultRecord = changeRecordSet(:insertSql,S(:id),S(serverDate("yyyy-MM-dd hh:mm:ss")),S(:IP),S(:operater),S(:longitude),S(:latitude),S(:operate),S(:address))
+
+  =:resultRecord
+%>

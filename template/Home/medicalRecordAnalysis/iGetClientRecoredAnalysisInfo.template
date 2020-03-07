@@ -1,0 +1,46 @@
+<%
+    /// 文 件 名：iGetClientRecoredAnalysisInfo
+    /// 描    述：获取某条、某人所有的 medical_record的分析数据（传入medical_record的ID,或clientid）(用一句话描述该文件做什么)
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/5 10:13  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+
+<%
+  debugMsg("[DEBUGMSG]:iGetClientRecoredAnalysisInfo.template 位置:15:"+"传入的MEDICALRECORDID的ID=="+:id+"===CLIENTID="+:clientid)
+  If :id == "__error__" || :id == ""
+      ///没有传入medical_record的ID   说明  查询的是   某个病人的所有历史病例
+      :sql_get_analysis = "SELECT MEDICALRECORDID,TIME,TOTALPEAK,QUANTITATIVEPEAK,DISTRIBUTIONONE,DISTRIBUTIONTWO,DISTRIBUTIONTHREE,DISTRIBUTIONFOUR,DISTRIBUTIONFIVE,DISTRIBUTIONSIX FROM MEDICAL_RECORD_ANALYSIS WHERE CLIENTID = ?"
+      :resultRecord = changeRecordSet(:sql_get_analysis,S(:clientid))
+  Else
+      ///传入medical_record的ID  说明  查询的是  某个病人  一条  记录
+      :sql_get_analysis = "SELECT TIME,TOTALPEAK,QUANTITATIVEPEAK,DISTRIBUTIONONE,DISTRIBUTIONTWO,DISTRIBUTIONTHREE,DISTRIBUTIONFOUR,DISTRIBUTIONFIVE,DISTRIBUTIONSIX FROM MEDICAL_RECORD_ANALYSIS WHERE MEDICALRECORDID = ?"
+      :resultRecord = changeRecordSet(:sql_get_analysis,S(:id))
+  EndIf
+
+  If :resultRecord == "ok"
+      :record_items_array = ""
+      Repeat
+          :record_items = jsonAddItem("", "time", S(TIME))
+          :record_items = jsonAddItem(:record_items, "totalpeak", S(TOTALPEAK))
+          :record_items = jsonAddItem(:record_items, "quantitativepeak", S(QUANTITATIVEPEAK))
+          :record_items = jsonAddItem(:record_items, "distributionone", S(DISTRIBUTIONONE))
+          :record_items = jsonAddItem(:record_items, "distributiontwo", S(DISTRIBUTIONTWO))
+          :record_items = jsonAddItem(:record_items, "distributionthree", S(DISTRIBUTIONTHREE))
+          :record_items = jsonAddItem(:record_items, "distributionfour", S(DISTRIBUTIONFOUR))
+          :record_items = jsonAddItem(:record_items, "distributionfive", S(DISTRIBUTIONFIVE))
+          :record_items = jsonAddItem(:record_items, "distributionsix", S(DISTRIBUTIONSIX))
+          :record_items = jsonAddItem(:record_items, "medical_record_id", S(MEDICALRECORDID))
+          :record_items_array = jsonAddArrayItem(:record_items_array, :record_items)
+      EndRepeat
+      =:record_items_array
+      debugMsg("[DEBUGMSG]:iGetClientRecoredAnalysisInfo.template 位置:41:"+"record_items_array="+:record_items_array)
+  Else
+      ="bad"
+  EndIf
+%>

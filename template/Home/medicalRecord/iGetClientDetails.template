@@ -1,0 +1,41 @@
+<%
+       :sql_clientInfo="SELECT clientName,clientId,hospital,doctorName,checkTime,checkResult,blood,picture FROM medical_record WHERE id=?"
+       :result_clientInfo = changeRecordSet(:sql_clientInfo,S(:id))
+
+       ///medical_record表查询结果ok或bad：
+       If :result_clientInfo == "ok"
+           ///ok
+           :clientId = clientId
+           :result_client_item = jsonAddItem("", "blood", S(blood))
+           :result_client_item = jsonAddItem(:result_client_item, "picture", S(picture))
+           :result_client_item = jsonAddItem(:result_client_item, "checkResult", S(checkResult))
+           :result_client_item = jsonAddItem(:result_client_item, "hospital", S(hospital))
+           :result_client_item = jsonAddItem(:result_client_item, "checkTime", S(checkTime))
+           :result_client_item = jsonAddItem(:result_client_item, "doctorName", S(doctorName))
+           :result_client_item = jsonAddItem(:result_client_item, "clientName", S(clientName))
+
+           :sql_clientDetail = "SELECT smoking,drinking,height,weight,hypertension,diabetes FROM client WHERE id=?"
+           :result_clientDetail = changeRecordSet(:sql_clientDetail,S(:clientId))
+
+           ///client表查询结果ok或bad
+           If :result_clientDetail == "ok"
+               ///ok
+                :result_client_item = jsonAddItem(:result_client_item, "smoking", S(smoking))
+                :result_client_item = jsonAddItem(:result_client_item, "drinking", S(drinking))
+                :result_client_item = jsonAddItem(:result_client_item, "height", S(height))
+                :result_client_item = jsonAddItem(:result_client_item, "weight", S(weight))
+                :result_client_item = jsonAddItem(:result_client_item, "hypertension", S(hypertension))
+                :result_client_item = jsonAddItem(:result_client_item, "diabetes", S(diabetes))
+
+                =:result_client_item
+           Else
+               ///bad
+                :result = "bad"
+                =:result
+           EndIf
+       Else
+           ///bad
+           :result = "bad"
+           =:result
+       EndIf
+%>

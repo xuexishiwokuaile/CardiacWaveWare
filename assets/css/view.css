@@ -1,0 +1,807 @@
+/**
+ * "Yet Another Multicolumn Layout" - YAML CSS Framework
+ *
+ * (en) Horizontal list navigation "hlist"
+ * (de) Horizontale Navigationsliste "hlist"
+ *
+ * @copyright       © 2005-2013, Dirk Jesse
+ * @license         CC-BY 2.0 (http://creativecommons.org/licenses/by/2.0/),
+ *                  YAML-CDL (http://www.yaml.de/license.html)
+ * @link            http://www.yaml.de
+ * @package         yaml
+ * @version         4.1.2
+ */
+@media all {
+  .ym-hlist {
+    /* (en) containing floats in IE */
+    /* (de) Einfassen der Floats im IE */
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    line-height: 1em;
+    background: #222;
+  }
+  .ym-hlist ul {
+    margin: 0;
+    padding: 0.5em 1.5em;
+    display: inline;
+    float: left;
+  }
+  .ym-hlist ul li {
+    display: inline;
+    float: left;
+    font-size: 1.0em;
+    line-height: 1;
+    list-style-type: none;
+    margin: 0 .25em 0 0;
+    padding: 0;
+  }
+  .ym-hlist ul li a, .ym-hlist ul li strong {
+    background: transparent;
+    color: #aaa;
+    display: block;
+    font-size: 1em;
+    line-height: 2em;
+    padding: 0 0.5em;
+    font-weight: normal;
+    text-decoration: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    width: auto;
+  }
+  /*.ym-hlist ul li a:focus,*/
+  /*.ym-hlist ul li a:hover,*/
+  /*.ym-hlist ul li a:active {*/
+    /*color: #ccc;*/
+    /*background: #666;*/
+    /*background: rgba(255, 255, 255, 0.25);*/
+    /*border-radius: 0.2em;*/
+    /*text-decoration: none;*/
+    /*outline: 0 none;*/
+  /*}*/
+  .ym-hlist ul li.active {
+    background: #666;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 0.2em;
+    color: #fff;
+  }
+  /*.ym-hlist ul li.active strong,*/
+  /*.ym-hlist ul li.active a:focus,*/
+  /*.ym-hlist ul li.active a:hover,*/
+  /*.ym-hlist ul li.active a:active {*/
+    /*background: transparent;*/
+    /*color: #fff;*/
+    /*text-decoration: none;*/
+  /*}*/
+
+  /* ------- search form -------- */
+  .ym-searchform {
+    float: right;
+    display: inline;
+    line-height: 2;
+    padding: 0.5em 1.5em;
+  }
+  .ym-searchform .ym-searchfield {
+    -webkit-appearance: none;
+    background: #fff;
+    line-height: 1;
+    padding: 0.25em;
+    width: 12em;
+    border: solid 1px #888;
+    border: solid 1px rgba(255, 255, 255, 0.1);
+    outline: none;
+    -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  .ym-searchform .ym-searchbutton {
+    -webkit-appearance: none;
+    background: #5f5f5f;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: .2em;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1em;
+    line-height: 1.25;
+    padding: 0.25em;
+    border: solid 1px transparent;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/**
+ * "Yet Another Multicolumn Layout" - YAML CSS Framework
+ *
+ * default screen stylesheet - PAGE-layout type layout
+ *
+ * @copyright       © 2005-2013, Dirk Jesse
+ * @license         CC-BY 2.0 (http://creativecommons.org/licenses/by/2.0/),
+ *                  YAML-CDL (http://www.yaml.de/license.html)
+ * @link            http://www.yaml.de
+ * @package         yaml
+ * @version         4.1.2
+ */
+@media screen {
+  /* force vertical scrollbar */
+  body {
+    overflow-y: scroll;
+  }
+
+  /* Layout Module Configuration & fallback for unsupported media queries */
+  .ym-wrapper {
+    min-width: 760px;
+    max-width: 80em;
+    margin: 0 auto;
+  }
+
+  .ym-wbox {
+    padding: 10px;
+  }
+
+  /* Basic Element Styling */
+  header {
+    background: #444;
+    color: #ccc;
+    padding: 1.5em;
+  }
+  header h1 {
+    background: transparent;
+    color: #fff;
+  }
+
+  nav {
+    background: #222222;
+  }
+
+  main {
+    padding: 1.5em 0 0 0;
+  }
+
+  footer {
+    margin: 0;
+    background: #eee;
+    color: #444;
+    padding: 1.5em;
+  }
+  footer p {
+    margin: 0;
+  }
+
+  /* Column-Set Configuration: 1-3 (sidebar right) */
+  .ym-column {
+    display: block;
+    overflow: hidden;
+    width: auto;
+  }
+
+  /* content - column */
+  .ym-col1 {
+    float: left;
+    width: 100%;
+  }
+
+  /* sidebar - column */
+  .ym-col3 {
+    position: relative;
+    float: left;
+    width: 340px;
+    margin-left: 0;
+    margin-right: -340px;
+  }
+
+  .ym-col1 .ym-cbox {
+    padding: 0 0.75em 0 1.5em;
+  }
+
+  .ym-col3 .ym-cbox {
+    padding: 0 20px 0 12px;
+  }
+
+  .ym-gbox {
+    padding: 0 1.5em 0 0;
+  }
+
+  /* skip links styling */
+  .ym-skiplinks a.ym-skip:focus,
+  .ym-skiplinks a.ym-skip:active {
+    color: #fff;
+    background: #333;
+    border-bottom: 1px #000 solid;
+    padding: 10px 0;
+    text-align: center;
+    text-decoration: none;
+  }
+}
+/* reset fallback values in modern browsers */
+@media screen and (min-width: 0px) {
+  .ym-wrapper {
+    min-width: 0px;
+  }
+}
+@media screen and (max-width: 760px) {
+  .ym-wbox h1{
+    line-height: 54px;
+  }
+
+  .ym-column h3{
+    line-height: 32px;
+  }
+  .ym-column center{
+    line-height: 32px;
+  }
+
+  /* Linearisation for Grid- and Column-Module, based on CSS class .linearize-level-1 */
+  .linearize-level-1, .linearize-level-1 > [class*="ym-c"], .linearize-level-1 > [class*="ym-g"] {
+    /* linearization for grids and columns module */
+    display: block;
+    float: none;
+    padding: 0;
+    margin: 0;
+    width: auto !important;
+  }
+  .linearize-level-1 > [class*="ym-c"] > [class*="ym-cbox"], .linearize-level-1 > [class*="ym-g"] > [class*="ym-gbox"] {
+    /* reset defined gutter values */
+    margin: 0;
+    padding: 0;
+    /* optional for containing floats */
+    overflow: hidden;
+  }
+
+  nav .ym-hlist ul {
+    padding-right: 10px;
+  }
+
+  .ym-searchform {
+    display: block;
+    float: none;
+    width: auto;
+    padding-right: 10px;
+    text-align: right;
+  }
+
+  .ym-searchform input[type="search"] {
+    width: 14%;
+  }
+}
+@media screen and (max-width: 480px) {
+  .ym-wbox h1{
+    line-height: 32px;
+  }
+
+  .ym-wbox {
+    padding: 0;
+  }
+
+  header {
+    padding: 0.75em 10px;
+  }
+  header h1 {
+    font-size: 1.5em;
+    line-height: 1em;
+    margin: 0;
+  }
+
+  footer,
+  main,
+  .ym-searchform,
+  nav .ym-hlist ul {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Linearisation for Grid- and Column-Module, based on CSS class .linearize-level-2 */
+  .linearize-level-2, .linearize-level-2 > [class*="ym-c"], .linearize-level-2 > [class*="ym-g"] {
+    /* linearization for grids and columns module */
+    display: block;
+    float: none;
+    padding: 0;
+    margin: 0;
+    width: auto !important;
+  }
+  .linearize-level-2 > [class*="ym-c"] > [class*="ym-cbox"], .linearize-level-2 > [class*="ym-g"] > [class*="ym-gbox"] {
+    /* reset defined gutter values */
+    margin: 0;
+    padding: 0;
+    /* optional for containing floats */
+    overflow: hidden;
+  }
+
+  .ym-searchform,
+  nav .ym-hlist ul,
+  nav .ym-hlist li {
+    display: block;
+    float: none;
+    width: auto;
+    text-align: left;
+  }
+
+  .ym-searchform input[type="search"] {
+    width: 75%;
+  }
+}
+
+/**
+ * "Yet Another Multicolumn Layout" - YAML CSS Framework
+ *
+ * (en) Uniform design of standard content elements
+ * (de) Einheitliche Standardformatierungen für die wichtigten Inhalts-Elemente
+ *
+ * @copyright       © 2005-2013, Dirk Jesse
+ * @license         CC-BY 2.0 (http://creativecommons.org/licenses/by/2.0/),
+ *                  YAML-CDL (http://www.yaml.de/license.html)
+ * @link            http://www.yaml.de
+ * @package         yaml
+ * @version         4.1.2
+ */
+@media all {
+  /*
+  * @section global typography settings
+  *
+  * vertical rhythm settings (based on em-unit)
+  * -------------------------------------------
+  * basefont-size:  14px (87.5%)
+  * line-height  :  21px (factor: 1.5) */
+  /* (en) reset font size for all elements to standard (16 Pixel) */
+  /* (de) Alle Schriftgrößen auf Standardgröße (16 Pixel) zurücksetzen */
+  html * {
+    font-size: 100%;
+  }
+
+  /**
+  * (en) reset monospaced elements to font size 16px in all browsers
+  * (de) Schriftgröße von monospaced Elemente in allen Browsern auf 16 Pixel setzen
+  *
+  * @see: http://webkit.org/blog/67/strange-medium/
+  */
+  textarea,
+  pre,
+  code,
+  kbd,
+  samp,
+  var,
+  tt {
+    font-family: Consolas, "Lucida Console", "Andale Mono", "Bitstream Vera Sans Mono", "Courier New", Courier;
+  }
+
+  /* font-size: 14px; */
+  body {
+    font-family: "Droid Serif", Georgia, "Times New Roman", Times, serif;
+    font-size: 87.5%;
+    color: #444444;
+  }
+
+  /*--- Headings | Überschriften ------------------------------------------------------------------------*/
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Droid Sans", Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    color: #161e21;
+    margin: 0;
+  }
+
+  h1 {
+    /* font-size: 48px; */
+    font-size: 342.85714%;
+    line-height: 0.875;
+    margin: 0 0 0.4375em 0;
+  }
+
+  h2 {
+    /* font-size: 32px; */
+    font-size: 228.57143%;
+    line-height: 1.3125;
+    margin: 0 0 0.65625em 0;
+  }
+
+  h3 {
+    /* font-size: 24px; */
+    font-size: 171.42857%;
+    line-height: 0.875;
+    margin: 0 0 0.875em 0;
+  }
+
+  h4 {
+    /* font-size: 21px; */
+    font-size: 150%;
+    line-height: 1;
+    margin: 0 0 1em 0;
+  }
+
+  h5 {
+    /* font-size: 18px; */
+    font-size: 128.57143%;
+    line-height: 1.16667;
+    margin: 0 0 1.16667em 0;
+  }
+
+  h6 {
+    /* font-size: 14px; */
+    font-size: 100%;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0 0 1.5em 0;
+  }
+
+  /* --- Lists | Listen  -------------------------------------------------------------------------------- */
+  ul,
+  ol,
+  dl {
+    font-size: 100%;
+    line-height: 1.5;
+    margin: 0 0 1.5em 0;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul ul {
+    list-style-type: circle;
+    margin-top: 0;
+  }
+
+  ol ol {
+    list-style-type: lower-latin;
+    margin-top: 0;
+  }
+
+  ol ul {
+    list-style-type: circle;
+    margin-top: 0;
+  }
+
+  li {
+    font-size: 100%;
+    line-height: 1.5;
+    margin-left: 1.2em;
+  }
+
+  dt {
+    font-weight: bold;
+  }
+
+  dd {
+    margin: 0 0 1.5em 0.8em;
+  }
+
+  /* --- general text formatting | Allgemeine Textauszeichnung ------------------------------------------ */
+  p {
+    font-size: 100%;
+    line-height: 1.5;
+    margin: 0 0 1.5em 0;
+  }
+
+  blockquote,
+  cite,
+  q {
+    font-family: "Droid Serif", Georgia, "Times New Roman", Times, serif;
+    font-style: italic;
+  }
+
+  blockquote {
+    background: transparent;
+    color: #666666;
+    margin: 1.5em 0 0 1.5em;
+  }
+
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  big {
+    /* font-size: 16px; */
+    font-size: 114.28571%;
+    line-height: 1.3125;
+  }
+
+  small {
+    /* font-size: 12px; */
+    font-size: 85.71429%;
+    line-height: 1.75;
+  }
+
+  pre,
+  code,
+  kbd,
+  tt,
+  samp,
+  var {
+    font-size: 100%;
+  }
+
+  pre {
+    font-size: 100%;
+    line-height: 1.5;
+    margin: 0 0 1.5em 0;
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  pre,
+  code {
+    color: #880000;
+  }
+
+  kbd,
+  samp,
+  var,
+  tt {
+    color: #666666;
+    font-weight: bold;
+  }
+
+  var,
+  dfn {
+    font-style: italic;
+  }
+
+  acronym,
+  abbr {
+    border-bottom: 1px #aaa dotted;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    cursor: help;
+  }
+
+  sub,
+  sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+
+  sup {
+    top: -0.5em;
+  }
+
+  sub {
+    bottom: -0.25em;
+  }
+
+  mark {
+    background: yellow;
+    color: black;
+  }
+
+  hr {
+    color: #fff;
+    background: transparent;
+    margin: 0 0 0.75em 0;
+    padding: 0 0 0.67857em 0;
+    border: 0;
+    border-bottom: 1px #eeeeee solid;
+  }
+
+  /*--- Links ----------------------------------------------------------------------------------------- */
+  a {
+    /*#4d87c7*/
+    color: black;
+    background: transparent;
+    text-decoration: none;
+  }
+
+  a:active {
+    outline: none;
+  }
+
+  /* (en) maximum constrast for tab focus - change with great care */
+  /* (en) Maximaler Kontrast für Tab Focus - Ändern Sie diese Regel mit Bedacht */
+  a:hover,
+  a:focus {
+    color: #4d87c7;
+    text-decoration: none;
+  }
+
+  /* --- images ------------------ */
+  img,
+  figure {
+    margin: 0;
+  }
+
+  .flexible {
+    margin-bottom: 1.5em;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* IE6 workaround - 2% space for possible borders */
+  * html .flexible {
+    width: 98%;
+  }
+
+  .bordered {
+    margin-bottom: 1.5em;
+    border: 2px #eee solid;
+    border: 2px white solid;
+    -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+  }
+
+  /**
+  * ----------------------------------------------------------------------- #
+  *
+  * Generic Content Classes
+  *
+  * (en) standard classes for positioning and highlighting
+  * (de) Standardklassen zur Positionierung und Hervorhebung
+  *
+  * @section content-generic-classes
+  */
+  .highlight {
+    color: #cc3300;
+  }
+
+  .dimmed {
+    color: #888888;
+  }
+
+  .box {
+    border-radius: 0.3em;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #888;
+    border-color: rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2);
+    color: #444;
+    color: rgba(0, 0, 0, 0.8);
+    padding: 1.42857em;
+    margin: 0 0 1.5em 0;
+  }
+  .box > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .label {
+    font-family: Verdana, Geneva, sans-serif;
+    padding: 1px 6px 2px;
+    display: inline-block;
+    vertical-align: middle;
+    letter-spacing: normal;
+    white-space: nowrap;
+    border-radius: 3px;
+    background: #06C;
+    color: #fff;
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .info {
+    background: #f4f4f4;
+  }
+
+  .success {
+    background: #88cc88;
+  }
+
+  .warning {
+    background: #cccc88;
+  }
+
+  .error {
+    background: #cc8888;
+  }
+
+  .float-left {
+    float: left;
+    display: inline;
+    margin: 0 1em 1.5em 0;
+  }
+
+  .float-right {
+    float: right;
+    display: inline;
+    margin: 0 0 1.5em 1em;
+  }
+
+  .center {
+    display: block;
+    text-align: center;
+    margin: 0 auto 1.5em auto;
+  }
+
+  /**
+  * ------------------------------------------------------------------------------------------------- #
+  *
+  * Tables | Tabellen
+  *
+  * (en) Generic classes for table-width and design definition
+  * (de) Generische Klassen für die Tabellenbreite und Gestaltungsvorschriften für Tabellen
+  *
+  * @section content-tables
+  */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #444444;
+    border-top: 1px #ccc solid;
+    border-bottom: 1px #ccc solid;
+    margin: 0 0 1.35714em 0;
+  }
+  table.narrow {
+    margin: 0 0 1.42857em 0;
+  }
+  table.narrow th,
+  table.narrow td {
+    padding: 0 0.5em;
+    line-height: 1.42857;
+  }
+  table.fixed {
+    table-layout: fixed;
+  }
+  table.bordertable {
+    border: 1px #ccc solid;
+  }
+  table.bordertable thead th {
+    background: #e0e0e0;
+    border-right: 1px #ccc solid;
+    border-bottom: 1px #ccc solid;
+  }
+  table.bordertable tbody th[scope="row"] {
+    background: #f0f0f0;
+  }
+  table.bordertable tbody th {
+    border-right: 1px solid #ccc;
+  }
+  table.bordertable tbody td {
+    border-right: 1px solid #ccc;
+  }
+
+  caption {
+    font-variant: small-caps;
+  }
+
+  th,
+  td {
+    line-height: 1.5em;
+    vertical-align: top;
+    padding: 0.71429em 0.5em;
+  }
+
+  th *:first-child,
+  td *:first-child {
+    margin-top: 0;
+  }
+
+  th.nowrap,
+  td.nowrap {
+    white-space: nowrap;
+  }
+
+  thead th {
+    text-align: left;
+    color: #000;
+    border-bottom: 2px #000 solid;
+  }
+
+  tbody {
+    /* highlight row on mouse over */
+  }
+  tbody th {
+    text-align: left;
+    border-top: 1px solid #ccc;
+  }
+  tbody td {
+    text-align: left;
+    border-top: 1px solid #ccc;
+  }
+  /*tbody tr:hover th,*/
+  /*tbody tr:hover td {*/
+    /*background: #f8f8f8;*/
+  /*}*/
+}

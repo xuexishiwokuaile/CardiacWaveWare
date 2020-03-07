@@ -1,0 +1,21 @@
+<%	debugMsg("-----++++++++++-------------------"#S(:account)) %>
+/// 数据清洗 e.g. staff@example.com 接收过来会变成 staff%40example.com,
+<%:clean_account=replace(:account,"%40","@")%>
+<%:selectSql = "select id,head_portrait,nickname,email,banner_url from mooc_userprofile where email=? " %>
+<%
+
+    :x=changeRecordSet(:selectSql,S(:clean_account))
+    If :x == "ok"
+        :banner_url="my.html?id="#id
+        :k =jsonAddItem("","userId",id)
+        :k =jsonAddItem(:k,"displayName",S(nickname))
+        :k =jsonAddItem(:k,"email",S(email))
+        :k =jsonAddItem(:k,"picImg",S(head_portrait))
+        :k =jsonAddItem(:k,"bannerUrl",S(:banner_url))
+        debugMsg("-------"#:k)
+    Else
+        Exit
+    EndIf
+%>
+<%=:k%>
+

@@ -1,0 +1,15 @@
+<%
+    :sql_deleteMedicalRecord="DELETE FROM medical_record WHERE id=?"
+    ///:result_deleteMedicalRecord = execSQL(:sql_deleteMedicalRecord,S(:id))
+    /// debugMsg(":result_deleteMedicalRecord=============="#:result_deleteMedicalRecord)
+
+   :result_deleteMedicalRecord = changeRecordSet(:sql_deleteMedicalRecord,S(:id))
+   :recordNum = recordCount()
+
+    ///返回json字符串格式的结果
+   :result = ""
+   :result = jsonAddArrayItem(:result_deleteMedicalRecord , :result)
+
+    =:result
+
+%>

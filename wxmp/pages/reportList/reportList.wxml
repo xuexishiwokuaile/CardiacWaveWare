@@ -1,0 +1,31 @@
+<view class="page"> 
+    <view class="btn-and-search"> 
+        <view class="btns">
+            <view class="check btns-bg" bind:tap="switchCheck">
+                <text class="btns-text">未检查</text>
+            </view>
+            <view class="checked btns-bg" bind:tap="switchCheck">
+                <text class="btns-text">已检查</text>
+            </view>
+        </view>
+        <view class="search">
+            <wux-search-bar clear bind:confirm="search" bind:cancel="cancel" bind:clear="cancel" />
+        </view>
+    </view>
+    <view class="page__bd">
+        <!-- 未检查 -->
+        <wux-cell-group wx:for="{{ items }}" wx:key="" wx:if="{{!isChecked}}">
+            <wux-cell title="{{item.clientName}}" is-link label2="{{item.checkTime}}" label="{{item.number}}" openType="navigateTo" url="#"></wux-cell>
+        </wux-cell-group>
+        <!-- 已检查 -->
+        <wux-cell-group wx:for="{{ items }}" wx:key="" wx:if="{{isChecked}}">
+            <wux-cell title="{{item.clientName}}" is-link label2="{{item.checkTime}}" label="{{item.number}}" openType="navigateTo" url="/pages/report/report?id={{item.id}}&&clientid={{item.clientId}}&&clientName={{item.clientName}}"></wux-cell>
+        </wux-cell-group>
+        <!-- 是否到达底部 -->
+        <wux-divider wx:if="{{isBottom}}">
+            <view class="loadmore">
+                <text class="text">到底啦</text>
+            </view>
+        </wux-divider>
+    </view>
+</view>

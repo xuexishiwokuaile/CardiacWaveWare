@@ -1,0 +1,56 @@
+<%
+    /// 文 件 名：wxAuthorizeReturn.template
+    /// 描    述：授权返回对应的结果(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/30 0030 0:07  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+    ///加入相应的系统设置对应的系统信息
+    #include "common/config.template"
+%>
+<%#include "common/commonFunction.template"%>
+<%
+ debugMsg("[DEBUGMSG]:wxAuthorizeReturn.template 位置:13:"+"换取回来的code:"+:code+"换取相应的state:"+:state)
+
+ :txt = executeRemoteService("api.weixin.qq.com","sns/oauth2/access_token?appid="+:_USER_WEIXIN_GZ_APP_appID+"&secret="+:_USER_WEIXIN_GZ_APP_appsecret+"&code="+:code+"&grant_type=authorization_code","",443,"https")
+  /// debugMsg("[DEBUGMSG]:wxAuthorizeReturn.template 位置:17:"+"https://api.weixin.qq.com/sns/oauth2/access_token?appid="+:_USER_WEIXIN_GZ_APP_appID+"&secret="+:_USER_WEIXIN_GZ_APP_appsecret+"&code="+:code+"&grant_type=authorization_code")
+  :openId = JSON_GetObjectItem(:txt, "openid")
+
+  :sql = "SELECT login_name,passwd FROM ST_PASSPORTS WHERE openid=?"
+  :resultRecord = changeRecordSet(:sql,S(:openId))
+  ///如果recordNum == 0 证明没有结果，需要重新录入
+  :recordNum = recordCount()
+
+  ///组装相应的返回的json结果
+  :result_records_item = jsonAddItem("", "openId", S(:openId))
+  :result_records_item = jsonAddItem(:result_records_item, "recordNum", S(:recordNum))
+
+  ///=login_name
+  If :recordNum == 1
+      Repeat
+          ///循环主体
+          :text = executeRemoteService("wave.zoolina.cn","CoreService/login","loginName="+login_name+"$^@^$passwd="+passwd,443,"https")
+         ///获取到对应的信息
+          :result_records_item = jsonAddItem(:result_records_item, "result", 1)
+          :result_records_item = jsonAddItem(:result_records_item, "userId", S(getSplitPart2ReturnResutl(:text, 0)))
+          ///因为usertoken当中信含有对应的=传统方法无法分隔，所以用了特殊方法
+          :strUserTokenSrc = getSplitPart(:text, "$_@_$",1)
+          :strUserTokenTarget = replace(:strUserTokenSrc, "userToken=", "")
+          :result_records_item = jsonAddItem(:result_records_item, "userToken", S(:strUserTokenTarget))
+
+          :result_records_item = jsonAddItem(:result_records_item, "loginName", S(getSplitPart2ReturnResutl(:text, 2)))
+          :result_records_item = jsonAddItem(:result_records_item, "classification", S(getSplitPart2ReturnResutl(:text, 3)))
+          :result_records_item = jsonAddItem(:result_records_item, "userName", S(getSplitPart2ReturnResutl(:text, 4)))
+          :result_records_item = jsonAddItem(:result_records_item, "loginId", S(getSplitPart2ReturnResutl(:text, 5)))
+
+      EndRepeat
+  Else
+      :result_records_item = jsonAddItem(:result_records_item, "result", 0)
+  EndIf
+
+  Exit :result_records_item
+%>

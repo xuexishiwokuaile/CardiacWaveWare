@@ -1,0 +1,12 @@
+<%
+    ///生成病历id
+    :medicalRecordId = tui1d()
+
+debugMsg("medicalRecordId=================="#:medicalRecordId)
+
+    :sql_saveMedicalRecord="INSERT INTO medical_record(id,clientId,clientName,hospital,doctorName,checkTime,testResult) VALUES (?,?,?,?,?,?,?)"
+    :result_saveMedicalRecord=changeRecordSet(:sql_saveMedicalRecord,S(:medicalRecordId),S(:clientId),S(:clientName),S(:hospital),S(:doctorName),S(:testTime),S(:testResult))
+    :recordNum = recordCount()
+
+    =:result_saveMedicalRecord
+%>

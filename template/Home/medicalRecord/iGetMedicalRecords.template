@@ -1,0 +1,87 @@
+<%
+      ///和原来的程序进行兼容，如果没有输入isUpdate的话就进行默认展示相应的内容
+      If :isChecked=="__error__"
+          :isChecked="false"
+      EndIf
+      ///默认的当前人员为医院角色
+      If :classification=="__error__"
+         :classification=2
+      EndIf
+      ///如果没有关键词，哪么默认就是空
+      If :keyword=="__error__"
+          :keyword = ""
+      EndIf
+
+      debugMsg("================================"+S("%"+:keyword+"%"))
+
+      ///计算相应的启始页码
+      :start = :page * :number_per_page
+
+      debugMsg("isChecked"+:isChecked)
+
+      debugMsg("[DEBUGMSG]:iGetMedicalRecords.template 位置:22:"+"开始操作前的参数为：isChecked="+:isChecked+"==classification="+:classification+"==keyword="+:keyword+"==:start="+:start)
+
+      ///如果当前人员是医院用户的话
+      If :classification == 2
+          ///计算共有多少条数据
+          :sql_medicalRecordsTotal = "SELECT id total FROM medical_record WHERE hospital=? AND isChecked=? AND (clientName LIKE ? OR number LIKE ?)"
+          :totalSql = changeRecordSet(:sql_medicalRecordsTotal,S(:hospital),S(:isChecked), S("%"+:keyword+"%"), S("%"+:keyword+"%"))
+          :totalItems = recordCount();
+
+          :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,blood,number,isUpdate,isChecked,waveformid,wavefilterid,wavedataid,waveviewid FROM medical_record WHERE hospital=? AND isChecked=? AND (clientName LIKE ? OR number LIKE ?) ORDER BY id DESC LIMIT ?,? "
+          :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:hospital),S(:isChecked),S("%"+:keyword+"%"), S("%"+:keyword+"%"),S(:start),S(:number_per_page))
+      EndIf
+      ///如果是普通检查人员的话只显示自己的信息
+      If :classification == 3
+          ///计算共有多少条数据
+         :sql_medicalRecordsTotal = "SELECT id FROM medical_record WHERE isChecked=? AND clientid=? AND (clientName LIKE ? OR number LIKE ?)"
+         :totalSql = changeRecordSet(:sql_medicalRecordsTotal,S(:isChecked),S(:clientid), S("%"+:keyword+"%"), S("%"+:keyword+"%"))
+         :totalItems = recordCount()
+         :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,blood,number,isUpdate,isChecked,waveformid,wavefilterid,wavedataid,waveviewid FROM medical_record WHERE isChecked=? AND clientid=? AND (clientName LIKE ? OR number LIKE ?) ORDER BY id DESC LIMIT ?,? "
+         :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:isChecked),S(:clientid), S("%"+:keyword+"%"), S("%"+:keyword+"%"),S(:start),S(:number_per_page))
+      EndIf
+      ///如果是管理员就显示所有人员的信息
+      If :classification == 1
+          ///计算共有多少条数据
+         :sql_medicalRecordsTotal= "SELECT id FROM medical_record WHERE isChecked=? AND (clientName LIKE ? OR number LIKE ?)"
+         :totalSql = changeRecordSet(:sql_medicalRecordsTotal,S(:isChecked),S("%"+:keyword+"%"), S("%"+:keyword+"%"))
+         :totalItems = recordCount()
+
+         :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,blood,number,isUpdate,isChecked,waveformid,wavefilterid,wavedataid,waveviewid FROM medical_record WHERE isChecked=? AND (clientName LIKE ? OR number LIKE ?) ORDER BY id DESC LIMIT ?,? "
+         :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:isChecked), S("%"+:keyword+"%"), S("%"+:keyword+"%"),S(:start),S(:number_per_page))
+      EndIf
+
+      debugMsg("result_medicalRecords"+:result_medicalRecords)
+
+       ///查询结果ok或bad：
+       If :result_medicalRecords == "ok"
+           ///ok
+           Repeat
+                ///每次循环存入一条病历信息
+                :result_records_item = jsonAddItem("", "blood", S(blood))
+                :result_records_item = jsonAddItem(:result_records_item, "checkResult", S(checkResult))
+                :result_records_item = jsonAddItem(:result_records_item, "checkTime", S(checkTime))
+                :result_records_item = jsonAddItem(:result_records_item, "doctorId", S(doctorId))
+                :result_records_item = jsonAddItem(:result_records_item, "doctorName", S(doctorName))
+                :result_records_item = jsonAddItem(:result_records_item, "clientId", S(clientId))
+                :result_records_item = jsonAddItem(:result_records_item, "clientName", S(clientName))
+                :result_records_item = jsonAddItem(:result_records_item, "id", S(id))
+                :result_records_item = jsonAddItem(:result_records_item, "number", S(number))
+                :result_records_item = jsonAddItem(:result_records_item, "isUpdate", S(isUpdate))
+                :result_records_item = jsonAddItem(:result_records_item, "isChecked", S(isChecked))
+                :result_records_item = jsonAddItem(:result_records_item, "waveformid", S(waveformid))
+                :result_records_item = jsonAddItem(:result_records_item, "wavefilterid", S(wavefilterid))
+                :result_records_item = jsonAddItem(:result_records_item, "wavedataid", S(wavedataid))
+                :result_records_item = jsonAddItem(:result_records_item, "waveviewid", S(waveviewid))
+                :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+            EndRepeat
+
+            :result_records_items = jsonAddItem("", "data", :result_records_array)
+            :result_records_items = jsonAddItem(:result_records_items, "totalItems", :totalItems)
+            =:result_records_items
+       Else
+           ///bad
+           :result = "bad"
+           =:result
+       EndIf
+%>

@@ -1,0 +1,1 @@
+<web-view src="{{baseUrl}}pages/home/medicalRecord/report.html?medicalRecordId={{reportId}}"></web-view>

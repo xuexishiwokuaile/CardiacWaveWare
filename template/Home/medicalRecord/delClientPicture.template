@@ -1,0 +1,29 @@
+<%
+    /// 文 件 名：delClientPicture
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/9 0:07  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+    debugMsg("[DEBUGMSG]:delClientPicture.template 位置:13:"+"picture======="+:picture+"id============="+:id)
+    :sql_picture = "SELECT picture FROM medical_record WHERE id =  ?"
+    :idCheck = changeRecordSet(:sql_picture,S(:id))
+    debugMsg("[DEBUGMSG]:delClientPicture.template 位置:17:"+"idCheck==================="+:idCheck+",picture:"+picture)
+    If :idCheck == "ok"
+        ////11111,22222,3333,   id=3333
+        :pic_del = replace(picture,:picture,"")
+        debugMsg("[DEBUGMSG]:delClientPicture.template 位置:23:"+"pic_del======"+:pic_del+"==========="+"picture======="+picture)
+
+        :deleteClient_sql = "UPDATE medical_record SET picture = ? WHERE id = ?"
+        = execSQL(:deleteClient_sql,S(:pic_del),S(:id))
+
+    EndIf
+    If :idCheck == "bad"
+        = "上传失败"
+    EndIf
+%>

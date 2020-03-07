@@ -1,0 +1,151 @@
+<view class="outer">
+    <view class="user-info-header">
+        <!-- <view class="user-logo">  -->
+            <!-- <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" /> -->
+            <open-data type="userAvatarUrl" class="user-avatar" /> 
+        <!-- </view> -->
+        <view class="id-status">
+            <view class="user-id">注册编号：{{id}}</view> 
+            <view class="user-status">已购设备用户</view>
+        </view>
+        <view class="purchase-history"><text class="purchase-history-text">购买历史</text></view>
+    </view>
+    <view class="hr"></view>
+    <view class="user-info">
+        <view class="info-btns">
+            <view class="info-btn" bind:tap="editorInfo">
+                <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/modifyInfo.png" />
+                <view class="btn-text">修改信息</view>
+            </view>
+            <view class="info-btn">
+                <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/myReport.png" />
+                <view class="btn-text">我的报告</view>
+            </view>
+            <view class="info-btn">
+                <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/myUser.png" />
+                <view class="btn-text">我的用户</view>
+            </view>
+        </view>
+        <view class="form-items">
+            <view class="form-item" wx:if="{{classification != 2}}">
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">姓&nbsp;&nbsp;&nbsp;&nbsp;名:</text>
+                    </view>
+                    <view class="name-input">
+                        <input placeholder-class="placeholder-text" value="{{name}}" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+                <view class="item alignment-control"  wx:if="{{classification == 3}}">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">性&nbsp;&nbsp;&nbsp;别:</text>
+                    </view>
+                    <view class="sex-input">
+                        <input value="{{gender}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="form-item">
+                <view class="item" wx:if="{{classification == 3 || classification == 2}}">
+                    <view>
+                        <text class="form-item-title">手机号:</text>
+                    </view>
+                    <view class="tel-input"> 
+                        <input value="{{phone}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+                <view class="item alignment-control" wx:if="{{classification != 2 && classification != 1}}">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">年&nbsp;&nbsp;&nbsp;龄:</text>
+                    </view>
+                    <view class="age-input">
+                        <input value="{{age}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="form-item" wx:if="{{classification == 3 && !isDisabled}}">
+                <view class="item">
+                    <view>
+                        <text class="form-item-title">验证码:</text>
+                    </view>
+                    <view class="code">
+                        <view class="code-input">
+                            <input placeholder="验证码" placeholder-class="placeholder-text" /> 
+                        </view>
+                        <view>
+                            <text class="get-code-btn">获取验证码</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            <view class="form-item" wx:if="{{classification == 2 || classification == 4}}"> 
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">机&nbsp;&nbsp;&nbsp;&nbsp;构:</text>
+                    </view>
+                    <view class="agency-input">
+                        <input placeholder="武汉大学国家网路安全学院" placeholder-class="placeholder-text" value="{{depart}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="form-item"  wx:if="{{classification == 3}}">
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">身&nbsp;&nbsp;&nbsp;&nbsp;高:</text>
+                    </view>
+                    <view class="height-input">
+                        <input value="{{height}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+                <view class="item alignment-control">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">体&nbsp;&nbsp;&nbsp;重:</text>
+                    </view>
+                    <view class="weight-input">
+                        <input value="{{weight}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="form-item" wx:if="{{classification == 3}}">
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">吸&nbsp;&nbsp;&nbsp;&nbsp;烟:</text>
+                    </view>
+                    <view class="smoke-input">
+                        <input value="{{smoking}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+                <view class="item alignment-control">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">饮&nbsp;&nbsp;&nbsp;酒:</text>
+                    </view>
+                    <view class="drink-input">
+                        <input value="{{drinking}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="form-item" wx:if="{{classification == 3}}">
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">糖尿病:</text>
+                    </view>
+                    <view class="diabetes-input">
+                        <input value="{{diabetes}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+                <view class="item">
+                    <view>
+                        <text class="form-item-title two-text" decode="{{true}}">高血压:</text>
+                    </view>
+                    <view class="hypertension-input">
+                        <input value="{{hypertension}}" placeholder-class="placeholder-text" disabled="{{isDisabled}}" />
+                    </view>
+                </view>
+            </view>
+            <view class="btn-area">
+                <button form-type="submit" wx:if="{{isDisabled == false}}">修改</button>
+                <button form-type="submit" class="btn-exit" wx:if="{{isDoctor == 1 || isDoctor == 2}}" bind:tap="userExit">退出</button> 
+            </view>
+        </view>
+    </view>
+</view>

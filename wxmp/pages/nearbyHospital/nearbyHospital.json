@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "header-cmp": "/components/header/header",
+    "wux-button": "/components/dist/button/index",
+    "wux-cell-group": "/components/dist/cell-group/index",
+    "wux-cell": "/components/dist/cell/index",
+    "wux-cascader": "/components/dist/cascader/index"
+  }
+}

@@ -1,0 +1,19 @@
+<%
+    /// 文 件 名：IaddRecord
+    /// 描    述：添加相应的日志记录
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/1/26 12:25  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+  :id = tuid()
+  :insertSql = "insert into record(id,rtime,IP,operater,longitude,latitude,operate,address) values(?,?,?,?,?,?,?,?)"
+  :resultRecord = changeRecordSet(:insertSql,S(:id),S(serverDate("yyyy-MM-dd hh:mm:ss")),S(:IP),S(:operater),S(:longitude),S(:latitude),S(:operate),S(:address))
+
+  =:resultRecord
+%>

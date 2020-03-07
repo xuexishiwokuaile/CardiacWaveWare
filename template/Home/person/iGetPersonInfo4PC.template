@@ -1,0 +1,58 @@
+<%
+    /// 文 件 名：iGetPersonInfo
+    /// 描    述：获取管理员/用户/监测机构/监察员的信息(用一句话描述该文件做什么)
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/2 11:34  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:getPersonInfo.template 位置:14:"+"传入的参数为：id=="+:id)
+    :sql_get_st_passport_info = "select * from ST_PASSPORTS where id = ?"
+    :sql_get_doctor_info = "select * from DOCTOR where id = ?"
+    :sql_get_client_info = "select * from CLIENT where id = ?"
+    :sql_get_monitor_info = "select * from MONITOR where id = ?"
+    :resultStRecord = changeRecordSet(:sql_get_st_passport_info,S(:id))
+    :recordNum = recordCount()
+    If :resultStRecord == "ok"
+        :classification = classification
+        debugMsg("[DEBUGMSG]:getPersonInfo.template 位置:20:"+"classification====="+:classification)
+        :result_records_item = jsonAddItem("","login_name",S(login_name))
+        :result_records_item = jsonAddItem(:result_records_item,"id",S(id))
+        :result_records_item = jsonAddItem(:result_records_item,"name",S(name))
+        :result_records_item = jsonAddItem(:result_records_item,"number",S(number))
+        :result_records_item = jsonAddItem(:result_records_item, "classification", S(classification))
+        :result_records_item = jsonAddItem(:result_records_item, "passwd", S(passwd))
+
+        ///根据不同的权限，进一步查询人员信息
+        If :classification == 2
+            ///查询监测机构的信息
+            :resultDoctorRecord = changeRecordSet(:sql_get_doctor_info,S(:id))
+            :result_records_item = jsonAddItem(:result_records_item,"department",S(department))
+            :result_records_item = jsonAddItem(:result_records_item,"position",S(position))
+            :result_records_item = jsonAddItem(:result_records_item,"hospital",S(hospital))
+            :result_records_item = jsonAddItem(:result_records_item,"phone",S(phone))
+        EndIf
+        If :classification == 3
+            ///查询用户的信息
+            :resultClientRecord = changeRecordSet(:sql_get_client_info,S(:id))
+            :result_records_item = jsonAddItem(:result_records_item,"phone",S(phone))
+        EndIf
+        If :classification == 4
+            ///查询监测员的信息
+            :resultMonitorRecord = changeRecordSet(:sql_get_monitor_info,S(:id))
+            :result_records_item = jsonAddItem(:result_records_item,"phone",S(phone))
+            :result_records_item = jsonAddItem(:result_records_item,"department",S(department))
+            :result_records_item = jsonAddItem(:result_records_item,"hospital",S(hospital))
+        EndIf
+        :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+        debugMsg("[DEBUGMSG]:getPersonInfo.template 位置:38:"+"result_records_array=="+:result_records_array)
+        =:result_records_array
+    Else
+        ="bad"
+    EndIf
+%>

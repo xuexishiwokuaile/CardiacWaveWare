@@ -1,0 +1,151 @@
+///获取所有栏目
+<%
+If :operation == "getAllColumns"
+    :allcolumnData=""
+    ///查出栏目的各个值
+    :selectSqlA = "SELECT id,parent_id,name,sort FROM columns ORDER BY parent_id,sort ASC"
+    changeRecordSet(:selectSqlA)
+    :i=0
+    Repeat
+      :ArrayAllId[:i]=id
+      :ArrayAllPId[:i]=parent_id
+      :ArrayAllName[:i]=name
+      :ArrayAllSort[:i]=sort
+      :ArrayAllChild[:i]=0
+      :i=:i+1
+    EndRepeat
+    :Arraylength = :i + 1 ///栏目的个数
+    ///分别找出一级栏目和二级栏目
+    ///外层while因子i 用来找一级栏目
+    :i=0
+    While :i < :Arraylength
+      ///parentId = 0 则为一级栏目
+      If :ArrayAllPId[:i] == 0
+         ///找出一级栏目对应的二级栏目
+        /// 内层while因子j 用来找一级栏目下的二级栏目
+         :j=0
+         While :j < :Arraylength
+            ///  二级栏目
+           If :ArrayAllPId[:j] == :ArrayAllId[:i]
+               ///一级栏目下的二级栏目数量+1
+               :ArrayAllChild[:i] = :ArrayAllChild[:i] + 1
+               :allcolumnData = :allcolumnData#"{'id':"#:ArrayAllId[:j]#",'pId':"#:ArrayAllPId[:j]#",'text':'<span id=&text&>"#:ArrayAllName[:j]#"</span><span class=&editorgan& style=&color:#cc3f44& onclick=&deleteModalshow(\\'"#:ArrayAllId[:j]#"\\')&><i class=&fa-trash& ></i>删除</span><span class=&editorgan& style=&color:#18a8df& onclick=&digmodal(\\'"#:ArrayAllId[:j]#"\\',\\'"#:ArrayAllName[:j]#"\\',\\'"#:ArrayAllSort[:j]#"\\')&><i class=&fa-edit&></i>修改</span>'},"
+           EndIf
+           :j =:j +1
+         EndWhile
+         ///一级栏目
+         :allcolumnData = :allcolumnData#"{'id':"#:ArrayAllId[:i]#",'pId':"#:ArrayAllPId[:i]#",'text':'<span id=&text&>"#:ArrayAllName[:i]#"</span><span class=&editorgan& style=&color:#18a8df& onclick=&digmodal(\\'"#:ArrayAllId[:i]#"\\',\\'"#:ArrayAllName[:i]#"\\',\\'"#:ArrayAllSort[:i]#"\\')&><i class=&fa-edit&></i>修改</span><span class=&editorgan&  style=&color:#5ca323& onclick=&addmodal(\\'"#:ArrayAllId[:i]#"\\',\\'"#:ArrayAllChild[:i]#"\\')&><i class=&fa-plus&></i>新增</span>'},"
+      EndIf
+      :i=:i+1
+    EndWhile
+    Exit(:allcolumnData)
+EndIf
+%>
+
+///以Json的形式获取所有栏目（测试）
+<%If :operation == "getAllColumnsJson"
+        :allcolumnData=""
+        :selectSqlA = "SELECT id,parent_id,name,sort FROM columns ORDER BY parent_id,sort ASC"
+        :result_getAllColumns  = changeRecordSet(:selectSqlA)
+        If :result_getAllColumns == "ok"
+            :i=0
+            Repeat
+              :ArrayAllId[:i]=id
+              :ArrayAllPId[:i]=parent_id
+              :ArrayAllName[:i]=name
+              :ArrayAllSort[:i]=sort
+              :ArrayAllChild[:i]=0
+              :i=:i+1
+            EndRepeat
+            :Arraylength = :i ///栏目的个数
+            ///分别找出一级栏目和二级栏目
+            ///外层while因子i 用来找一级栏目
+            :i=0
+            While :i != :Arraylength
+              ///parentId = 0 则为一级栏目
+              If :ArrayAllPId[:i] == 0
+                 ///找出一级栏目对应的二级栏目
+                /// 内层while因子j 用来找一级栏目下的二级栏目
+                 :j=0
+                 While :j != :Arraylength
+                    ///  二级栏目
+                   If :ArrayAllPId[:j] == :ArrayAllId[:i]
+                       ///一级栏目下的二级栏目数量+1
+                       :ArrayAllChild[:i] = :ArrayAllChild[:i] + 1
+                       :result_records_item = jsonAddItem("","grade",S("second"))
+                       :result_records_item = jsonAddItem(:result_records_item,"id",S(:ArrayAllId[:j]))
+                       :result_records_item = jsonAddItem(:result_records_item,"pId",S(:ArrayAllPId[:j]))
+                       :result_records_item = jsonAddItem(:result_records_item,"text",S(:ArrayAllName[:j]))
+                       :result_records_item = jsonAddItem(:result_records_item,"sort",S(:ArrayAllSort[:j]))
+                       :result_records_array = jsonAddArrayItem(:result_records_array,:result_records_item)
+                       ///:result_records_items = jsonAddItem("","second",:result_records_array)
+                   EndIf
+                   :j =:j +1
+                 EndWhile
+                 ///一级栏目
+                 :result_records_item = jsonAddItem("","grade",S("fist"))
+                 :result_records_item = jsonAddItem(:result_records_item,"id",S(:ArrayAllId[:i]))
+                 :result_records_item = jsonAddItem(:result_records_item,"pId",S(:ArrayAllPId[:i]))
+                 :result_records_item = jsonAddItem(:result_records_item,"text",S(:ArrayAllName[:i]))
+                 :result_records_item = jsonAddItem(:result_records_item,"sort",S(:ArrayAllSort[:i]))
+                 :result_records_item = jsonAddItem(:result_records_item,"childCount",S(:ArrayAllChild[:i]))
+                 :result_records_array = jsonAddArrayItem(:result_records_array,:result_records_item)
+                 ///:result_records_items = jsonAddItem("","columns",:result_records_array)
+              EndIf
+              :i=:i+1
+            EndWhile
+            =:result_records_array
+        EndIf
+EndIf
+%>
+
+///获取一级栏目数量
+<%If :operation == "getFirstColumCount"
+	:firstselectSql = "select id from columns where parent_id = '0'"
+	changeRecordSet(:firstselectSql)
+	:firstColumCount=recordCount()
+  Exit(:firstColumCount)
+EndIf%>
+
+
+///获取文章页面的左侧栏目列表树
+<%If :operation == "getAllColumnsReadOnly"
+	:allcolumnData=""
+	:selectSql = "select id, name, parent_id from columns"
+	changeRecordSet(:selectSql)
+	If recordCount()>0
+		Repeat
+		:allcolumnData = :allcolumnData#"{'id':'"#id#"','pId':'"#parent_id#"','text':'"#name#"'},"
+		EndRepeat
+		Exit(:allcolumnData)
+	EndIf
+EndIf%>
+
+
+///文章管理页面,点击左侧的某个栏目，显示其栏目下的文章
+<%
+If :operation == "getGrantColumns"
+    	If :classification == 1
+    		:querystr="select id, name,parent_id from columns"
+    	EndIf
+    	changeRecordSet(:querystr)
+    	:i=0
+    	:parentIds = ""
+    	:typelist = ""
+      ///构造json，用来显示类型(栏目)的下拉列表树(ztree实现)
+    	If recordCount()>0
+    		Repeat
+    			:data = jsonAddItem("","id",S(id))
+    			:data = jsonAddItem(:data,"pId",S(parent_id))
+    			:data = jsonAddItem(:data,"name",S(name))
+    			If :i !=0
+            		:typelist = jsonAddArrayItem(:typelist,:data)
+    			Else
+            		:typelist = jsonAddArrayItem("",:data)
+    			EndIf
+    			:i=:i+1
+    		EndRepeat
+    		Exit (:typelist)
+    	EndIf
+EndIf
+%>

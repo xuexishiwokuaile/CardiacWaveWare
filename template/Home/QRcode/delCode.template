@@ -1,0 +1,4 @@
+<%
+      :sql_del = "DELETE FROM QRCODE WHERE ID = ?;"
+      :resultRecord = execSQL(:sql_del,S(:id))
+%>

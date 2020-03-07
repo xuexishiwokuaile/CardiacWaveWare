@@ -1,0 +1,18 @@
+<%
+    /// 文 件 名：Sms.template
+    /// 描    述：系统使用对应的手机短信的类(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/2/27 22:55  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+
+   executeRemoteService("v.juhe.cn/sms/send","mobile=15327246245&tpl_id=138317&tpl_value=%23code%23%3D"+"43512"+"&key=bef38c6a45c757540da85b48cbf8e90a","","")
+///
+///  111111111111111111111111
+///serverDate("yy")
+
+%>

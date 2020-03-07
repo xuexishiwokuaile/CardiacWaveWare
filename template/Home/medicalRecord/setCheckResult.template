@@ -1,0 +1,5 @@
+<%
+      :sql_setCheckResult = "UPDATE medical_record SET blood=?,checkResult=?,picture=? WHERE id=?"
+      :result_setCheckResult = changeRecordSet(:sql_setCheckResult,S(:blood),S(:checkResult),S(:pictures),S(:id))
+      =:result_setCheckResult
+%>

@@ -1,0 +1,4 @@
+<%
+    :sql_deladmins = "DELETE FROM ST_PASSPORTS WHERE ID IN(?);"
+    :resultRecord = execSQL(:sql_deladmins,S(:submitIds))
+%>

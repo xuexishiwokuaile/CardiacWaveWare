@@ -1,0 +1,87 @@
+<view class="outer">
+    <view class="search"> 
+        <wux-search-bar clear maxlength="8" placeholder="请输入用户姓名，手机号，注册编号查询" />
+    </view>
+    <view class="header">
+        <view class="btns"> 
+            <view class="histor-case btns-bg">
+                <text class="btns-text">未监测用户</text>
+            </view>
+            <view class="wave-playback btns-bg">
+                <text class="btns-text">已监测用户</text>
+            </view>
+            <view class="modify-info btns-bg">
+                <text class="btns-text">监测次数</text>
+            </view>
+        </view>
+        <view class="hr"></view>
+        <view class="items">
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">新用户</view>
+                    <view class="test-times">监测次数 0 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">新用户</view>
+                    <view class="test-times">监测次数 0 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">新用户</view>
+                    <view class="test-times">监测次数 0 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">上次监测时间   2019 - 04 -18  09:09:15</view>
+                    <view class="test-times">监测次数 1 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">上次监测时间   2019 - 04 -18  09:09:15</view>
+                    <view class="test-times">监测次数 1 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="item">
+                <view class="left-logo">
+                    <image src="https://img.vim-cn.com/be/cababf0b1eea16f387129ab208cb9a054aefec.png" />
+                </view>
+                <view class="right-text">
+                    <view class="name-id">沈家强<text class="user-id">注册编号：201904190001</text></view>
+                    <view class="last-use">上次监测时间   2019 - 04 -18  09:09:15</view>
+                    <view class="test-times">监测次数 1 次</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+        </view>
+    </view>
+</view>

@@ -1,0 +1,21 @@
+<html>
+<head>
+    <script type="text/javascript" src="/Scripts/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script>
+        function response(){
+            var file_ctr = $("#file1")[0];
+            var file = file_ctr.files[0];
+            var form1 = new FormData();
+            form1.append("i",12);
+            form1.append("FILE1",file);
+            //sendForm(homeAddress()+"examples/multipart.template",form1,"#clientArea");
+            loadFromWS("examples/multipart.template",form1,"clientArea");
+        }
+    </script>
+</head>
+<input type="FILE" id="file1"><br>
+<input type="button" value="ok" onclick="javascript:response()">
+    <div id="clientArea">
+    </div>
+</htm>

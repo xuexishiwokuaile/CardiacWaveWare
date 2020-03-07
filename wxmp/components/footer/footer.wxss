@@ -1,0 +1,20 @@
+/* components/footer/footer.wxss */
+.outer{
+    display: flex;
+    justify-content: center;
+    padding-top: 32rpx;
+}
+.footer{
+    display: flex;
+    flex-direction: column;
+    color: #6d6c6a;
+    font-size: 22rpx;
+    align-items: flex-start;
+}
+.item{
+    display: flex;
+    padding-top: 10rpx;
+}
+.item-title{
+    width: 100rpx;
+}

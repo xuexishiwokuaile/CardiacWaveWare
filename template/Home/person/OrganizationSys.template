@@ -1,0 +1,11 @@
+<%
+	:sql = "select id,classification,types from cardiac_classification where 1=? ORDER BY id"
+	:x = changeRecordSet(:sql, 1)
+debugMsg(:x#"_____________________")
+  Repeat
+  ="{'id':"#id#",'type':'"#types#"','text':'<span id=&text&>"#classification#"</span>'},"
+ EndRepeat
+%>
+
+
+

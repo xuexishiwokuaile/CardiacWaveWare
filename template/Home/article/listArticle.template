@@ -1,0 +1,84 @@
+<%
+    /// 文 件 名：getArticleList
+    /// 描    述：获取文章列表(用一句话描述该文件做什么)  
+    /// 项目名称：sie_web      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/11 14:39  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%#include "common/checkLoginFilterNew.template"%>
+<%
+    debugMsg("[DEBUGMSG]:getArticleList.template 位置:13:"+"page="+:page+"=limit="+:limit+"==keywords=="+:keywords+"=columnsId="+:columnsId)
+    ///是否传入了搜索的关键字
+    If :keywords =="__error__"
+       :keywords = ""
+    EndIf
+    ///是否传入了栏目的ID
+    If :columnsId != "__error__" && :columnsId != 0
+        ///获取文章的数量
+        :sql_articleNum = "select id from article where (title like ? OR publisher like ? OR modify_date like ? OR article_type like ?) and (article_type = ? or article_type in (SELECT id FROM columns WHERE parent_id = ?))"
+        :resultRecord = changeRecordSet(:sql_articleNum,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:columnsId),S(:columnsId))
+        :recordNum = recordCount()
+
+        :sql_article = "select on_top,id,title,publisher,article_type,modify_date from article where (title like ? OR publisher like ? OR modify_date like ? OR article_type like ?) and (article_type = ? or article_type in (SELECT id FROM columns WHERE parent_id = ?)) ORDER BY on_top DESC,modify_date desc  LIMIT ? OFFSET ?"
+        :resultRecord = changeRecordSet(:sql_article,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:columnsId),S(:columnsId),S(:limit),S((:page-1)*:limit))
+    Else
+        ///获取文章的数量
+        :sql_articleNum = "select id from article where (title like ? OR publisher like ? OR modify_date like ? OR article_type like ?)"
+        :resultRecord = changeRecordSet(:sql_articleNum,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+        :recordNum = recordCount()
+
+        :sql_article = "select on_top,id,title,publisher,article_type,modify_date from article where (title like ? OR publisher like ? OR modify_date like ? OR article_type like ?) ORDER BY on_top DESC,modify_date desc LIMIT ? OFFSET ?"
+        :resultRecord = changeRecordSet(:sql_article,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+    EndIf
+
+    ///保存信息
+    :i=0
+    Repeat
+        :ArrayAllId[:i]=id
+        :ArrayAllTitle[:i]=title
+        :ArrayAllPublisher[:i]=publisher
+        :ArrayAllArticle_type[:i]=article_type
+        :ArrayAllModify_date[:i]=modify_date
+        :ArrayAllOn_top[:i]=on_top
+        :i=:i+1
+    EndRepeat
+    :index = 0
+    :record_items_array = ""
+    While :index < :i
+        ///通过栏目ID，获取栏目名称
+        :ArrayAllArticle_Name[:index] = ""
+        :sql_getColumnName = "select name,id from columns where id = ?"
+        :resultRecord = changeRecordSet(:sql_getColumnName,S(:ArrayAllArticle_type[:index]))
+        :ArrayAllArticle_Name[:index] = name
+        ///封装成json
+        :record_items = jsonAddItem("", "title", S(:ArrayAllTitle[:index]))
+        :record_items = jsonAddItem(:record_items, "publisher", S(:ArrayAllPublisher[:index]))
+        :record_items = jsonAddItem(:record_items, "id", S(:ArrayAllId[:index]))
+        :record_items = jsonAddItem(:record_items, "article_type", S(:ArrayAllArticle_Name[:index]))
+        :record_items = jsonAddItem(:record_items, "modify_date", S(:ArrayAllModify_date[:index]))
+        :record_items = jsonAddItem(:record_items, "on_top", S(:ArrayAllOn_top[:index]))
+        :record_items_array = jsonAddArrayItem(:record_items_array, :record_items)
+        :index += 1
+    EndWhile
+    If :resultRecord == "ok"
+       ///ok
+       ///成功 返回状态码0
+       :code = 0
+       :result_records_items = jsonAddItem("","code",:code)
+       :result_records_items = jsonAddItem(:result_records_items,"data",:record_items_array)
+       :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+
+    Else
+        ///bad
+        /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+        :code = 0
+        :result_records_array="[]"
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    EndIf
+    =:result_records_items
+%>

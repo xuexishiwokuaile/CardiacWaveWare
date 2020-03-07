@@ -1,0 +1,89 @@
+<view class="outer"> 
+    <view class="header">
+        <view class="btns"> 
+            <view class="histor-case btns-bg" wx:if="{{!hideHistoryBtn}}">
+                <text class="btns-text" bind:tap="goHistoryReport">历史病例</text> 
+            </view>
+            <view class="wave-playback btns-bg">
+                <text class="btns-text">波形回放</text>
+            </view>
+            <view class="modify-info btns-bg">
+                <text class="btns-text">信息修改</text>
+            </view>
+            <!-- <view class="share-btn btns-bg" open-type='share'>
+                <text class="btns-text btns-text-two" decode="{{true}}">分&nbsp;&nbsp;&nbsp;&nbsp;享</text>
+            </view> -->
+            <view >
+                <button open-type='share'>分享</button>
+            </view>
+        </view>
+        <view class="hr"></view>
+    </view>
+    <view class="report-container">
+        <view class="report-title-outer">
+            <view class="report-title">心脏高精度动力学分析报告</view>
+            <view class="report-time">TIME : {{time}}</view>
+        </view>
+        <view class="report-item-row">
+            <view class="quantitative-peak">
+                <text class="report-item-text">定量峰值</text>
+                <view class="quantitative-peak-data data-text bg-purple">{{quantitativepeak}}</view>
+            </view>
+            <view class="total-peak">
+                <text class="report-item-text">总峰值</text>
+                <view class="total-peak-data data-text bg-purple">{{totalpeak}}</view>
+            </view>
+        </view>
+        <view class="report-item-col">
+            <view class="peak-conclusion">
+                <text class="report-item-text">心电波峰值分析结论</text>
+            </view>
+            <view class="data-text {{peakConclusion == 1?'conclusion bg-green':'bg-orange'}}">阴性（心血管状态表现健康）</view>
+            <view class="data-text {{peakConclusion == 2?'conclusion bg-cyan-blue':'bg-orange'}}">阳性，心肌疲劳预警（请保持良好生活作息）</view>
+            <view class="data-text {{peakConclusion == 3?'conclusion bg-purple':'bg-orange'}}">阳性，心血管冠状粥样硬化风险（请到医院进行检查）</view>
+            <view class="data-text {{peakConclusion == 4?'conclusion bg-pink':'bg-orange'}}">阳性，心血管冠状粥样硬化，冠脉血液呈50%以下改变（紧急医院检查）</view>
+        </view>
+        
+        <view class="polarity-distribution">
+            <view class="hr"></view>
+            <view class="polarity-distribution-title">
+                <text class="report-item-text">极性分布</text>
+            </view>
+            <view class="report-item-row">
+                <view class="quantitative-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布1&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributionone}}%
+                </view>
+                <view class="total-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布2&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributiontwo}}%
+                </view>
+                <view class="total-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布3&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributionthree}}%
+                </view>
+            </view>
+            <view class="report-item-row">
+                <view class="quantitative-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布4&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributionfour}}%
+                </view>
+                <view class="total-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布5&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributionfive}}%
+                </view>
+                <view class="total-peak-data data-text bg-purple polarity-distribution-item">
+                    <text decode="{{true}}">极性分布6&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                    {{distributionsix}}%
+                </view>
+            </view>
+        </view>
+        <view class="polarity-distribution-conclusion">
+            <view class="polarity-distribution-conclusion-title">
+                <text class="report-item-text">心电波极性分布分析结论</text>
+            </view>
+            <view class="data-text {{distributionConclusion == 1?'conclusion bg-green':'bg-orange'}}">阴性（心血管状态表现健康）</view>
+            <view class="data-text {{distributionConclusion == 2?'conclusion bg-pink':'bg-orange'}}">阳性，心肌组织可能出现炎症细胞浸润风险（改善良好生活习惯）</view>
+        </view>
+    </view>
+</view>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="心脏高精度动力学分析系统" />
+    <meta name="author" content="" />
+    <title>病案信息-心脏高精度电动力学分析系统</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/systemManage.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.js"></script>
+
+</head>
+<body class="page-body">
+<div class="page-container" id="page">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <!--相应的顶部导航区相应的内容-->
+        <div id="nav-content-inner"></div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">就诊记录</h1>
+                <p class="description">Medical Records View</p>
+            </div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <i class="fa-home"></i>Home
+                    </li>
+                    <li>
+                        Medical Record
+                    </li>
+                    <li class="active">
+                        <strong>Medical Records View</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="panel-heading">
+                    <h3 class="panel-title" id="checkNumber"></h3>
+                    <script type="text/javascript">
+                      document.getElementById("checkNumber").innerText ="病人信息（编号：" + sessionStorage.getItem('clientRecord_number') + ")";
+                    </script>
+                    <div class="panel-options">
+                        <a href="medicalRecordsList.html">
+                            <span class="collapse-icon"><i class="fa-chevron-left"></i>返回</span>
+                        </a>
+                    </div>
+                </div>
+                <script>
+                  jQuery(document).ready(function($) {
+                    //加载相应的公共项，页头和侧边栏
+                    let classification = sessionStorage.getItem('classification');
+                    if(classification ==4){
+                      loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=病案列表$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+                    }else{
+                      loadFromWS("Home/menu/LeftSideMenu.template", "Item=个人信息$^@^$item=病历查询$^@^$loginName=" + sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+                    }
+                    loadFromWS("Home/menu/topNavContent.template", "userName=" + sessionStorage.getItem('userName'), "nav-content-inner");
+
+                    console.log(sessionStorage.getItem('medicalRecordId'));
+
+                    //加载相应的病历数据
+                    $("#clientName").val(sessionStorage.getItem('clientRecord_clientName'));
+                    $("#hospital").val(sessionStorage.getItem('clientRecord_hospital'));
+                    $("#doctorName").val(sessionStorage.getItem('clientRecord_doctorName'));
+                    $("#checkTime").val(sessionStorage.getItem('clientRecord_checkTime'));
+                    $("#weight").val(sessionStorage.getItem('clientRecord_weight'));
+                    $("#height").val(sessionStorage.getItem('clientRecord_height'));
+                    $("#isSmoking").val(sessionStorage.getItem('clientRecord_smoking'));
+                    $("#isDrinking").val(sessionStorage.getItem('clientRecord_drinking'));
+                    $("#hypertension").val(sessionStorage.getItem('clientRecord_hypertension'));
+                    $("#diabetes").val(sessionStorage.getItem('clientRecord_diabetes'));
+
+                  })
+                </script>
+                <div class="panel-body" id="clientRecord">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="clientName" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">医院</label>
+                            <div class="col-sm-10">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="hospital" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">主治医生</label>
+                            <div class="col-sm-10">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="doctorName" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">检查时间</label>
+                            <div class="col-sm-10">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="checkTime" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">身高</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="height">
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">体重</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="weight">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否抽烟</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <select type="text" class="form-control" name='name' id="isSmoking" required>
+                                        <option value ="是">是</option>
+                                        <option value ="否">否</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">是否喝酒</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <select type="text" class="form-control" name='name' id="isDrinking" required>
+                                        <option value ="是">是</option>
+                                        <option value ="否">否</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">高血压</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <select type="text" class="form-control" name='name' id="hypertension" required>
+                                        <option value ="无">无</option>
+                                        <option value ="一级">一级</option>
+                                        <option value ="二级">二级</option>
+                                        <option value ="三级">三级</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">糖尿病</label>
+                            <div class="col-sm-4">
+                                <div class="input-group col-sm-12">
+                                    <select type="text" class="form-control" name='name' id="diabetes" required>
+                                        <option value ="无">无</option>
+                                        <option value ="一型">一型</option>
+                                        <option value ="二型">二型</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-separator"></div>
+                    </form>
+                </div>
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">检查列表</h3>
+                    <div class="panel-options">
+                    </div>
+                </div>
+                <div class="panel-body" id="checkItemList">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-group" id="checkItem">
+                        </div>
+                        <div class="btn btn-red btn-icon btn-icon-standalone" id="addCheckItem" style="min-width:100px;background-color: grey;margin-left: 150px" onclick="addCheckItem()">
+                            <span style="padding-left:0;padding-right:0">增加检查项</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">检查结果</label>
+                            <div class="col-sm-10">
+                                <div class="input-group col-sm-12">
+                                    <input type="text" class="form-control" placeholder="" id="checkResult">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-separator"></div>
+
+                    </form>
+                </div>
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">病历列表</h3>
+                    <div class="panel-options">
+                    </div>
+                </div>
+                <div class="panel-body" id="medicalRecordsList">
+                    <form role="form" class="form-horizontal">
+                        <div class="row">
+                            <div id="medicalRecords"></div>
+                            <div>
+                                <img onmouseover="addBorder(0)" onmouseleave="deleteBorder(0)" id="addMedicalRecord0" src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2018291808590000001" style="position: relative;z-index: 0;float: left;width:200px;height:200px;margin-left: 20px;margin-top: 20px;" onclick="selectFile()">
+                            </div>
+                        </div>
+                        <input  type="file" id="add_medicalRecord" style="display: none;" onchange="addNewMedicalRecord()" multiple>
+                        <div class="form-group-separator"></div>
+                    </form>
+                </div>
+
+                <div class="panel-body" id="saveClientRecord">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-group" style="text-align:right" >
+                            <div class="col-sm-10"></div>
+                            <div class="col-sm-2">
+                                <div class="btn btn-red btn-icon btn-icon-standalone" id="updateMR" style="min-width:200px;background-color: green;" onclick="saveClientRecord()">
+                                    <span style="padding-left:0;padding-right:0">提交检查结果</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+        <footer class="main-footer sticky footer-type-1">
+            <div class="footer-inner">
+                <div class="footer-text">
+                    &copy; 2018
+                    <strong>heart</strong>
+                    </a> 心脏高精度电动力学分析系统 - Collect from <a href="http://sdev.whu.edu.cn/" title="网页模板" target="_blank">武汉大学</a>
+                </div>
+                <div class="go-up">
+                    <a href="#" rel="go-top">
+                        <i class="fa-angle-up"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<div class="modal fade" id="viewMedicalRecord" style="margin-left: 500px;margin-top: 100px; display: none;">
+    <img id="bigMedicalRecord" src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2018291808590000001" style="float: left;width:500px;height:500px;margin-left: 20px;margin-top: 20px;">
+</div>
+
+<script type="text/javascript">
+  /**
+   * 鼠标悬停显示边框
+   **/
+  function addBorder(number) {
+    var id = "addMedicalRecord" + number;
+    document.getElementById(id).style.border="1px solid black";
+  }
+
+  /**
+   * 鼠标离开去掉边框
+   **/
+  function deleteBorder(number){
+    var id = "addMedicalRecord" + number;
+    document.getElementById(id).style.border="0";
+  }
+
+  /**
+   * 放大点击的图片
+   */
+  function viewMedicalRecord(number){
+    var bigId = "addMedicalRecord" + number;
+    var src = document.getElementById(bigId).src;
+    document.getElementById("bigMedicalRecord").src = src;
+    $("#viewMedicalRecord").modal('show');
+  }
+
+  /**
+   * 删除图片
+   */
+  function deletePicture(number) {
+    var deleteId1 = "addMedicalRecord" + number;
+    var deleteId2 = "deletePicture" + number;
+    document.getElementById(deleteId1).style.display = "none";
+    document.getElementById(deleteId2).style.display = "none";
+  }
+
+  /**
+   * 删除血管信息
+   */
+  function deleteBlood(item) {
+    var deleteId = "checkItem" + item;
+    document.getElementById(deleteId).style.display = "none";
+    $("#addCheckItem").show();
+  }
+</script>
+
+<script type="text/javascript">
+  /**
+   * 点击按钮增加检查项
+   */
+  var item = 1;
+  function addCheckItem(){
+    var isDeleteNumber = 0;
+    console.log("item================"+item);
+    for (var i = 1; i< item;i++) {
+      var bloodId = "checkItem" + i;
+      if (document.getElementById(bloodId).style.display != "none") {
+        isDeleteNumber+=1;
+      }
+    }
+    console.log("isDeleteNumber=========="+isDeleteNumber);
+    if (isDeleteNumber == 3) {
+      $("#addCheckItem").hide();
+    }
+    if(isDeleteNumber < 5){
+      $("#checkItem").append('\n' +
+          '                        <div class="form-group" id="checkItem'+item+'">\n' +
+          '                            <label class="col-sm-2 control-label">血管</label>\n' +
+          '                            <div class="col-sm-1">\n' +
+          '                                <div class="input-group col-sm-12">\n' +
+          '                                    <select type="text" class="form-control" id="bloodVessel'+item+'" required>\n' +
+          '                                        <option value ="无">无</option>\n' +
+          '                                        <option value ="LM">LM</option>\n' +
+          '                                        <option value ="LAD">LAD</option>\n' +
+          '                                        <option value ="LCX">LCX</option>\n' +
+          '                                        <option value ="RCA">RCA</option>\n' +
+          '                                    </select>\n' +
+          '                                </div>\n' +
+          '                            </div>\n' +
+          '                            <label class="col-sm-2 control-label">部位</label>\n' +
+          '                            <div class="col-sm-1">\n' +
+          '                                <div class="input-group col-sm-12">\n' +
+          '                                    <select type="text" class="form-control" id="bloodPart'+item+'" required>\n' +
+          '                                        <option value ="无">无</option>\n' +
+          '                                        <option value ="近段">近段</option>\n' +
+          '                                        <option value ="中段">中段</option>\n' +
+          '                                        <option value ="远段">远段</option>\n' +
+          '                                    </select>\n' +
+          '                                </div>\n' +
+          '                            </div>\n' +
+          '                            <label class="col-sm-2 control-label">狭窄程度</label>\n' +
+          '                            <div class="col-sm-2">\n' +
+          '                                <div class="input-group col-sm-12">\n' +
+          '                                    <select type="text" class="form-control" id="bloodNarrow'+item+'" required>\n' +
+          '                                        <option value ="无">无</option>\n' +
+          '                                        <option value ="50%以下">50%以下</option>\n' +
+          '                                        <option value ="50%-70%">50%-70%</option>\n' +
+          '                                        <option value ="70%以上">70%以上</option>\n' +
+          '                                    </select>\n' +
+          '                                </div>\n' +
+          '                            </div>\n' +
+          '                            <div class="col-sm-1">\n'+
+          '                                <div class="btn btn-red btn-icon btn-icon-standalone form-control" id="updateMR" style="min-width:30px;background-color: grey;" onclick="deleteBlood('+item+')">\n'+
+          '                                    <span style="padding-left:0;padding-right:0;padding-top: 10px;">删除</span>\n'+
+          '                                </div>\n'+
+          '                            </div>\n'+
+          '                        </div>');
+    }
+    console.log(item);
+    item += 1;
+  }
+
+  /**
+   * 选择病历图片
+   */
+  var number = 1;
+  function selectFile() {
+    document.getElementById("add_medicalRecord").click();
+  }
+
+  var addMedicalRecordId;
+
+  function addNewMedicalRecord() {
+    var files = document.getElementById("add_medicalRecord").files;
+    var fileNumbers = files.length;
+    for (var i = 1; i < fileNumbers + 1; i++) {
+      $("#medicalRecords").append('<img src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2018296057990000001" style="position: absolute;z-index: 10;width: 20px;height: 20px;margin-left: 200px;margin-top: 20px;" onclick="deletePicture('+number+')" id="deletePicture'+number+'">\n');
+      $("#medicalRecords").append('<img onclick="viewMedicalRecord('+number+')" onmouseover="addBorder('+number+')" onmouseleave="deleteBorder('+number+')" src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2018290835570000001" style="float: left;width:200px;height:200px;margin-left: 20px;margin-top: 20px" id="addMedicalRecord' + number + '">\n');
+      var id = "addMedicalRecord" + number;
+      setMedicalRecord(files[i-1],id);
+      number++;
+    }
+  }
+  var setMedicalRecord = function(file,id) {
+    var afterUploadFile = function(tid) {
+      document.getElementById(id).src = "/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=" + tid;
+      addMedicalRecordId = tid;
+      var objs = new Array();
+      var afterSavePic = function() {
+        if (objs[0] == "ok") {
+          location.reload(true);
+        } else {
+          alert("上传病历失败");
+        }
+      };
+    };
+    uploadToDatabase(file, afterUploadFile, "databaseType=PostgresXL");
+  };
+
+  /**
+   * 若是第二次点击修改且数据库中有数据则先加载数据库中的数据
+   **/
+  ///病历照片
+  var obj_picture = new Array();
+  var processResult_picture = function(){
+    var isPicture = obj_picture[0];
+    if (isPicture == "ok"){
+      var pictureInfo = obj_picture[1].split(',');
+      if (pictureInfo == "" || pictureInfo == "__null__"){
+      }
+      else {
+        console.log(pictureInfo);
+        for (var i = 1; i < pictureInfo.length + 1; i++) {
+          console.log(pictureInfo[i - 1]);
+          $("#medicalRecords").append('<img src="/one/downloadFile.spe?dtype=PostgresXL&mode=html&fileid=2018296057990000001" style="position: absolute;z-index: 10;width: 20px;height: 20px;margin-left: 200px;margin-top: 20px;" onclick="deletePicture(' + i + ')" id="deletePicture' + i + '">\n');
+          $("#medicalRecords").append('<img onclick="viewMedicalRecord(' + i + ')" onmouseover="addBorder(' + i + ')" onmouseleave="deleteBorder(' + i + ')" src="' + pictureInfo[i - 1] + '" style="float: left;width:200px;height:200px;margin-left: 20px;margin-top: 20px" id="addMedicalRecord'+ i + '">\n');
+          number = pictureInfo.length+1;
+        }
+      }
+    }
+  };
+  getFromWS("Home/medicalRecord/getPictures.template", "id="  + sessionStorage.getItem('medicalRecordId') , obj_picture, processResult_picture);
+
+  ///血管信息
+  var bloodInfo;
+  var obj_blood = new Array();
+  var processResult_blood = function(){
+    if (obj_blood[0] == "ok") {
+      bloodInfo = obj_blood[1];
+      console.log(bloodInfo);
+      if(bloodInfo == "" || bloodInfo == "__null__"){
+        $("#checkItem").append('\n' +
+            '                        <div class="form-group" id="checkItem'+item+'">\n' +
+            '                            <label class="col-sm-2 control-label">血管</label>\n' +
+            '                            <div class="col-sm-1">\n' +
+            '                                <div class="input-group col-sm-12">\n' +
+            '                                    <select type="text" class="form-control" id="bloodVessel'+item+'" required>\n' +
+            '                                        <option value ="无">无</option>\n' +
+            '                                        <option value ="LM">LM</option>\n' +
+            '                                        <option value ="LAD">LAD</option>\n' +
+            '                                        <option value ="LCX">LCX</option>\n' +
+            '                                        <option value ="RCA">RCA</option>\n' +
+            '                                    </select>\n' +
+            '                                </div>\n' +
+            '                            </div>\n' +
+            '                            <label class="col-sm-2 control-label">部位</label>\n' +
+            '                            <div class="col-sm-1">\n' +
+            '                                <div class="input-group col-sm-12">\n' +
+            '                                    <select type="text" class="form-control" id="bloodPart'+item+'" required>\n' +
+            '                                        <option value ="无">无</option>\n' +
+            '                                        <option value ="近段">近段</option>\n' +
+            '                                        <option value ="中段">中段</option>\n' +
+            '                                        <option value ="远段">远段</option>\n' +
+            '                                    </select>\n' +
+            '                                </div>\n' +
+            '                            </div>\n' +
+            '                            <label class="col-sm-2 control-label">狭窄程度</label>\n' +
+            '                            <div class="col-sm-2">\n' +
+            '                                <div class="input-group col-sm-12">\n' +
+            '                                    <select type="text" class="form-control" id="bloodNarrow'+item+'" required>\n' +
+            '                                        <option value ="无">无</option>\n' +
+            '                                        <option value ="50%以下">50%以下</option>\n' +
+            '                                        <option value ="50%-70%">50%-70%</option>\n' +
+            '                                        <option value ="70%以上">70%以上</option>\n' +
+            '                                    </select>\n' +
+            '                                </div>\n' +
+            '                            </div>\n' +
+            '                            <div class="col-sm-1">\n'+
+            '                                <div class="btn btn-red btn-icon btn-icon-standalone form-control" id="updateMR" style="min-width:30px;background-color: grey;" onclick="deleteBlood('+item+')">\n'+
+            '                                    <span style="padding-left:0;padding-right:0;padding-top: 10px;">删除</span>\n'+
+            '                                </div>\n'+
+            '                            </div>\n'+
+            '                        </div>');
+        item++;
+      }
+      else{
+        var json_blood = JSON.parse(bloodInfo);
+        if (json_blood.length == 4){
+          $("#addCheckItem").hide();
+        }
+        for(var j=1 ; j <= json_blood.length ; j++){
+          $("#checkItem").append('\n' +
+              '                        <div class="form-group" id="checkItem'+item+'">\n' +
+              '                            <label class="col-sm-2 control-label">血管</label>\n' +
+              '                            <div class="col-sm-1">\n' +
+              '                                <div class="input-group col-sm-12">\n' +
+              '                                    <select type="text" class="form-control" id="bloodVessel'+item+'" required>\n' +
+              '                                        <option id="1" value ="无">无</option>\n' +
+              '                                        <option id="LM" value ="LM">LM</option>\n' +
+              '                                        <option id="LAD" value ="LAD">LAD</option>\n' +
+              '                                        <option id="LCX" value ="LCX">LCX</option>\n' +
+              '                                        <option id="RCA" value ="RCA">RCA</option>\n' +
+              '                                    </select>\n' +
+              '                                </div>\n' +
+              '                            </div>\n' +
+              '                            <label class="col-sm-2 control-label">部位</label>\n' +
+              '                            <div class="col-sm-1">\n' +
+              '                                <div class="input-group col-sm-12">\n' +
+              '                                    <select type="text" class="form-control" id="bloodPart'+item+'" required>\n' +
+              '                                        <option id="无" value ="无">无</option>\n' +
+              '                                        <option id="近段" value ="近段">近段</option>\n' +
+              '                                        <option id="中段" value ="中段">中段</option>\n' +
+              '                                        <option id="远段" value ="远段">远段</option>\n' +
+              '                                    </select>\n' +
+              '                                </div>\n' +
+              '                            </div>\n' +
+              '                            <label class="col-sm-2 control-label">狭窄程度</label>\n' +
+              '                            <div class="col-sm-2">\n' +
+              '                                <div class="input-group col-sm-12">\n' +
+              '                                    <select type="text" class="form-control" id="bloodNarrow'+item+'" required>\n' +
+              '                                        <option id="无" value ="无">无</option>\n' +
+              '                                        <option id="50%以下" value ="50%以下">50%以下</option>\n' +
+              '                                        <option id="50%-70%" value ="50%-70%">50%-70%</option>\n' +
+              '                                        <option id="70%以上" value ="70%以上">70%以上</option>\n' +
+              '                                    </select>\n' +
+              '                                </div>\n' +
+              '                            </div>\n' +
+              '                            <div class="col-sm-1">\n'+
+              '                                <div class="btn btn-red btn-icon btn-icon-standalone form-control" id="updateMR" style="min-width:30px;background-color: grey;" onclick="deleteBlood('+item+')">\n'+
+              '                                    <span style="padding-left:0;padding-right:0;padding-top: 10px;">删除</span>\n'+
+              '                                </div>\n'+
+              '                            </div>\n'+
+              '                        </div>');
+          var all_options_vessel = document.getElementById("bloodVessel"+j).options;
+          for(var i=0; i<all_options_vessel.length ; i++){
+            if(all_options_vessel[i].id == json_blood[j-1].vessel){
+              all_options_vessel[i].selected = true;
+            }
+          }
+          var all_options_part = document.getElementById("bloodPart"+j).options;
+          for(var i=0; i<all_options_part.length ; i++){
+            if(all_options_part[i].id == json_blood[j-1].part){
+              all_options_part[i].selected = true;
+            }
+          }
+          var all_options_narrow = document.getElementById("bloodNarrow"+j).options;
+          for(var i=0; i<all_options_narrow.length ; i++){
+            if(all_options_narrow[i].id == json_blood[j-1].narrow){
+              all_options_narrow[i].selected = true;
+            }
+          }
+          item += 1;
+          console.log(item);
+        }
+        if (item == 5) {
+          $("#addCheckItem").hide();
+        }
+      }
+    }
+    else {
+      toastr.error("查看失败或数据已更改！请重试！", "查看失败");
+    }
+  };
+  getFromWS("Home/medicalRecord/getBlood.template", "id="  + sessionStorage.getItem('medicalRecordId') , obj_blood, processResult_blood);
+
+  /**
+   * 保存修改的检查结果
+   */
+  function saveClientRecord(){
+    var medicalRecordId = sessionStorage.getItem('medicalRecordId');
+    var checkResult = $("#checkResult").val();
+
+    /**
+     * 将血管检查信息包装成json字符串
+     **/
+    var json_vesselInfo = [];
+    var row_vessel = {};
+    console.log("item=========="+item);
+    for(var i = 1;i < item ; i++){
+      var bloodVessel = document.getElementById("bloodVessel" + i).value;
+      var bloodPart = document.getElementById("bloodPart" + i).value;
+      var bloodNarrow = document.getElementById("bloodNarrow" + i).value;
+      var isDelete = document.getElementById("checkItem" + i).style.display;
+      if (isDelete != "none") {
+        row_vessel = {vessel: bloodVessel, part: bloodPart, narrow: bloodNarrow};
+        json_vesselInfo.push(row_vessel);
+      }
+    }
+    var json_vesselInfo_str = JSON.stringify(json_vesselInfo);
+    console.log(json_vesselInfo_str);
+
+    /**
+     * 将病历图片的信息包装成数组
+     */
+    var medicalRecordPictures = [];
+    for (var j = 1; j < number; j++) {
+      var medicalRecord = document.getElementById("addMedicalRecord" + j).src;
+      var isDelete = document.getElementById("addMedicalRecord" + j).style.display;
+      if (isDelete != "none") {
+        medicalRecordPictures.push(medicalRecord);
+      }
+    }
+    console.log(medicalRecordPictures);
+
+    var obj_saveClientRecord = new Array();
+    var processResult_saveClientRecord = function() {
+      if (obj_saveClientRecord[0] == "ok") {
+        toastr.success("提交成功！", "提交成功");
+        setTimeout("location.href='clientRecords.html'",2000);
+      }
+      else {
+        toastr.error("提交失败！请重试！", "提交失败");
+      }
+    };
+    getFromWS("Home/medicalRecord/setCheckResult.template", "id="  + medicalRecordId + "$^@^$checkResult=" + checkResult + "$^@^$blood=" + json_vesselInfo_str + "$^@^$pictures=" + medicalRecordPictures , obj_saveClientRecord, processResult_saveClientRecord);
+
+    /**
+     * 更新医生修改的病人信息
+     */
+    var clientId = sessionStorage.getItem('clientId');
+    console.log(clientId);
+    var height = document.getElementById("height").value;
+    var weight = document.getElementById("weight").value;
+    var smoking = document.getElementById("isSmoking").value;
+    var drinking = document.getElementById("isDrinking").value;
+    var hypertension = document.getElementById("hypertension").value;
+    var diabetes = document.getElementById("diabetes").value;
+    var newClient = "id=" + clientId + "$^@^$height=" + height + "$^@^$weight=" + weight + "$^@^$smoking=" + smoking + "$^@^$drinking=" + drinking + "$^@^$hypertension=" + hypertension + "$^@^$diabetes=" + diabetes;
+    console.log(newClient);
+    var obj_updateClient = new Array();
+    var processResult_updateClient = function() {
+      if (obj_updateClient == 'ok'){
+      }
+      else {
+        toastr.error("修改病人信息失败！请重试！", "修改病人信息失败");
+      }
+    };
+    getFromWS("Home/medicalRecord/updateClient.template",newClient,obj_updateClient,processResult_updateClient);
+  }
+</script>
+
+<script type="text/javascript">
+
+</script>
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/uikit/js/uikit.min.js"></script>
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/assets/js/selectboxit/jquery.selectBoxIt.min.js"></script>
+<script src="/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<script src="/assets/js/select2/select2.min.js"></script>
+
+</body>
+</html>

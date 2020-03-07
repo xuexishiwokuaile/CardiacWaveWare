@@ -1,0 +1,21 @@
+<%	debugMsg("json相应的测试程序！") %>
+<%
+        :k = ""
+        :k =jsonAddItem("","userId",S("1"))
+        :k =jsonAddItem(:k,"displayName",S("测试1"))
+        :k =jsonAddItem(:k,"email",S("email"))
+        :k =jsonAddItem(:k,"picImg",S("picImg"))
+        :k =jsonAddItem(:k,"bannerUrl",S("bannerUrl"))
+        :dataArray = jsonAddArrayItem("",:k)
+
+        :k =jsonAddItem("","userId",S("2"))
+        :k =jsonAddItem(:k,"displayName",S("测试222"))
+        :k =jsonAddItem(:k,"email",S("email222"))
+        :k =jsonAddItem(:k,"picImg",S("picImg222"))
+        :k =jsonAddItem(:k,"bannerUrl",S("bannerUrl222"))
+        :dataArray = jsonAddArrayItem(:dataArray,:k)
+
+        :data = jsonAddItem("", "users", :dataArray)
+        :data = jsonAddItem(:data, "school", S("同济附小"+:token))
+%>
+<%=:data%>

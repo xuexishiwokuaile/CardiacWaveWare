@@ -1,0 +1,187 @@
+/* pages/report/report.wxss */
+
+/* 横线 */
+
+.hr {
+    border-top: 1px solid #f3f1f0;
+    width: 680rpx;
+    margin: 0rpx auto;
+}
+
+.outer {
+    width: 750rpx;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 顶部三个按钮 */
+
+.btns {
+    width: 700rpx;
+    display: flex;
+    justify-content: space-between;
+    font-size: 30rpx;
+    margin: 0 auto;
+    padding-bottom: 24rpx;
+}
+
+.btns-bg {
+    width: 200rpx;
+    height: 80rpx;
+    /* padding-left: 34rpx; */
+}
+
+.histor-case {
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/case-btn.png?sign=f27b547cdfa02fd490981a67cfb888ac&t=1562589075");
+    background-size: 200rpx;
+}
+
+.wave-playback {
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/wave-btn.png?sign=7515a9c0ae49e64950aee840189e0958&t=1562588593");
+    background-size: 200rpx;
+}
+
+.modify-info {
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/info-btn.png?sign=aea20ef5515f582e20f839f534fa8f66&t=1562588772");
+    background-size: 200rpx;
+}
+
+.btns-text {
+    height: 80rpx;
+    line-height: 70rpx;
+    color: #faf8f8;
+    font-size: 16px;
+    width: 200rpx;
+    text-align: center;
+    margin-left: 40rpx;
+}
+
+.btns-text-two {
+    margin-left: 16rpx;
+}
+
+/* 修改分享按钮的样式 */
+
+button::after {
+    border: none;
+}
+
+button {
+    background-color: #fff;
+    height: 82rpx;
+    line-height: 70rpx;
+    color: #faf8f8;
+    font-size: 16px;
+    width: 130rpx;
+    padding-left: 30rpx;
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/wave-play-back.png?sign=77a77dd67e478a352d693d69c95537e5&t=1562588558");
+    background-size: 130rpx 100%;
+    border-radius: 10rpx;
+}
+
+/* 颜色 */
+
+.bg-green {
+    background-color: #3ac990;
+}
+
+.bg-cyan-blue {
+    background-color: #4DC5D5;
+}
+
+/* 报告标题、时间 */
+
+.report-title-outer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.report-title {
+    font-size: 45rpx;
+    margin: 0 auto;
+    padding-top: 20rpx;
+}
+
+.report-time {
+    color: #8f8f8f;
+    font-size: 20rpx;
+    margin: 0 auto;
+    padding-top: 30rpx;
+    padding-bottom: 32rpx;
+}
+
+/* 定量峰值/总峰值 */
+
+.report-item-row {
+    display: flex;
+    width: 700rpx;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+
+.report-item-text {
+    font-size: 30rpx;
+    color: #070707;
+}
+
+.data-text {
+    color: #fffdfd;
+    font-size: 21rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    margin-top: 18rpx;
+    padding-left: 10rpx;
+}
+
+.bg-purple {
+    background-color: #a9b6ef;
+}
+
+.bg-orange {
+    background-color: #f6b37f;
+}
+
+.quantitative-peak-data, .total-peak-data {
+    width: 264rpx;
+}
+
+.bg-pink {
+    background-color: #f191b0;
+}
+
+.report-item-col {
+    display: flex;
+    flex-direction: column;
+    width: 700rpx;
+    margin: 40rpx auto;
+}
+
+/* 极性分布 */
+
+.polarity-distribution {
+    display: flex;
+    flex-direction: column;
+    width: 700rpx;
+    margin: 40rpx auto;
+}
+
+.polarity-distribution-item {
+    width: 210rpx;
+}
+
+/* 极性分布分析结论 */
+
+.polarity-distribution-conclusion {
+    display: flex;
+    flex-direction: column;
+    width: 700rpx;
+    margin: 0 auto;
+}
+
+.conclusion {
+    background-image: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/check.png?sign=4989d97302688e6d66a1f7beb10dc7bd&t=1562589688");
+    background-size: 10% 80%;
+    background-position: 96% 4rpx;
+    background-repeat: no-repeat;
+}

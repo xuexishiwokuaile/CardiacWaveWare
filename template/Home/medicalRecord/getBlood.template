@@ -1,0 +1,13 @@
+<%
+    ///获取检查的病历信息
+    :sql_blood="SELECT blood FROM medical_record WHERE id=?"
+    :result_blood = changeRecordSet(:sql_blood,S(:id))
+
+    =:result_blood
+
+    debugMsg(":result=========="#:result_editMedicalRecord)
+%>
+  $_@_$
+<%
+	=blood
+%>

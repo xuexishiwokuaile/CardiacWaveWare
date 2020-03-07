@@ -1,0 +1,35 @@
+<%
+    /// 文 件 名：dataTables.template
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/2/16 0016 22:07  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+
+    debugMsg("[DEBUGMSG]:dataTables.template 位置:13:"+"当前第几页："+:currentPage+"。第页共多少条："+:pageSize+"。开始是多少条："+:start+"传过来的参数："+:personId+"搜索关键词："+:keyWord)
+    :result_records_array = ""
+    :result_records_item = ""
+
+    :result_records_item = jsonAddItem(:result_records_item, "userName", S("沈"))
+    :result_records_item = jsonAddItem(:result_records_item, "loginName", S("sjq"))
+    :result_records_item = jsonAddItem(:result_records_item, "id", S("1122"))
+    :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+
+    :result_records_item = jsonAddItem(:result_records_item, "userName", S("李"))
+    :result_records_item = jsonAddItem(:result_records_item, "loginName", S("ljq"))
+    :result_records_item = jsonAddItem(:result_records_item, "id", S("1123"))
+    :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+
+
+    :result_records_items = jsonAddItem("", "data", :result_records_array)
+    :result_records_items = jsonAddItem(:result_records_items, "currentPage", :currentPage)
+    :result_records_items = jsonAddItem(:result_records_items, "pageSize", :pageSize)
+    :result_records_items = jsonAddItem(:result_records_items, "start", :start))
+    :result_records_items = jsonAddItem(:result_records_items, "total", 6)
+    =:result_records_items
+
+%>

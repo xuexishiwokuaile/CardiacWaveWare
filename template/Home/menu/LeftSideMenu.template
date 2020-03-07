@@ -1,0 +1,203 @@
+///获得权限
+<%
+    :sql_classification = "select classification from st_passports where login_name=?"
+    :result_classification = changeRecordSet(:sql_classification,S(:loginName))
+    :classification = classification
+    =:classification
+%>
+
+<header class="logo-env" style="padding-top:15px;padding-bottom:15px;">
+	<div class="logo">
+		<a href="dashboard-1.html" class="logo-expanded">
+			<img src="/assets/images/logo@2x.png" alt="" />
+		</a>
+
+		<a href="dashboard-1.html" class="logo-collapsed" style="width:15px">
+			<img src="/assets/images/logo@2x.png" height="15" alt="" />
+		</a>
+	</div>
+	<div class="mobile-menu-toggle visible-xs">
+		<a href="#" data-toggle="user-info-menu">
+			<i class="fa-bell-o"></i>
+			<span class="badge badge-success">7</span>
+		</a>
+
+		<a href="#" data-toggle="mobile-menu">
+			<i class="fa-bars"></i>
+		</a>
+	</div>
+</header>
+
+
+    ///classification=1,表示成员为管理员
+    <%If classification == "1"%>
+      <ul id="main-menu" class="main-menu">
+      	<li <%If :Item=="系统管理"%>class="active opened active"<%EndIf%>>
+      		<a href="#">
+      			<i class="linecons-cog"></i>
+      			<span class="title">系统管理</span>
+      			<div class="title" style="padding-left:30px">System Management</div>
+      		</a>
+
+      		<ul>
+      			<li <%If :item=="人员管理"%>class="active"<%EndIf%>>
+      				<a href="/pages/home/person/personManage.html">
+      					  <i class="fa-minus-circle"></i>
+      					<span class="title">人员管理</span>
+      				</a>
+      			</li>
+
+
+      		<li <%If :item=="栏目管理"%>class="active"<%EndIf%>>
+              <a href="/pages/home/article/columnManagement.html">
+                    <i class="fa-minus-circle"></i>
+                   <span class="title">栏目管理</span>
+              </a>
+          </li>
+
+          <li <%If :item=="文章管理"%>class="active"<%EndIf%>>
+               <a href="/pages/home/article/articleManagement.html">
+                    <i class="fa-minus-circle"></i>
+                   <span class="title">文章管理</span>
+               </a>
+          </li>
+          </ul>
+
+      		<ul>
+              <li <%If :item=="二维码"%>class="active"<%EndIf%>>
+                <a href="/pages/home/QRcode/QRCode.html">
+                    <i class="fa-minus-circle"></i>
+                  <span class="title">二维码</span>
+                </a>
+              </li>
+            </ul>
+
+            <ul>
+              <li <%If :item=="病历查询"%>class="active"<%EndIf%>>
+                <a href="/pages/home/medicalRecord/medicalRecordsList.html">
+                  <i class="fa-minus-circle"></i>
+                  <span class="title">病案列表</span>
+                </a>
+              </li>
+            </ul>
+
+            <ul>
+              <li <%If :item=="医疗机构"%>class="active"<%EndIf%>>
+                <a href="/pages/home/hostpitals/hostpitals.html">
+                  <i class="fa-minus-circle"></i>
+                   <span class="title">医疗机构</span>
+                 </a>
+               </li>
+             </ul>
+
+            <ul>
+                <li <%If :item=="病历列表"%>class="active"<%EndIf%>>
+                  <a href="/pages/home/medicalRecordAnalysis/listAllRecords.html">
+                      <i class="fa-minus-circle"></i>
+                    <span class="title">病历列表</span>
+                  </a>
+                </li>
+              </ul>
+
+///              <ul>
+///                    <li <%If :item=="病历列表测试"%>class="active"<%EndIf%>>
+///                      <a href="/pages/home/medicalRecordAnalysis/test_tlistRecords.html">
+///                          <i class="fa-minus-circle"></i>
+///                        <span class="title">病历列表测试</span>
+///                      </a>
+///                    </li>
+///              </ul>
+
+            <ul>
+                <li <%If :item=="病历分析"%>class="active"<%EndIf%>>
+                  <a href="/pages/home/medicalRecordAnalysis/medicalRecordAnalysis.html">
+                      <i class="fa-minus-circle"></i>
+                    <span class="title">病历分析</span>
+                  </a>
+                </li>
+              </ul>
+
+             <ul>
+                <li <%If :item=="登录日志"%>class="active"<%EndIf%>>
+                  <a href="/pages/home/record/list.html">
+                    <i class="fa-minus-circle"></i>
+                    <span class="title">登录日志</span>
+                  </a>
+                </li>
+              </ul>
+      	</li>
+      </ul>
+    <%EndIf%>
+
+    ///classification=2,表示登录人为医生
+    <%If classification == "2"%>
+      <ul id="main-menu" class="main-menu">
+        <li <%If :Item=="个人信息"%>class="active opened active"<%EndIf%>>
+      		<a href="#">
+      			<i class="fa fa-edit"></i>
+      			<span class="title">就诊记录</span>
+      			<div class="title" style="padding-left:30px">Medical Records</div>
+      		</a>
+
+      		<ul>
+      			<li <%If :item=="病历查询"%>class="active"<%EndIf%>>
+      				<a href="/pages/home/medicalRecord/medicalRecordsList.html">
+      					<i class="fa-minus-circle"></i>
+      					<span class="title">病案列表</span>
+      				</a>
+      			</li>
+      		</ul>
+      	</li>
+      </ul>
+    <%EndIf%>
+
+
+    ///classification=3，表示登录认为病人
+    <%If classification == "3"%>
+      <ul id="main-menu" class="main-menu">
+        <li <%If :Item=="个人信息"%>class="active opened active"<%EndIf%>>
+      		<a href="#">
+      			<i class="fa fa-edit"></i>
+      			<span class="title">个人信息</span>
+      			<div class="title" style="padding-left:30px">Personal Information</div>
+      		</a>
+
+      		<ul>
+      			<li <%If :item=="病历查询"%>class="active"<%EndIf%>>
+      				<a href="clientMedicalRecords.html">
+      					<i class="fa-minus-circle"></i>
+      					<span class="title">病历查询</span>
+      				</a>
+      			</li>
+      		</ul>
+      	</li>
+      </ul>
+    <%EndIf%>
+
+    ///classification=4，表示登录认为监测员
+    <%If classification == "4"%>
+        <ul id="main-menu" class="main-menu">
+            <li <%If :Item=="系统管理"%>class="active opened active"<%EndIf%>>
+              <a href="#">
+                <i class="linecons-cog"></i>
+                <span class="title">系统管理</span>
+                <div class="title" style="padding-left:30px">System Management</div>
+              </a>
+
+              <ul>
+                <li <%If :item=="病案列表"%>class="active"<%EndIf%>>
+                  <a href="/pages/home/medicalRecord/medicalRecordsList.html">
+                      <i class="fa-minus-circle"></i>
+                    <span class="title">病案列表</span>
+                  </a>
+                </li>
+                <li <%If :item=="二维码"%>class="active"<%EndIf%>>
+                    <a href="#" onclick="produceQRCode()">
+                          <i class="fa-minus-circle"></i>
+                         <span class="title">二维码</span>
+                    </a>
+                </li>
+              </ul>
+            </li>
+        </ul>
+    <%EndIf%>

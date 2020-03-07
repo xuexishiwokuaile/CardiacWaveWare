@@ -1,0 +1,12 @@
+<view >页面预览</view>
+
+<view bind:tap="index">用户端和监测员端主页</view>
+<view bind:tap="userReg">用户注册</view> 
+<view bind:tap="doctorReg">监测员注册</view>
+<view bind:tap="nearHos">附件医院</view>
+<view bind:tap="report">用户端报告</view>
+<view bind:tap="historyRep">历史报告</view>
+<view bind:tap="comm">心康社区</view>
+<view bind:tap="userMa">用户管理</view>
+<view bind:tap="center">个人中心</view>
+<view bind:tap="cardiac">心脏监测</view>

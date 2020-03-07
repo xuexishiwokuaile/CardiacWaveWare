@@ -1,0 +1,94 @@
+/* components/index/index.wxss */
+
+page{
+  width: 100%;
+  height: 100%;
+  font-family: 'STxihei';
+  position: relative;
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* justify-content: center; */
+}
+.outer{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* border: 4rpx solid red; */
+}
+.header{
+  width: 100%;
+  position: absolute;
+  top: 0rpx;
+  
+}
+.index-container{
+  /* height: 100%; */
+  /* margin: 40% 0; */
+  /* border: 2rpx solid blue; */
+}
+/* 问题反馈&合作洽谈 */
+.footer{
+  position: absolute;
+  bottom: 10rpx;
+  /* margin-bottom: 10rpx; */
+  /* margin-top: 20rpx; */
+  /* float: left; */
+  /* border: 4rpx solid seagreen; */
+
+}
+
+/* 横线 */
+.hr{
+  border-top: 1px solid #f3f1f0;
+  width: 680rpx;
+  margin: 44rpx auto;
+}
+/* 选项 */
+.item-outer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.items{
+  width: 750rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.item image{
+  width: 132rpx;
+  height: 150rpx;
+}
+.item-text{
+  color: #606064;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+.question-cooperation{
+  display: flex;
+  justify-content: center;
+}
+.question-cooperation-text{
+  color: #5099ff;
+  font-size: 22rpx;
+  padding: 0 20rpx 0 20rpx;
+}
+/* 用户管理按钮 */
+.user-manage{
+  background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/index-user-manage-btn.png?sign=751388fe6003807883913438cb83706e&t=1562589626");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 198rpx;
+  height: 78rpx;
+  margin-left: 50rpx;
+}
+.user-manage-text{
+  color: #faf8f8;
+  font-size: 30rpx;
+  text-align: center;
+  line-height:68rpx;
+  margin-left: 44rpx;
+}

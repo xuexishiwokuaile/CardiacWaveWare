@@ -1,0 +1,35 @@
+<%
+    /// 文 件 名：iDeleteUsers
+    /// 描    述：管理员后台，删除/批量删除用户(用一句话描述该文件做什么)
+    /// 项目名称：cardiac
+    /// 作    者：武汉大学国家网络安全学院@沈家强
+    /// 发布日期：2019/5/8 14:01
+    /// 文件版本：V1.0
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved.
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:iDeleteUsers.template 位置:14:"+"传过来的ids="+:ids+"批量删除的数量usersCount="+:usersCount)
+    split(:ids, ",", &arrayId)
+
+    /// 单个删除用户 可以不用传usersCount
+    If :usersCount == "__error__"
+        :usersCount = 1
+    EndIf
+
+    :sql_delete_passports = "DELETE FROM st_passports WHERE id = ?"
+    :sql_delete_client = "DELETE FROM client WHERE ID =?"
+    :i=0
+    While :i < :usersCount
+        :resultRecord = execSQL(:sql_delete_passports,S(:arrayId[:i]))
+        :resultRecord = execSQL(:sql_delete_client,S(:arrayId[:i]))
+        :i = :i + 1
+    EndWhile
+    If :resultRecord == "ok$^@^$UPDATED="
+        ="ok"
+    Else
+        =:resultRecord
+    EndIf
+%>

@@ -1,0 +1,18 @@
+<%
+    Function add(:x,:y)
+      =:x+:y
+    EndFunction
+
+    ///获取表格当中，固定列相应的值
+    ///参数：1相应的列名
+    ///参数：2相应的表名
+    ///参数：3相应的ID值
+    Function getValueFromTable(:strColoumName,:strTableName,:strId)
+      split(:str,",", &array)
+
+      :sql="SELECT "+:strColoumName+" AS result FROM " + :strTableName + " WHERE login_name=?"
+      :resultRecord = changeRecordSet(:sql,S(:strId))
+      =result
+    EndFunction
+
+%>

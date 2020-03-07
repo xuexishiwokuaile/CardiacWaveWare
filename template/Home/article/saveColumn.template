@@ -1,0 +1,49 @@
+///新增栏目
+<%If :operation=="newColumn"
+  :id=tuid()
+	:insertSql = "insert into columns(id,name,parent_id,sort) values(?,?,?,?)"
+	If :parent_id=="0"
+		debugMsg(:parent_id#"一级=================")
+	Else
+		debugMsg(:parent_id#"不是一级=================")
+	EndIf
+	:x=changeRecordSet(:insertSql,S(:id),S(:name),S(:parent_id),S(:sort))
+	=:x
+EndIf%>
+
+///修改栏目名称和排序（陈）
+<%If  :operation=="editColumn"
+	:updateSql = "update columns set name=? ,sort=? where id= ?"
+	:x=changeRecordSet(:updateSql,S(:name),:sort,S(:id))
+	Exit(:x)
+EndIf%>
+
+///仅修改栏目排序（陈）
+<%If  :operation=="editColumnOnlySort"
+	 :updateSql = "update columns set sort=? where id= ?"
+	 changeRecordSet(:updateSql,:sort,S(:id))
+	Exit("ok")
+EndIf%>
+
+///删除栏目
+<%If :operation=="deleteColumn"
+		:sqlStr2 = "select * from columns where parent_id=?"
+		:x=changeRecordSet(:sqlStr2,S(:id))
+		:num2=recordCount()
+    :selectSql = "select * from article where article_type = ?"
+    changeRecordSet(:selectSql,S(:id))
+    :num3 = recordCount()
+    If :num3>0
+        :i="该栏目下有文章，无法删除"
+        Exit(:i)
+    EndIf
+		If :num2>0
+			:i="该栏目有子栏目，无法删除"
+					debugMsg("该栏目下有文章，无法删除")
+			Exit(:i)
+		Else
+			:sqlStr3 = "delete from columns where id=?"
+			:i=changeRecordSet(:sqlStr3,S(:id))
+			Exit(:i)
+		EndIf
+EndIf%>

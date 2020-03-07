@@ -1,0 +1,21 @@
+<!-- databaseName=single_database -->
+<html>
+<head>
+  <META content="text/html; charset=UTF-8" http-equiv="Content-Type">
+</head>
+<body>
+<label>这里是一个访问模板文件的例子。与其他例子不同的是，它的返回内容独立的作为一个完整的html文档存在，而不是插入到其他的html文档中。</lable><br>
+这个例子演示的主要内容如下：<br>
+（1）tpl格式的URL的用法，如"/sample/tpldemo.tpl?id=我们"，接下来由apache的Rewrite和反向代理功能，配合CGI、StaionServer，会完成后继的处理。<br>
+（2）通过get方式（URL）传递汉字的用法。<br>
+<%:sqlstr1="select SQL_CALC_FOUND_ROWS nid from cs_english_notices limit 3"%>
+<%:sqlstr2="SELECT FOUND_ROWS() "%>
+<%:x=changeRecordSet(:sqlstr1,:sqlstr2)%>
+	<%Repeat%>
+		<%=nid%><br>
+	<%EndRepeat%>
+<%=:x%><br>
+<%=:FOUND_ROWS%><br>
+外部变量id=<%=:id%>
+</body>
+</html>

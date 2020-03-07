@@ -1,0 +1,34 @@
+<%
+    ///计算共有多少条数据
+///    :sql_recordsTotal = "SELECT id FROM MEDICAL_RECORD_ANALYSIS WHERE (clientname LIKE ?)"
+///    :totalSql = changeRecordSet(:sql_recordsTotal,S("%"+:keyWord+"%"))
+///    :totalItems = recordCount();
+
+    :sql_Records = "SELECT * FROM MEDICAL_RECORD_ANALYSIS WHERE CAST(QUANTITATIVEPEAK AS DOUBLE)>'60000' OR CAST(DISTRIBUTIONFOUR AS DOUBLE)>'0.17' OR CAST(DISTRIBUTIONFIVE AS DOUBLE)>'0.15' OR CAST(DISTRIBUTIONSIX AS DOUBLE)>'0.09' AND (clientname LIKE ?) LIMIT 100"
+    :result_Records = changeRecordSet(:sql_Records,S("%"+:keyWord+"%"))
+
+    :result_records_array=""
+
+    ///查询结果ok或bad：
+    If :result_Records == "ok"
+        ///ok
+        Repeat
+            ///每次循环存入一条病历信息
+            :result_records_item = jsonAddItem("", "clientname", S(clientname))
+            :result_records_item = jsonAddItem(:result_records_item, "time", S(time))
+            :result_records_item = jsonAddItem(:result_records_item, "quantitativepeak", S(quantitativepeak))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionfour", S(distributionfour))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionfive", S(distributionfive))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionsix", S(distributionsix))
+            :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+        EndRepeat
+    EndIf
+
+    ///bad
+    :result_records_items = jsonAddItem("", "data", :result_records_array)
+    :result_records_items = jsonAddItem(:result_records_items, "currentPage", :currentPage)
+    :result_records_items = jsonAddItem(:result_records_items, "pageSize", :pageSize)
+    :result_records_items = jsonAddItem(:result_records_items, "start", :start))
+    :result_records_items = jsonAddItem(:result_records_items, "total", S(100))
+    =:result_records_items
+%>

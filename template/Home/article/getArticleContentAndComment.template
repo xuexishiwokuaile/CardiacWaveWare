@@ -1,0 +1,71 @@
+///通过文章ID获取文章内容
+<%If :operation == "getArticleFromId"
+    If :id == ""
+      Exit ""
+    EndIf
+    :sql = "select title, content, publish_date,appendix_id,article_type from article where id=? "
+    changeRecordSet(:sql, S(:id))
+    If recordCount()>0
+      Repeat
+    %>
+    <div class="deanacticletop">
+    			<h4>
+    				<center><%=title%></center>
+    			</h4>
+    </div>
+    <div class="deanmanagerart">
+    			<span class="deanfenxianga">
+    			<%:mid_publish_date = mid(publish_date,0,16)%>
+    			<center>日期：<%=:mid_publish_date%></center>
+    				</span>
+    			<span id="fontstyle_change">
+    			<center style="margin: 6px 0 6px 0">
+    			【字体：
+              				<a href="javascript:void(0);"><i class="fontstyle" onclick="fontZoomC();">大</i></a>
+              				<a href="javascript:void(0);"><i class="fontstyle" onclick="fontZoom();">中</i> </a>
+              				<a href="javascript:void(0);"><i class="fontstyle" onclick="fontZoomA();">小</i></a>】
+    			</center>
+    			</span>
+    		</div>
+    		<div class="bm vw">
+    			<div class="d">
+    				<table cellpadding="0" cellspacing="0" class="vwtb">
+    					<tbody>
+    						<tr>
+    							<td id="article_content">
+    								<%=content%>
+    							</td>
+    						</tr>
+
+    <%  If appendix_id !=""
+        split(appendix_id,";",&appendixIdsArray)%>
+                <tr>
+                   <td>
+        <%:i=0%>
+        附件:
+        <%While :i<arrayLength(&appendixIdsArray)%>
+    <%
+        :selectSql = "select filename from uploadedfiles where filetuid=? "
+        :result = changeRecordSet(:selectSql, S(:appendixIdsArray[:i]))
+        :fileName=filename
+    %>
+	      <a style="display:block;margin-left:30px;color:#1386FF" title="点击下载" href="/one/downloadFile.spe?dtype=Sqldb&mode=attachment&fileid=<%=:appendixIdsArray[:i]%>"> <%=:fileName%></a>
+    <%
+        :i = :i+1;
+        EndWhile
+        EndIf
+    %>
+					</td>
+				  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+<%
+	EndRepeat
+Else
+	该文章已被删除
+EndIf
+EndIf
+%>
+

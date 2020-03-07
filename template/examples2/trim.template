@@ -1,0 +1,19 @@
+///公共相应的对应的方法引入
+<%#include "common/commonFunction.template"%>
+
+<%
+    :strContent = "  sjq ni hao hello yar    "
+    :strReturn = trim(:strContent)
+    debugMsg(:strReturn)
+    =:strReturn
+
+
+    :strSrc = "1***2345***22222"
+    :strTarget = getSplitPart(:strSrc, "***", 2)
+    =:strTarget
+
+    :strReplace = "userToken=9p8is1uJK`9eKVuJ9^bhk>{5Ezo9}ny8`P?rQ6>;4dpO<g8Ecj}PFHrxD13CoKgn"
+    :strReplaceTarget = replace(:strReplace, "userToken=", "")
+    =:strReplaceTarget
+%>
+

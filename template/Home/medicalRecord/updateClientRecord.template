@@ -1,0 +1,30 @@
+<%
+    /// 文 件 名：updateClientRecord
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/5 10:54  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+debugMsg("[DEBUGMSG]:updateClientRecord.template 位置:13:"+"checkResult========"+:checkResult+"id========"+:id+"clientId==="+:clientId+".blood="+:blood)
+    :sql_client = "SELECT * FROM client WHERE id = ?"
+    :idCheck = changeRecordSet(:sql_client,S(:clientId))
+    If :idCheck == "ok"
+        :updateClient_sql = "UPDATE client SET height = ?,weight = ?,smoking = ?,drinking = ?,hypertension = ?,diabetes = ? WHERE id = ?"
+        = execSQL(:updateClient_sql,S(:height),S(:weight),S(:smoking),S(:drinking),S(:hypertension),S(:diabetes),S(:clientId))
+        :updateResult_sql = "UPDATE medical_record SET blood = ?,checkResult = ? WHERE id = ?"
+        =execSQL(:updateResult_sql,S(:blood),S(:checkResult),S(:id))
+        :strJsonDataItem = jsonAddItem("", "msg", S("ok"))
+        Exit :strJsonDataItem
+
+        debugMsg("[DEBUGMSG]:updateClientRecord.template 位置:24:"+""+:strJsonDataItem)
+    EndIf
+    If :idCheck == "bad"
+       :strJsonDataItem = jsonAddItem("", "msg", S("bad"))
+       Exit :strJsonDataItem
+    EndIf
+%>

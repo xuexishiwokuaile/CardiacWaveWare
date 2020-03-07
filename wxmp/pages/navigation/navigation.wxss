@@ -1,0 +1,4 @@
+/* pages/navigation/navigation.wxss */
+view{
+    margin-top: 20rpx;
+}

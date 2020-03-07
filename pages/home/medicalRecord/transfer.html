@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="心脏高精度动力学分析系统" />
+    <meta name="author" content="" />
+    <title>心脏高精度电动力学分析系统</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/systemManage.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body class="page-body" style="text-align:center">
+<div class="page-container">
+        <div class="modal-body">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label style="font-size:15px;">提示：</label>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:15px;">如您已经在本医院注册成为用户，请点击登录按钮获取检查号码</label>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:15px;">如未进行过注册，请点击注册按钮填写相应信息完成注册获得检查号码</label>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <button style="display: block;margin-top: 23px; background-color: blue;color: white;height: 50px" type="button" class="form-control" id="signIn">登录</button>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <button style="display: block;margin-top: 23px; background-color: grey;color: black;height: 50px;" type="button" class="form-control" id="signUp">注册</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function($) {
+    var Request=new QueryString();
+    var monitorId = Request['monitorId'];
+    var doctorId = Request["doctorId"];
+    var directPath = Request["directPath"];
+    console.log(Request);
+    //如果传递过来的要求直接访问注册
+    if(directPath == "signIn"){
+      sessionStorage.setItem('doctorId',doctorId);
+      sessionStorage.setItem('monitorId',monitorId);
+      location.href="clientSignIn.html";
+    }
+    else if(directPath == "signUp"){
+      sessionStorage.setItem('doctorId',doctorId);
+      sessionStorage.setItem('monitorId',monitorId);
+      location.href="clientSignUp.html";
+    }
+
+    /**
+     * 用户点击登录跳转这登录界面
+     **/
+    $('#signIn').on('click', function () {
+      sessionStorage.setItem('doctorId',doctorId);
+      location.href="clientSignIn.html";
+    });
+
+    /**
+     * 用户点击注册跳转至用户注册页面
+     */
+    $('#signUp').on('click', function () {
+      sessionStorage.setItem('doctorId',doctorId);
+      location.href="clientSignUp.html";
+    });
+  });
+
+  /**
+   * 获取doctorId
+   */
+  function QueryString() {//构造参数对象并初始化
+    var name, value, i;
+    var str = location.href;//获得浏览器地址栏URL串
+    var num = str.indexOf("?");
+    str = str.substr(num + 1);//截取“?”后面的参数串
+    var arrtmp = str.split("&");//将各参数分离形成参数数组
+    for (i = 0; i < arrtmp.length; i++) {
+      num = arrtmp[i].indexOf("=");
+      if (num > 0) {
+        name = arrtmp[i].substring(0, num);//取得参数名称
+        value = arrtmp[i].substr(num + 1);//取得参数值
+        this[name] = value;//定义对象属性并初始化
+      }
+    }
+  }
+</script>
+
+
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/uikit/js/uikit.min.js"></script>
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/assets/js/selectboxit/jquery.selectBoxIt.min.js"></script>
+<script src="/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<script src="/assets/js/select2/select2.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<%
+    /// 文 件 名：listHostpitals
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/22 11:29  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+debugMsg("[DEBUGMSG]:listHostpitals.template 位置:13:"+"page=="+:page+"=limit="+:limit+"==keywords=="+:keywords)
+  If :keywords =="__error__"
+     :keywords = ""
+  EndIf
+     :sql_get_record_count = "SELECT * FROM hospitals WHERE (name LIKE ? OR address LIKE ?)"
+     :resultRecord = changeRecordSet(:sql_get_record_count,S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+     :recordNum = recordCount()
+     :sql_get_record = "SELECT * FROM hospitals WHERE (name LIKE ? OR address LIKE ?) ORDER BY LENGTH(cNumber),cNumber ASC LIMIT ? OFFSET ?"
+     :resultRecord = changeRecordSet(:sql_get_record,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+     :result_records_array=""
+
+  If :resultRecord == "ok"
+      Repeat
+        ///循环主体
+        :result_records_item = jsonAddItem("", "id", S(id))
+        :result_records_item = jsonAddItem(:result_records_item, "cNumber", S(cNumber))
+        :result_records_item = jsonAddItem(:result_records_item, "province", S(province))
+        :result_records_item = jsonAddItem(:result_records_item, "city", S(city))
+        :result_records_item = jsonAddItem(:result_records_item, "name", S(name))
+        :result_records_item = jsonAddItem(:result_records_item, "address", S(address))
+        :result_records_item = jsonAddItem(:result_records_item, "longitude", S(longitude))
+        :result_records_item = jsonAddItem(:result_records_item, "latitude", S(latitude))
+        :result_records_item = jsonAddItem(:result_records_item, "description", S(description))
+        :result_records_item = jsonAddItem(:result_records_item, "remark", S(remark))
+        :result_records_array = jsonAddArrayItem(:result_records_array ,:result_records_item)
+      EndRepeat
+      ///成功 返回状态码0
+            :code = 0
+            :result_records_items = jsonAddItem("","code",:code)
+            :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+        Else
+            /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+            :code = 0
+            :result_records_array="[]"
+            :result_records_items = jsonAddItem("","code",:code)
+            :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+        EndIf
+        :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+        =:result_records_items
+%>

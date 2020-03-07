@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据分析</title>
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.js"></script>
+    <script type="text/javascript" src="/assets/js/qrcode.min.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <script>
+      function analysis(arrayDots,index){
+        // arrayDots 2048个点数组   index 当前数据在表格中的位置(第几行)
+        let min = parseInt(arrayDots[0]);
+        // 找出最小的点
+        for(let i=1;i<arrayDots.length;i++){
+          if(parseInt(arrayDots[i]) < min){
+            min = parseInt(arrayDots[i]);
+          }
+        }
+
+        // console.log("最小的是："+min);
+        // 计算各点与最小的点之间的值
+        let calculateOne = 0;
+        for(let i=0;i<arrayDots.length;i++){
+          calculateOne += (arrayDots[i] - min);
+        }
+        // 写入到表格的相应位置
+        $($(".calculate-one")[index]).text(calculateOne);
+      }
+      //加载表格
+      let use = layui.use(['table', 'jquery'], function() {
+        var table = layui.table;
+        var $ = layui.$;
+        table.render({
+          elem: '#list-table'
+          , url: '/Home/medicalRecordAnalysis/getDataAnalysis.template'
+          , cellMinWidth: 260
+          , cols: [
+            [
+              {type: 'checkbox', fixed: 'left'}
+              , {field: 'name', title: '姓名',  align: 'center',templet: '#nameTpl'}
+              , {field: 'checkTime', title: '检查时间',  align: 'center'}
+              , {field: 'calculateOne', title: '计算1',  align: 'center', templet: '#calculateOneTpl'}
+            ]]
+          , page: true,
+          done: function(res, curr, count) {
+            //如果是异步请求数据方式，res即为你接口返回的信息。
+            //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+            console.log(res.data);
+            for(let i=0;i<res.data.length;i++){
+              analysis(res.data[i].dots.split("\n"),i);
+            }
+          },
+        });
+
+        //搜索
+        $('#search').click(function() {
+          var data = $('#searchName').val();//搜索的关键字
+          //重载表格
+          layui.use('table', function() {
+            var table = layui.table;
+            table.reload('list-table', {
+              url: '/Home/record/listRecord.template',
+              where: { //设定异步数据接口的额外参数，任意设
+                keyWord: data,
+              }
+              , page: {
+                curr: 1, //重新从第 1 页开始
+              },
+            });
+          });
+        });
+
+      });
+    </script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <h2>分析列表</h2>
+        </div>
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="user-table">
+                <div class="table-header-btn personManage-btns" style="padding: 4px 0;">
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchName" autocomplete="off"
+                                   placeholder="登录人员/时间">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search" style="margin: auto 0!important;">搜索</button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="list-table" lay-filter="records-table"></table>
+                <script type="text/html" id="calculateOneTpl">
+                    <!--  存放 计算1 的值-->
+                    <span class="calculate-one"> </span>
+                </script>
+                <script type="text/html" id="nameTpl">
+                    {{#  if(d.isuseful == 2){ }}
+                        <div style="color: red">{{d.name}}</div>
+                    {{#  } else { }}
+                        <div>{{d.name}}</div>
+                    {{#  } }}
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+    <HEAD>
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.6.2/html5shiv.js"></script>
+      <script src="EnglishV/js/respond.src.js"></script>
+    <![endif]-->
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<TITLE>师生园地</TITLE>
+		<link rel="stylesheet" type="text/css" href="/CSS/maintain/alert.css" />
+
+		<LINK rel=stylesheet type=text/css href="/CSS/home/nav100330.css">
+
+		<link  rel="stylesheet" href="/CSS/maintain/bootstrap.css">
+		<script type="text/javascript" src="/Scripts/bootstrap.js"></script>
+	
+
+		<!--头部-->
+		<LINK rel=stylesheet type=text/css href="/CSS/home/screen-fix100330.css">
+		<!--导航栏-->
+
+		<script type="text/javascript" src="/Scripts/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+		<script type="text/javascript" src="/Scripts/jquery-migrate-1.2.1.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery.alert.js"></script>
+		<SCRIPT   type="text/JavaScript">
+          var needCheck=true;
+          var userId;
+          var userToken;
+          userId = localStorage.getItem('userId');
+          userToken = localStorage.getItem('userToken');
+          if(!userId || !userToken ){
+            $("#loginInfo").html("教师：");
+            // $("#loginAnchor")[0].style.display="";
+            // $("#logoutAnchor")[0].style.display="none";
+          }
+          var dealResult = function(){
+            alert(obj[0]);
+
+            if(obj[0]=="failed"){
+              localStorage.removeItem('userId');
+              localStorage.removeItem('userToken');
+              localStorage.removeItem('classification');
+              localStorage.removeItem('loginName');
+              $("#loginInfo").html("教师：");
+              $("#loginAnchor")[0].style.display="";
+              $("#logoutAnchor")[0].style.display="none";
+            }
+            else{
+              $("#loginInfo").html("<a href='/pages/maintain/index.html'>"+localStorage.getItem('loginName')+"</a>：");
+              $("#loginAnchor")[0].style.display="none";
+              $("#logoutAnchor")[0].style.display="";
+            }
+          };
+          var obj = new Array();
+          getFromWS("CoreService/checkLogin","id="+userId+"$^@^$token="+userToken,obj,dealResult);
+          alert("aaaa")
+
+
+
+
+          function passResult(results){
+      if(results[0].substring(0,6)=="failed"){
+          alert("登录失败："+results[0].substring(7));
+          $("#goingFig")[0].value='normal';
+      }
+      else{
+            localStorage.setItem('userId',results[0]);
+            localStorage.setItem('userToken',results[1]);
+            localStorage.setItem('classification',results[2]);
+            localStorage.setItem('loginName',results[3]);
+            hiClose();            
+            refreshState();
+            // if($("#goingFig")[0].value=='going'){
+            //    $("#goingFig")[0].value='normal';
+            //    loadFromWS("dynamicPage()","folder=maintain$^@^$template=security.template$^@^$userId="+results[0]+"$^@^$userToken="+results[1]+"$^@^$classification="+results[2],"operationPad");
+            // }
+      }
+  }
+
+  function sendLogin(){
+     var loginName= $("#popup_message #loginName").val();
+     var passwd = $("#popup_message #passwd").val();
+     if(loginName==""){
+        alert("用户名不能为空");
+        $("#popup_message #loginName")[0].focus();
+        return;
+     }
+     if(passwd==""){
+        alert("密码不能为空");
+        $("#popup_message #passwd")[0].focus();
+        return;
+     }
+     var vcode = $("#popup_message #vcode").html();
+     if($("#popup_message #vcodeCtr").val().toUpperCase()!=vcode){
+        alert("请输入正确的验证码！");
+        vcode = veriCode();
+        $("#popup_message #vcode")[0].innerHTML = vcode;
+        $("#popup_message #vcodeCtr")[0].value='';
+        $("#popup_message #vcodeCtr")[0].focus();
+        return;
+     }
+     login(loginName,passwd,passResult);
+  }
+  
+ </SCRIPT>
+
+
+
+<script type="text/javascript">
+    function refreshState(){
+        var needCheck=true;
+        var userId;
+        var userToken;
+        userId = localStorage.getItem('userId');
+        userToken = localStorage.getItem('userToken');
+        if(!userId || !userToken ){
+            $("#loginInfo").html("教师：");
+           // $("#loginAnchor")[0].style.display="";
+           // $("#logoutAnchor")[0].style.display="none";
+            return;
+        }
+        var dealResult = function(){
+            if(obj[0]=="failed"){
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('classification');
+                localStorage.removeItem('loginName');
+                $("#loginInfo").html("教师：");
+                $("#loginAnchor")[0].style.display="";
+                $("#logoutAnchor")[0].style.display="none";
+            }
+            else{
+                $("#loginInfo").html("<a href='/pages/maintain/index.html'>"+localStorage.getItem('loginName')+"</a>：");
+                $("#loginAnchor")[0].style.display="none";
+                $("#logoutAnchor")[0].style.display="";
+            }
+        };
+        var obj = new Array();
+        getFromWS("CoreService/checkLogin","id="+userId+"$^@^$token="+userToken,obj,dealResult); 
+    } 
+</script>
+
+<script type="text/javascript">
+    function dologin(){
+        var loginIn=true;
+        var userId;
+        var userToken;
+        userId = localStorage.getItem('userId');
+        userToken = localStorage.getItem('userToken');
+        if(!userId || !userToken )
+            loginIn=false;
+        if(loginIn){
+            alert("已登录，若要重新登录，请先登出。");
+            return;
+        }
+        hiBox('#showbox', '登录',300,170,'','.a_close');
+        var vcode = veriCode();
+        $("#popup_message #vcode")[0].innerHTML = vcode;
+        $("#popup_message #loginName")[0].focus();
+    }
+</script>
+
+<script type="text/javascript">
+    function dologout(){
+        var userId = localStorage.getItem('userId');
+        var userToken = localStorage.getItem('userToken');
+        if(!userId || !userToken)
+            return;
+        var callBack = function(){
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('classification');
+            localStorage.removeItem('loginName');            
+            document.location.reload();
+        };
+        logout(userId,userToken,callBack);        
+    }
+</script>
+
+
+<script type="text/javascript">
+
+    function enterSubmit(){
+        var event=arguments.callee.caller.arguments[0]||window.event;//消除浏览器差异  
+        if (event.keyCode == 13){  
+            var loginName= $("#popup_message #loginName")[0];
+            if(loginName.value==''){
+                loginName.focus();
+                return;
+            }
+            var passwd = $("#popup_message #passwd")[0];
+            if(passwd.value==''){
+                passwd.focus();
+                return;
+            }
+            var vcodeCtr = $("#popup_message #vcodeCtr")[0];
+            if(vcodeCtr.value==''){
+                vcodeCtr.focus();
+                return;
+            }
+            sendLogin();
+        }
+    }
+</script> 
+
+		<script type="text/javascript">
+
+    function showBlogContent(bid,author){
+        var paras= 'bid='+bid+'$^@^$author='+author;
+        loadFromWS("blog/blogcontent.template", paras, "blogContentList");
+    }
+
+    $(function() {
+        var tag = "师生园地";
+        var paras = "tag="+tag;
+        loadFromWS("Home/header.template",paras,"base_hd");
+	var q = document.URL.split('?')[1];
+        q = decodeURI(q);
+        var types=[];
+		q = oneArguFromList("author",q,types);
+        paras="author="+types[0];
+		q = oneArguFromList("pageNumber",q,types);
+        if(types[0]==="")
+            paras += "$^@^$pageNumber=1";
+        else
+            paras += "$^@^$pageNumber="+types[0];
+		q = oneArguFromList("pageSize",q,types);
+        if(types[0]==="")
+            paras += "$^@^$pageSize=5";
+        else
+            paras += "$^@^$pageSize="+types[0];
+		q = oneArguFromList("type",q,types);
+        if(types[0]!=="")
+            paras += "$^@^$type="+types[0];
+        $("#subtype")[0].value=types[0];        //var paras= q.replace(/&/g,'$^@^$'); 
+        loadFromWS("examples/testblog.template", paras, "blogLeft");
+        loadFromWS("blog/blog.template", paras, "blogContentList");
+	});
+
+		</script>
+
+<!--
+		<script type="text/javascript">
+			//将id为demo的元素变为折叠组件
+			$("#demo").collapse({
+				toggle : true
+			});
+			//打开
+			function open_collapse() {
+				$("#demo").collapse("show");
+			}
+
+			//折叠
+			function hide_collapse() {
+				$("#demo").collapse("hide");
+			}
+        </script>  -->
+		<META name=GENERATOR content="MSHTML 8.00.7600.16588">
+		<style type="text/css">
+		</style>
+
+		<style type="text/css">
+			.main {
+				margin: 0 auto;
+				width: 980px;
+				background-color: #FFFFFF;
+				padding-top: 20px;
+			}
+			.left_nav {
+				float: left;
+				margin-right: 20px;
+				width: 20%;
+				height: 500px;
+				/*border: 1px #CCCCCC solid;*/
+			}
+			.right_content {
+				float: left;
+				padding: 10px;
+				width: 77.5%;
+				min-height: 700px;
+				border: 1px #DFDFDF solid;
+			}
+			.abstract {
+				padding: 10px;
+				border: 1px #DFDFDF solid;
+				border-top: none;
+				margin-bottom: 10px;
+				/*border-top:3px #5fc0c1 solid;*/
+
+			}
+			.accordion-heading {
+				text-align: left;
+			}
+			.accordion-heading a {
+				text-decoration: none;
+				color: #333;
+				/*margin-left: -100px;*/
+			}
+			.ol_catalog {
+				margin-left: 30px;
+				padding: 0px;
+				text-align: left;
+				margin-top: 10px;
+				font-size: 12px;
+			}
+			.ol_catalog li {
+				margin-bottom: 6px;
+				padding: 3px;
+				border-bottom: 1px #CCCCCC dashed;
+			}
+			.ol_catalog li a {
+				text-decoration: none;
+				color: #555;
+			}
+			.blog {
+				display: block;
+				padding: 10px;
+				padding-bottom: 40px;
+				margin-bottom: 10px;
+				padding-top: 0px;
+				border-bottom: 1px #CCCCCC dashed;
+				text-align: left;
+			}
+			.blog1 {
+				display:block;
+				padding: 10px;
+				padding-bottom:40px;
+				margin-bottom: 10px;
+				padding-top:0px;
+				border-bottom: 1px #CCCCCC dashed;
+				text-align: left;
+				#height: 150px;
+
+				
+			}
+			h3 {
+				text-align: left;
+				color: #555;
+				font-weight: bold;
+			}
+			h3 a {
+				text-decoration: none;
+			}
+
+			p {
+				text-align: left;
+				text-indent: 2em;
+			}
+			.blog_tag {
+				float: right;
+				font-size: 13px;
+				list-style: none;
+			}
+			.blog_tag li {
+				float: left;
+				padding: 5px;
+			}
+
+			footer {
+				margin: 0 auto;
+				margin-top: 10px;
+				padding: 26px 0 0 0;
+				height: 88px;
+				width: 100%;
+				overflow: hidden;
+				font-size: 12px;
+				line-height: 18px;
+				color: #000;
+				text-align: center;
+			}
+			._intro1{
+				position: relative;
+				padding-top: 10px;
+				padding:10px;
+	            text-align:center;
+	            display:block;
+				font-size:14px;
+				font-weight:bold;
+				width:94.5%;
+				margin-left:10px;
+				margin-bottom:0px;
+				float:none;
+			}
+
+		</style>
+	</HEAD>
+	<BODY>
+        <input type=hidden id='subtype' value='' />
+		<DIV id=base_hd class="test1">
+			
+		</DIV>
+		<div class="main" id="">
+			<div class="left_nav" id="blogLeft">
+				
+			</div>
+			
+			<div class="right_content" id="blogContentList">
+			
+
+			</div>
+		</div>
+
+		<footer>
+
+			武汉大学 国际软件学院 研发中心 制作维护
+			<br>
+			Copyright&copy; 2010, 武汉大学国际软件学院. All rights reserved.
+			<Br>			
+		</footer>
+<script type="text/javascript">refreshState();</script>
+<div id="showbox" style="display:none; align:center">
+    <table cellspacing="0" cellpadding="0" border="0" style="margin-left:10px">
+    <tr>
+      <td style="width:40px"></td>
+      <td style="width:60px">  <label1 style="margin-bottom: 0px;font-size: 12px;line-height:0px;cursor:default;text-decoration:none;">用户名：</label1>  </td>
+      <td>  <input id="loginName" style="width:100px;height:18px;padding: 0px 0px;margin-bottom: 0px" type="text" onkeydown="enterSubmit()"></td>
+      <td></td>
+    </tr>
+    <tr style="height:5px"></tr>
+    <tr>
+      <td style="width:40px"></td>
+      <td style="width:60px">  <table  cellspacing="0" cellpadding="0" border="0"><tr><td>密</td><td style="width:8px"></td><td>码：</td></tr></table> </td>
+      <td>  <input id="passwd" type="password" style="width:100px;height:18px;padding: 0px 0px;margin-bottom: 0px" onkeydown="enterSubmit()">  </td>
+      <td></td>
+    </tr>
+    <tr style="height:5px"></tr>
+    <tr>
+      <td style="width:40px"></td>
+      <td style="width:60px">  <label1 style="margin-bottom: 0px;font-size: 12px;line-height:0px;cursor:default;text-decoration:none;">验证码：</label1>  </td>
+      <td>  <input id="vcodeCtr" style="ime-mode:disabled;width:100px;height:18px;padding: 0px 0px;margin-bottom: 0px" type="text" onkeydown="enterSubmit()"></td>
+      <td> <div id="vcode" UNSELECTABLE="on" STYLE="-moz-user-select:none;"></div></td>
+    </tr>
+    <tr style="height:5px"></tr>
+    <tr>
+      <td style="width:40px"></td>
+      <td style="width:60px"> <input type=button style="width:50px;font-size:12px;font-weight:normal;line-height:20px;" value="确认" onclick="javascript:sendLogin();">  </td>
+      <td> </td>
+    </tr>
+  </table>
+</div>
+	</BODY>
+
+</HTML>

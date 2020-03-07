@@ -1,0 +1,57 @@
+<%
+    /// 文 件 名：addDoctorForMiniApp
+    /// 描    述：微信小程序 医生注册(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/5/8 16:12  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+  debugMsg("==addDoctorFroMiniApp.template=="#"==:login_name="#:login_name#"==:passwd="#:passwd#"==:phone="#:phone#"==:name="#:name#"==:hospital="#:hospital+"=depart="+:depart+"=position="+:position)
+  ///先判断用户名是否重复（手机号）
+  :sql_insertClient="SELECT * FROM ST_PASSPORTS WHERE LOGIN_NAME=?"
+  :result_insertClient = changeRecordSet(:sql_insertClient,S(:login_name))
+  :recordNum = recordCount()
+
+  If :recordNum == 0
+      ///用户名没有重复,开始注册
+
+      ///小程序注册中，没有  科室  职位  这两个字段，而PC端后台管理的新增中却有
+      If :depart == "__error__"
+          :depart = ""
+      EndIf
+      If :position == "__error__"
+          :position = ""
+      EndIf
+
+
+      :doctorId = tuid()
+        ///获取number 用于排序
+        :sql_max="SELECT CAST(max(CAST(number AS int)) AS VARCHAR) AS NUM FROM ST_PASSPORTS"
+        :resultRecord = changeRecordSet(:sql_max)
+        If :resultRecord == "ok"
+            :num = num+10
+        Else
+            :num=""
+        EndIf
+
+        :sqlStr="insert into st_passports(id,login_name,passwd,classification,name,number) values(?,?,md5(?),?,?,?)"
+        :result_insertStPassports=execSQL(:sqlStr,S(:doctorId),S(:login_name),S(:passwd),S(:classification),S(:name),S(:num))
+
+        :sqlDoc="insert into doctor(id,name,hospital,department,position,phone,number) values(?,?,?,?,?,?,?)"
+        :result_insertDoctor=execSQL(:sqlDoc,S(:doctorId),S(:name),S(:hospital),S(:depart),S(:position),S(:phone),S(:num))
+
+        If :result_insertStPassports=="ok$^@^$UPDATED=" && :result_insertDoctor=="ok$^@^$UPDATED="
+            ="ok"
+        Else
+            ="bad"
+        EndIf
+  Else
+      ///用户名重复
+      ="rpt"
+  EndIf
+%>

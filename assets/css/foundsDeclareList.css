@@ -1,0 +1,63 @@
+#deleteModal .noborder{border: 0!important;text-align: center;padding-top: 20px!important}
+#deleteModal .modal-dialog{width: 400px;margin-top: 200px}
+#deleteModal .modal-footer{text-align: center}
+html .select2-drop .select2-results li.select2-result-unselectable .select2-result-label{color:#656161}
+.diypar{padding-top: 20px;}
+.listMember{
+
+      background-color: #eeeeee;
+}
+@media (min-width: 768px){
+.modal-dialog {
+    width: 800px;
+    margin: 30px auto;
+}
+}
+.modaltext{line-height: 35px; text-align: right;}
+#addapprover , .approverlist{padding-top: 10px;margin-left: 0}
+span#tablename{
+   text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                max-width:70px;
+                    display: inline-block;
+}
+span#tableMemberType{
+text-overflow: ellipsis;
+             overflow: hidden;
+             white-space: nowrap;
+             max-width:70px;
+                 display: inline-block;
+
+}
+span#tablepratip{
+text-overflow: ellipsis;
+             overflow: hidden;
+             white-space: nowrap;
+             max-width:90px;
+                 display: inline-block;
+
+}
+span#tableworktotaltrip{
+text-overflow: ellipsis;
+             overflow: hidden;
+             white-space: nowrap;
+             max-width:90px;
+                 display: inline-block;
+
+}
+span#tableworkbasictrip{
+text-overflow: ellipsis;
+             overflow: hidden;
+             white-space: nowrap;
+             max-width:90px;
+                 display: inline-block;
+
+}
+span#tablebanktrip{
+  text-overflow: ellipsis;
+               overflow: hidden;
+               white-space: nowrap;
+               max-width:60px;
+                   display: inline-block;
+}

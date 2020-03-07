@@ -1,0 +1,77 @@
+<%
+    debugMsg("#################")
+    debugMsg(:columnsId)
+
+    If :keywords =="__error__"
+        :keywords == ""
+    EndIf
+
+    :k = 0
+    If :columnsId == "0"
+        ///获取所有父模块id
+        :sql_getAllFather = "SELECT ID FROM MODULE_COLUMNS WHERE PARENT_ID = '0'"
+        :result_getAllFather = changeRecordSet(:sql_getAllFather)
+        Repeat
+            :ArrayAllColumnsId[:k] = ID
+            :k = :k + 1
+        EndRepeat
+    Else
+        :ArrayAllColumnsId[:k] = :columnsId
+        :k = :k + 1
+    EndIf
+
+    :count = 0
+    :recordNum = 0
+    While :count < :k
+        ///判断当前模块是否有子模块，如果有，则显示子模块的信息，如果没有，则显示该模块自己的信息
+        :sql_haveChild = "SELECT NAME,INTRODUCTION,ID FROM MODULE_COLUMNS WHERE (NAME LIKE ? OR INTRODUCTION LIKE ?) AND PARENT_ID = ?"
+        :result_haveChild = changeRecordSet(:sql_haveChild,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:ArrayAllColumnsId[:count]))
+        :recordNum1 = recordCount()
+        ///当前模块有子模块
+        If :result_haveChild == "ok"
+            ///存储子模块信息
+            :i = 0
+            Repeat
+                :ArrayAllName[:i] = NAME
+                :ArrayAllIntroduction[:i] = INTRODUCTION
+                :ArrayAllId[:i] = ID
+                :i = :i + 1
+            EndRepeat
+            ///获取当前模块信息
+            :sql_getInfo = "SELECT NAME FROM MODULE_COLUMNS WHERE ID = ?"
+            :result_getInfo = changeRecordSet(:sql_getInfo,S(:ArrayAllColumnsId[:count]))
+            If :result_getInfo == "ok"
+                :j = 0
+                While :j < :i
+                    :result_info = jsonAddItem("","name",S(:ArrayAllName[:j]))
+                    :result_info = jsonAddItem(:result_info,"introduction",S(:ArrayAllIntroduction[:j]))
+                    :result_info = jsonAddItem(:result_info,"id",S(:ArrayAllId[:j]))
+                    :result_info = jsonAddItem(:result_info,"parent",S(NAME))
+                    :result_info_array = jsonAddArrayItem(:result_info_array,:result_info)
+                    :j = :j + 1
+                EndWhile
+            EndIf
+        ///当前模块无子模块
+        ///Else
+            ///获取当前模块信息
+           /// :sql_getInfo = "SELECT NAME,INTRODUCTION,ID FROM MODULE_COLUMNS WHERE (NAME LIKE ? OR INTRODUCTION LIKE ?) AND ID = ?"
+           /// :result_getInfo = changeRecordSet(:sql_getInfo,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:ArrayAllColumnsId[:count]))
+           /// If :result_getInfo == "ok"
+             ///   :result_info = jsonAddItem("","name",S(NAME))
+              ///  :result_info = jsonAddItem(:result_info,"introduction",S(INTRODUCTION))
+               /// :result_info = jsonAddItem(:result_info,"id",S(ID))
+              ///  :result_info = jsonAddItem(:result_info,"parent",S("🈚️"))
+               /// :result_info_array = jsonAddArrayItem(:result_info_array,:result_info)
+           /// EndIf
+        EndIf
+        :count = :count + 1
+        :recordNum = :recordNum + :recordNum1
+    EndWhile
+
+
+    :code = 0
+    :result_records_items = jsonAddItem("","code",:code)
+    :result_records_items = jsonAddItem(:result_records_items,"data",:result_info_array)
+    :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+    =:result_records_items
+%>

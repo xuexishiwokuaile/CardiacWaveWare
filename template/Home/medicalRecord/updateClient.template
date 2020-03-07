@@ -1,0 +1,8 @@
+<%
+    ///程序代码
+    :sql_updateClient = "UPDATE client SET height=?,weight=?,smoking=?,drinking=?,hypertension=?,diabetes=? WHERE id=?"
+    :result_updateClient = changeRecordSet(:sql_updateClient,S(:height),S(:weight),S(:smoking),S(:drinking),S(:hypertension),S(:diabetes),S(:id))
+    :recordNum = recordCount()
+
+    =:result_updateClient
+%>

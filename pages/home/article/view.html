@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>文章</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/articleView.css"/>
+    <script src="/assets/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript">
+      function getUrlString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r!=null) return unescape(r[2]); return "";
+      }
+      jQuery(document).ready(function($) {
+        var id = getUrlString("id");
+        var parasId = "operation=getArticleFromId";
+        parasId += "$^@^$id=" + id;
+        var content = new Array();
+        var contentResult = function(){
+          jQuery("#articleContentAndComment").html(content[0]);
+        }
+        getFromWS("Home/article/getArticleContentAndComment.template",parasId,content,contentResult);
+      });
+
+      ///新增 修改字体的函数（ 陈 ）
+      function fontZoom(){//中形字体
+        document.getElementById('article_content').style.fontSize='18px';
+        document.getElementById('article_content').style.lineHeight='40px';
+      }
+
+      function fontZoomA(){//小形字体
+        document.getElementById('article_content').style.fontSize='14px';
+        document.getElementById('article_content').style.lineHeight='26px';
+      }
+      function fontZoomC(){//大形字体
+        document.getElementById('article_content').style.fontSize='23px';
+        document.getElementById('article_content').style.lineHeight='30px';
+      }
+
+    </script>
+</head>
+<body>
+<div class="ym-wrapper">
+    <div class="ym-wbox">
+        <header>
+            <h1>心脏高精度动力学分析系统</h1>
+        </header>
+        <nav id="nav">
+            <div class="ym-hlist">
+                <ul>
+                    <li class="active"><strong>导航1</strong></li>
+                    <li><a href="#">导航2</a></li>
+                    <li><a href="#">导航3</a></li>
+                    <li><a href="#">导航4</a></li>
+                    <li><a href="#">导航5</a></li>
+                </ul>
+                <form class="ym-searchform">
+                    <input class="ym-searchfield" type="search" placeholder="搜索..." />
+                    <input class="ym-searchbutton" type="submit" value="搜索" />
+                </form>
+            </div>
+        </nav>
+        <main>
+            <div class="ym-column linearize-level-1">
+                <div class="ym-col1">
+                    <div class="ym-cbox">
+                        <section class="box info">
+                            <div class="deanneirong_c" id="articleContentAndComment">
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <center>© 2018 技术支持 武汉樱顶网络安全技术中心- Collect from 心脏高精度动力学分析系统</center>
+        </footer>
+    </div>
+</div>
+</body>
+</html>

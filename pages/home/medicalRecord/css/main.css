@@ -1,0 +1,259 @@
+/* reset */
+
+body,
+ol,
+ul,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+th,
+td,
+dl,
+dd,
+form,
+fieldset,
+legend,
+input,
+textarea,
+select {
+	margin: 0;
+	padding: 0
+}
+
+body {
+	font: 0.75rem "方正悠黑", "Arial Narrow", HELVETICA;
+	background: #fff;
+	-webkit-text-size-adjust: 100%;
+	width: 100%;
+	margin: 0 auto;
+	/* 水平居中 */
+	background-image: url("../imgs/bg-log.png");
+}
+
+a {
+	color: #2d374b;
+	text-decoration: none
+}
+
+a:hover {
+	color: #cd0200;
+	text-decoration: underline
+}
+
+em {
+	font-style: normal
+}
+
+li {
+	list-style: none
+}
+
+img {
+	border: 0;
+	vertical-align: middle
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0
+}
+
+p {
+	word-wrap: break-word
+}
+
+
+/* outer */
+.outer {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+
+}
+
+/* header */
+.header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	/* align-items: center; */
+}
+
+.header-top {
+	width: 100%;
+	display: flex;
+	margin: 20px 0 6px 0;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.barcode {
+	width: 40%;
+	margin-left: 1rem;
+}
+
+.barcode img {
+	width: 6rem;
+}
+.date{
+	font-size: 0.5rem;
+	margin-right: 1rem;
+}
+.header-title {
+	font-family: "华文行楷";
+	font-size: 2rem;
+	margin-bottom: 1.2rem;
+	/*margin-left: 280px;*/
+	text-align: center;
+}
+
+.header-info {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+
+}
+
+.header-line {
+	height: 1px;
+	border-top: 1px solid black ;
+	margin: 0.5rem 0 0 0;
+	width: 100%;
+}
+
+
+/* container */
+.container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 1rem 0 0 0.5rem;
+}
+
+.basic-situation {
+	display: flex;
+	flex-direction: column;
+	
+}
+
+.basic-info {
+	display: flex;
+	
+}
+
+.basic {
+	margin-right: 0.2rem;
+}
+
+.height,
+.weight,
+.smoking{
+	margin-right: 0.9rem;
+}
+
+
+/* 行间距 */
+.detection-parameter,
+.peak-situation div,
+.peak-conclusion div,
+.polarity-distribution-title,
+.polarity-distribution-item1,
+.polarity-distribution-item2,
+.report-conclusion,
+.polarity-conclusion div{
+	margin-top: 0.5rem;
+}
+
+/* 段间距 */
+.peak-situation,
+.peak-conclusion,
+.polarity-distribution,
+.polarity-conclusion,
+.remarks{
+	margin-top: 1rem;
+}
+
+
+.report-conclusion {
+	color: #ff111f;
+}
+
+.peak-conclusion-title{
+	/*padding-right: 0.5rem;*/
+	margin-right: 0.5rem;
+}
+
+.polarity-distribution-title{
+	/*padding-right: 0.5rem;*/
+	margin-right: 0.5rem;
+}
+.polarity-distribution-item1,
+.polarity-distribution-item2 {
+	display: flex;
+}
+
+.polarity-distribution-item {
+	padding-right: 1rem;
+}
+
+.remarks{
+	line-height:1rem;
+	padding-right: 0.5rem;
+}
+
+
+/*病历位置*/
+.content-imgs{
+	padding: 0.5rem;
+}
+
+.content-imgs-title{
+	margin-right: 0.5rem;
+	font-weight: bolder;
+	margin-bottom: 0.5rem;
+}
+
+.content-imgs img{
+	width: 100%;
+	margin-bottom: 0.5rem;
+}
+
+
+/* footer */
+.footer {
+	width: 100%;
+	display: flex;
+	align-items: flex-end;
+	margin: 1rem 0 1rem 0;
+	font-family: "华文行楷";
+	font-size: 0.6rem;
+}
+.text{
+	margin: 0 0 0 0.5rem;
+	
+}
+.text div{
+	margin: 8px 0 0 0;
+}
+.jishu2{
+	/*padding-left:0.5rem;*/
+}
+.footer-spacing{
+	letter-spacing: 14px;
+}
+
+.qrcode{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 7rem;
+	margin-left: 0.5rem;
+}
+.qrcode img{
+	width: 70%;
+}

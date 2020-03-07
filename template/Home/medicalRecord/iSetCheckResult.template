@@ -1,0 +1,22 @@
+<%
+debugMsg("11111111111111111")
+  :sql_setCheckResult = "UPDATE medical_record SET picture=?, blood=? WHERE id=?"
+  :resultRecord_setCheckResult = changeRecordSet(:sql_setCheckResult,S(:picture),S(:blood),S(:id))
+
+  debugMsg("picture=========="#:picture)
+  debugMsg("id==============="#:id)
+
+  If :resultRecord_setCheckResult == "ok"
+    :sql_selectClientId = "SELECT clientId FROM medical_record WHERE id=?"
+    :resultRecord_sql_selectClientId = changeRecordSet(:sql,S(:id))
+    :recordNum = recordCount()
+
+    :sql_setClientDetail = "UPDATE client SET height=?,weight=?,drinking=?,smoking=?,hypertension=?,diabetes=? WHERE id=?"
+    :resultRecord_sql_sql_setClientDetail = changeRecordSet(:sql,S(:height),S(:weight),S(:drinking),S(:smoking),S(:hypertension),S(:diabetes),S(clientId))
+    :recordNum = recordCount()
+  EndIf
+
+  :result_callback = ""
+  :result_callback = jsonAddItem("","status",S(:resultRecord_setCheckResult))
+  =:result_callback
+%>

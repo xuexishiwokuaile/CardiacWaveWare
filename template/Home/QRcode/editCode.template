@@ -1,0 +1,6 @@
+<%
+      :sql_editQRcode = "UPDATE QRcode set width=?,height=?,text=? WHERE id=?"
+      :result_sql_editQRcode = changeRecordSet(:sql_editQRcode,S(:width),S(:height),S(:text),S(:id))
+
+      =:result_sql_editQRcode
+%>

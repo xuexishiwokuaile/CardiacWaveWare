@@ -1,0 +1,8 @@
+<%
+    debugMsg("[DEBUGMSG]:deleteClients.template 位置:2:"+":submitIds==========="+:submitIds)
+    :sql_delclients = "DELETE FROM ST_PASSPORTS WHERE ID IN(?);"
+    :resultRecord = execSQL(:sql_delclients,S(:submitIds))
+
+    :sql_del = "DELETE FROM client WHERE ID IN(?);"
+    :resultRecord = execSQL(:sql_del,S(:submitIds))
+%>

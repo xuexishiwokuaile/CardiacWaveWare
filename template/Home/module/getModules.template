@@ -1,0 +1,24 @@
+<%
+  :sql_depart="SELECT * FROM MODULE_COLUMNS ORDER BY SORT ASC"
+  :resultRecord = changeRecordSet(:sql_depart)
+  :recordNum = recordCount()
+  :result_records_array=""
+  If :resultRecord=="ok"
+      :result_record_item=jsonAddItem("", "pId", S("-1"))
+      :result_record_item=jsonAddItem(:result_record_item, "name", S("所有模块"))
+      :result_record_item=jsonAddItem(:result_record_item, "id", S("0"))
+      :result_record_item=jsonAddItem(:result_record_item, "sort", S("0"))
+      :result_records_array = jsonAddArrayItem(:result_records_array, :result_record_item)
+      Repeat
+        :result_record_item=jsonAddItem("", "pId", S(PARENT_ID))
+        :result_record_item=jsonAddItem(:result_record_item, "name", S(NAME))
+        :result_record_item=jsonAddItem(:result_record_item, "id", S(ID))
+        :result_record_item=jsonAddItem(:result_record_item, "sort", S(SORT))
+        :result_records_array = jsonAddArrayItem(:result_records_array, :result_record_item)
+      EndRepeat
+///      :result_records_items = jsonAddItem("", "data", :result_records_array)
+      =:result_records_array
+  Else
+      =:resultRecord
+  EndIf
+%>

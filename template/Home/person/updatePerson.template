@@ -1,0 +1,31 @@
+<%
+    :sql_judgelogin = "select * from st_passports where login_name=? and login_name not in(?)"
+    :resultRecord=changeRecordSet(:sql_judgelogin,S(:login_name),S(:doctorLoginName))
+    ///判断说明：
+    If  :resultRecord == "bad"
+        ///判断主体
+        If :classification == 3
+            ///判断主体
+            :sqlStr = "update st_passports set login_name=?,classification=?,name=? where id=?"
+            :x=execSQL(:sqlStr,S(:login_name),S(:classification),S(:name),S(:id))
+            :sqlDoc = "update doctor set login_name=?,name=?,position=?,department=?,hospital=?,token=?,phone=? where id=?"
+            :x=execSQL(:sqlDoc,S(:login_name),S(:name),S(:position),S(:department),S(:hospital),S(:token),S(:phone),S(:id))
+        Else
+            If :classification == 4
+                :sqlStr = "update st_passports set login_name=?,classification=?,name=? where id=?"
+                :x=execSQL(:sqlStr,S(:login_name),S(:classification),S(:name),S(:id))
+                :sqlClient = "update client set login_name=?,name=?,phone=? where id=?"
+                :x=execSQL(:sqlClient,S(:login_name),S(:name),S(:phone),S(:id))
+            Else
+                :sqlStr = "update st_passports set login_name=?,classification=?,name=? where id=?"
+                :x=execSQL(:sqlStr,S(:login_name),S(:classification),S(:name),S(:id))
+                =:x
+            EndIf
+        EndIf
+    Else
+        ///分支主体
+        :resultRecord="rpt"
+        =:resultRecord
+    EndIf
+
+%>

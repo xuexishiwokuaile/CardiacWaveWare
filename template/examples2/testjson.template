@@ -1,0 +1,38 @@
+<%:i=jsonAddItem("","key1","value1")%>
+<%:i=jsonAddItem(:i,"key2","value2")%>
+<%:j=jsonAddItem("","key3","value3")%>
+<%:j=jsonAddItem(:j,"key4","value4")%>
+<%:k=jsonAddArrayItem("",:i)%>
+<%:k=jsonAddArrayItem(:k,:j)%>
+<%:k=jsonAddItem("","key5",:k)%>
+<%:k=jsonAddItem(:k,"key6","value6")%>
+<%=:k%><br/>
+<%=:op%><br/>
+<%=:info%><br/>
+<%=:uId%><br/>
+JSON_GetObjectFormat(const QStringList &args, TemplateFile *);<br/>
+JSON_GetObjectItem(const QStringList &args, TemplateFile *);<br/>
+JSON_GetArraySize(const QStringList &args, TemplateFile *);<br/>
+<%:type=JSON_GetObjectFormat(:info)%>
+<%=:type%><br/>
+<%:name = JSON_GetObjectItem(:info,"name")%>
+<%=:name%><br/>
+<%:sex = JSON_GetObjectItem(:info,"sex")%>
+<%=:sex%><br/>
+<%:age = JSON_GetObjectItem(:info,"age")%>
+<%=:age%><br/>
+Test array type<br/>
+<%:health=JSON_GetObjectItem(:info, "health")%>
+<%:health#"--------------------"%>
+<%:health_type=JSON_GetObjectFormat(:health)%>
+<%=:health_type%><br/>
+<%:health_size=JSON_GetArraySize(:health)%>
+<%=:health_size%><br/>
+<%:j=0%>
+<%While :j < :health_size%>
+<%:test = JSON_GetArrayItem(:health,:j)%>
+<%:j = :j+1%>
+<%=:test%>
+<%EndWhile%>
+
+

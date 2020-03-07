@@ -1,0 +1,92 @@
+<%
+    debugMsg("--------------")
+    debugMsg(:columnsId)
+    debugMsg(:roles)
+    split(:roles, ",", &arrayRole)
+
+    /// 单个删除 可以不用传modulesCount
+    If :moduleCount == "__error__"
+        :moduleCount = 1
+    EndIf
+
+    If :roles == ""
+        :sql_init_modules = "UPDATE MODULE_ROLE SET MODULE_ID = REPLACE(MODULE_ID,?,'')"
+        :resultRecords = execSQL(:sql_init_modules,S(","+:columnsId))
+        If :resultRecords == "ok$^@^$UPDATED="
+            ="ok"
+        Else
+            =:resultRecords
+        EndIf
+    Else
+        :sql_init_modules = "UPDATE MODULE_ROLE SET MODULE_ID = REPLACE(MODULE_ID,?,'')"
+        :resultRecords = execSQL(:sql_init_modules,S(","+:columnsId))
+
+        :sql_update_modules = "UPDATE MODULE_ROLE SET MODULE_ID = CONCAT(MODULE_ID,?) WHERE ROLE = ?"
+        :i=0
+        While :i < :moduleCount
+            :resultModules = execSQL(:sql_update_modules,S(","+:columnsId),S(:arrayRole[:i]))
+            :i = :i + 1
+        EndWhile
+
+        If :resultModules == "ok$^@^$UPDATED="
+            ="ok"
+        Else
+            =:resultModules
+        EndIf
+    EndIf
+
+
+    ///这个部分的目的是，根据子模块的显示选项来修改父模块（父模块无法直接修改），如果父模块下的所有子模块对一个角色都无法显示，那么该父
+    ///模块也无法显示；相反，如果有任一子模块可显示，那么该父模块也可以显示
+
+    ///找到传入子模块的父模块
+    :sql_findFather = "SELECT PARENT_ID FROM MODULE_COLUMNS WHERE ID = ?"
+    :result_findFather = changeRecordSet(:sql_findFather,S(:columnsId))
+    :ArrayParentId[0] = PARENT_ID
+    ///获取该父模块的所有子模块
+    :sql_getAllChildren = "SELECT ID FROM MODULE_COLUMNS WHERE PARENT_ID = ?"
+    :result_getAllChildren = changeRecordSet(:sql_getAllChildren,S(PARENT_ID))
+    :m = 0
+    ///存储所有获取到的子模块id
+    Repeat
+        :ArrayAllChildren[:m] = ID
+        :m = :m + 1
+    EndRepeat
+    ///获取所有角色
+    :sql_getAllRole = "SELECT ROLE FROM MODULE_ROLE"
+    :result_getAllRole = changeRecordSet(:sql_getAllRole)
+    ///存储获取到的角色
+    :n = 0
+    Repeat
+        :ArrayAllRole[:n] = ROLE
+        :n = :n + 1
+    EndRepeat
+
+    ///检查每一个角色对子模块的显示选项
+    :p = 0
+    While :p < :n
+         ///父模块的显示选项
+         :fatherDisplay = "true"
+         :sql_checkDisplay = "SELECT ID FROM MODULE_ROLE WHERE ROLE = ? AND MODULE_ID LIKE ?"
+         :q = 0
+         While :q < :m
+            :result_checkDisplay = changeRecordSet(:sql_checkDisplay,S(:ArrayAllRole[:p]),S("%,"+:ArrayAllChildren[:q]+"%"))
+            If :result_checkDisplay == "bad"
+                :fatherDisplay = "false"
+            EndIf
+            :q = :q + 1
+         EndWhile
+         ///根据fatherDisplay的值修改父模块的显示选项
+         If :fatherDisplay == "true"
+            ///将父模块修改为对该角色可见
+            ///初始化
+            :sql_initFatherDisplay = "UPDATE MODULE_ROLE SET MODULE_ID = REPLACE(MODULE_ID,?,'')"
+            :result_initFatherDisplay = changeRecordSet(:sql_updateFatherDisplay,S(","+:ArrayParentId[0]))
+
+            ///更改显示选项
+            :sql_updateFatherDisplay = "UPDATE MODULE_ROLE SET MODULE_ID = CONCAT(MODULE_ID,?) WHERE ROLE = ?"
+            :result_updateFatherDisplay = changeRecordSet(:sql_updateFatherDisplay,S(","+:ArrayParentId[0]),S(:ArrayAllRole[:p]))
+         EndIf
+         :p = :p + 1
+    EndWhile
+%>

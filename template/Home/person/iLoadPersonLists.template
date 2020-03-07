@@ -1,0 +1,78 @@
+<%
+    /// 文 件 名：iLoadPersonLists
+    /// 描    述：加载人员(用一句话描述该文件做什么)  
+    /// 项目名称：20190316修改心电波      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/30 16:44  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%#include "common/checkLoginFilterNew.template"%>
+<%
+    /// 前端分页  传来两个值 page当前页  limit页大小
+    /// 默认加载管理员列表
+    /// 搜索的关键字 keywords
+    debugMsg("[DEBUGMSG]:iLoadPersonLists.template 位置:17:"+"page="+:page+"=limit="+:limit+"==classification_id="+:classification_id+"==keywords=="+:keywords+"=userId="+:userId)
+
+
+    ///是否传入了搜索的关键字
+    If :keywords =="__error__"
+       :keywords = ""
+    EndIf
+
+    /// 是否传入了机构id
+    If :classification_id =="__error__"
+        /// 默认加载管理员列表，先获取数量
+        :sql_get_all_admin_count = "select * from st_passports where classification =? and (login_name like ? OR name like ?)"
+        :resultRecord = changeRecordSet(:sql_get_all_admin_count,S(1),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+        :recordNum = recordCount()
+        ///分页
+        :sql_get_admins = "select * from st_passports where classification =? and (login_name like ? OR name like ?) LIMIT ? OFFSET ?"
+        :resultRecord = changeRecordSet(:sql_get_admins,S(1),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+    Else
+      If :classification_id == 0
+          /// 获取所有人员类别总用户的数量
+          :sql_get_all_admin_count = "select * from st_passports where login_name like ? OR name like ?"
+          :resultRecord = changeRecordSet(:sql_get_all_admin_count,S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+          :recordNum = recordCount()
+          ///分页
+          :sql_get_admins = "select * from st_passports where login_name like ? OR name like ? LIMIT ? OFFSET ?"
+          :resultRecord = changeRecordSet(:sql_get_admins,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      Else
+///        获取当前人员类别下用户的数量
+           :sql_get_users_count = "select * from st_passports where classification =? and (login_name like ? OR name like ?)"
+           :resultRecord = changeRecordSet(:sql_get_users_count,S(:classification_id),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+           :recordNum = recordCount()
+///              分页
+           :sql_get_users = "select * from st_passports where classification =? and (login_name like ? OR name like ?)  LIMIT ? OFFSET ?"
+           :resultRecord = changeRecordSet(:sql_get_users,S(:classification_id),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      EndIf
+     EndIf
+
+    :result_records_array=""
+    If :resultRecord == "ok"
+        Repeat
+          ///循环主体
+          :result_records_item = jsonAddItem("", "id", S(id))
+          :result_records_item = jsonAddItem(:result_records_item,"login_name",S(login_name))
+          :result_records_item = jsonAddItem(:result_records_item,"name",S(name))
+          :result_records_item = jsonAddItem(:result_records_item,"number",S(number))
+          :result_records_item = jsonAddItem(:result_records_item,"classification",S(classification))
+          :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+        EndRepeat
+        ///成功 返回状态码0
+        :code = 0
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    Else
+        /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+        :code = 0
+        :result_records_array="[]"
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    EndIf
+    :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+    =:result_records_items
+%>

@@ -1,0 +1,252 @@
+<!-- pages/register/register.wxml注册界面 -->  
+<view class="outer">
+    <header-cmp class="header"></header-cmp>
+    <view class="register-container">
+        <form bindsubmit="formSubmit">  
+            <view class="role-selection">
+                <view class="user" bind:tap="switchIdentity">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/user-avatar.png" class="avatar"  wx:if="{{!isUserReg}}"/>
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/user-avatar-check.png" class="avatar"  wx:if="{{isUserReg}}"/>
+                </view>
+                <view class="doctor" bind:tap="switchIdentity">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/doctor-avatar.png" class="avatar"  wx:if="{{isUserReg}}" />
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/doctor-avatar-check.png" class="avatar"  wx:if="{{!isUserReg}}" />
+                </view>
+            </view>
+            <!-- 用户注册 -->
+            <view class="form-items-outer user-form-outer" wx:if="{{isUserReg}}">
+                <view class="form-items">
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">姓&nbsp;&nbsp;&nbsp;&nbsp;名:</text>
+                            </view>
+                            <view class="name-input">
+                                <input placeholder="请输入您的姓名" placeholder-class="placeholder-text" name="name" class="input-text" />
+                            </view>
+                        </view>
+                        <view class="item alignment-control">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">性&nbsp;&nbsp;&nbsp;别:</text>
+                            </view>
+                            <view class="sex-input">
+                                <!-- <input  name="sex" class="input-text" /> -->
+                                <input name="sex" class="input-text"  placeholder="请选择" placeholder-class="placeholder-text" bind:tap="selectGender" value="{{genderValue}}" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title" decode="{{true}}">密&nbsp;&nbsp;&nbsp;&nbsp;码:</text>
+                            </view>
+                            <view class="pwd-input">
+                                <input placeholder="请输入密码" placeholder-class="placeholder-text" name="pwd" password="true" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">确认密码:</text>
+                            </view>
+                            <view class="pwd2-input">
+                                <input placeholder="请再次输入密码" placeholder-class="placeholder-text" name="pwd2"  password="true" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">手机号:</text>
+                            </view>
+                            <view class="tel-input">
+                                <input placeholder="请输入您的手机号" placeholder-class="placeholder-text" name="phone" class="input-text" />
+                            </view>
+                        </view>
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">年&nbsp;&nbsp;&nbsp;&nbsp;龄:</text>
+                            </view>
+                            <view class="age-input">
+                                <input placeholder="请输入" placeholder-class="placeholder-text" name="age" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">机&nbsp;&nbsp;&nbsp;&nbsp;构:</text>
+                            </view>
+                            <view class="agency-input">
+                                <input name="department" class="input-text" placeholder-class="placeholder-text" placeholder="请选择医疗机构或合作单位名称"  value="{{ departValue }}" bind:tap="selectDepart" />
+                            </view>
+                        </view>
+                    </view>
+                    <!-- <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">验证码:</text>
+                            </view>
+                            <view class="code">
+                                <view class="code-input">
+                                    <input placeholder="验证码" placeholder-class="placeholder-text" name="code" />
+                                </view>
+                                <view>
+                                    <text class="get-code-btn">获取验证码</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view> -->
+                   
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">身&nbsp;&nbsp;&nbsp;&nbsp;高:</text>
+                            </view>
+                            <view class="height-input">
+                                <input placeholder="CM" placeholder-class="placeholder-text" name="height" class="input-text" />
+                            </view>
+                        </view>
+                        <view class="item alignment-control">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">体&nbsp;&nbsp;&nbsp;重:</text>
+                            </view>
+                            <view class="weight-input">
+                                <input placeholder="KG" placeholder-class="placeholder-text" name="weight" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">吸&nbsp;&nbsp;&nbsp;&nbsp;烟:</text>
+                            </view>
+                            <view class="smoke-input">
+                                <!-- <input placeholder="是 / 否" placeholder-class="placeholder-text" name="smoking" class="input-text"/> -->
+                                <input name="smoking" class="input-text" placeholder-class="placeholder-text" placeholder="请选择"  value="{{ isSmokingValue }}" bind:tap="selectSmoke" />
+                            </view>
+                        </view>
+                        <view class="item alignment-control">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">饮&nbsp;&nbsp;&nbsp;酒:</text>
+                            </view>
+                            <view class="drink-input">
+                                <!-- <input placeholder="是 / 否" placeholder-class="placeholder-text" name="drinking" class="input-text" /> -->
+                                <input name="drinking" class="input-text" placeholder-class="placeholder-text" placeholder="请选择"  value="{{ isDrinkingValue }}" bind:tap="selectDrink" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">糖尿病:</text>
+                            </view>
+                            <view class="diabetes-input">
+                                <!-- <input placeholder="是 / 否" placeholder-class="placeholder-text" name="diabetes" class="input-text" /> -->
+                                <input name="diabetes" class="input-text" placeholder-class="placeholder-text" placeholder="请选择"  value="{{ isDiabetesValue }}" bind:tap="selectDiabetes" />
+                            </view>
+                        </view>
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">高血压:</text>
+                            </view>
+                            <view class="hypertension-input">
+                                <!-- <input placeholder="是 / 否" placeholder-class="placeholder-text" name="hypertension" class="input-text"/> -->
+                                <input name="hypertension" class="input-text" placeholder-class="placeholder-text" placeholder="请选择"  value="{{ isHypertensionValue }}" bind:tap="selectHypertension" />
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            <view class="form-items-outer doctor-form-outer"  wx:if="{{!isUserReg}}">
+                <view class="form-items">
+                    <view class="form-item doctor-register-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">姓&nbsp;&nbsp;&nbsp;&nbsp;名:</text>
+                            </view>
+                            <view class="doctor-name-input">
+                                <input placeholder="请输入您的姓名" placeholder-class="placeholder-text" name="name" class="input-text"/>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title" decode="{{true}}">密&nbsp;&nbsp;&nbsp;&nbsp;码:</text>
+                            </view>
+                            <view class="pwd-input">
+                                <input placeholder="请输入密码" placeholder-class="placeholder-text" name="pwd" password="true" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">确认密码:</text>
+                            </view>
+                            <view class="pwd2-input">
+                                <input placeholder="请再次输入密码" placeholder-class="placeholder-text" name="pwd2"  password="true" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <view class="form-item doctor-register-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">手机号:</text>
+                            </view>
+                            <view class="tel-input">
+                                <input placeholder="请输入您的手机号" placeholder-class="placeholder-text" name="phone" class="input-text" />
+                            </view>
+                        </view>
+                    </view>
+                    <!-- <view class="form-item doctor-register-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title">验证码:</text>
+                            </view>
+                            <view class="code">
+                                <view class="code-input">
+                                    <input placeholder="验证码" placeholder-class="placeholder-text" name="code" />
+                                </view>
+                                <view>
+                                    <text class="get-code-btn">获取验证码</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view> -->
+                    <view class="form-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">机&nbsp;&nbsp;&nbsp;&nbsp;构:</text>
+                            </view>
+                            <view class="agency-input">
+                                <input name="department" class="input-text" placeholder-class="placeholder-text" placeholder="请选择医疗机构或合作单位名称"  value="{{ departValue }}" bind:tap="selectDepart" />
+                            </view>
+                        </view>
+                    </view>
+                    <!-- <view class="form-item doctor-register-item">
+                        <view class="item">
+                            <view>
+                                <text class="form-item-title two-text" decode="{{true}}">邀请码:</text>
+                            </view>
+                            <view class="invite-code-input">
+                                <input placeholder="请输入邀请码" placeholder-class="placeholder-text" name="inviteCode" />
+                            </view>
+                        </view>
+                    </view> -->
+                    <!-- <view class="btn-area doctor-register-btn">
+                        <button form-type="submit">注册</button>
+                    </view> -->
+                </view>
+            </view>
+            <view class="btn-area">
+                <button form-type="submit">注册</button>
+            </view>
+            <wux-select id="wux-select1" /><!--机构选择-->
+            <wux-select id="wux-select2" /><!--性别选择-->
+            <wux-select id="wux-select3" /><!--是否选择-->
+        </form>
+    </view>
+</view>

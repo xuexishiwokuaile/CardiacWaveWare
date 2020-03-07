@@ -1,0 +1,47 @@
+<%
+
+    ///根据要要求补允相应的特殊字符
+    ///如234，要求5位，补允“0”，最后的结果00234
+    Function padLeft(:strSource,:length,:strRex)
+        :nLength = :length - strlen(:strSource)///计算相应的字符长度与给字长度的差值，大于0证明给定长度较大
+        :strRetrun = :strSource
+        If  :nLength > 0            ///如果大于证明长度不够进行补允字符
+            :i=0
+            While :i < :nLength
+                :strRetrun = :strRex#:strRetrun
+                :i +=1
+            EndWhile
+        EndIf
+        ///返回相应的参数
+    =:strRetrun
+    EndFunction
+
+    ///将所有的空格取消如 "  我是 你 的老师  !      " 转换后为"我是你的老师!"
+    ///参数:strSource 对应的源字符串
+    Function trim(:strSource)
+        =replace(:strSource, " ", "")
+    EndFunction
+
+    ///将相应的字符串进行对应的分隔，返回指定部分的内容
+    Function getSplitPart(:strSource, :strRex, :nPart)
+      split(:strSource,:strRex, &array)
+///      debugMsg("[DEBUGMSG]:commonFunction.template 位置:28:"+"1111111111111111111111111111111111111")
+      =:array[:nPart]
+    EndFunction
+
+    ///简单工具类，主要是获取excsql返回的对应的SQL的值，并获取相应的结果集
+    Function getSplitPart2SqlResutl(:strSource, :nPart)
+      split(:strSource,"$^@^$", &array)
+      :strTemp = :array[:nPart]
+      split(:strTemp, "=", &arrayTemp)
+      =:arrayTemp[1]
+    EndFunction
+
+    ///简单工具类，主要是获取excsql返回的对应的SQL的值，并获取相应的结果集
+    Function getSplitPart2ReturnResutl(:strSource, :nPart)
+      split(:strSource,"$_@_$", &array)
+      :strTemp = :array[:nPart]
+      split(:strTemp, "=", &arrayTemp)
+      =:arrayTemp[1]
+    EndFunction
+%>

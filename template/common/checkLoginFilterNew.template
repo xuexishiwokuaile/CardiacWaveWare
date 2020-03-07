@@ -1,0 +1,13 @@
+///相应的检查登录过滤器,若用户没有登录，前端会直接跳转登录页面
+///注意：此template需搭LayUI的数据表格一起使用！
+
+<%
+    :login=checkLogin(:userId,:userToken)
+    debugMsg("[DEBUGMSG]:checkLoginFilter.template 位置:5:"+"login=="+:login+"==:userId=="+:userId+"==:userToken=="+:userToken)
+    If :login!="ok"
+           Exit "{\"filterRes\": -1,\"code\": 0,\"count\": 0,\"data\": []}"
+    EndIf
+
+%>
+
+

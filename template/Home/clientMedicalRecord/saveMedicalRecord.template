@@ -1,0 +1,20 @@
+<%
+    ///生成病历id
+    :medicalRecordId = tuid()
+
+debugMsg("medicalRecordId=================="#:medicalRecordId)
+
+    ///根据医生姓名与医院查询医生ID
+    :sql_findDoctorId="SELECT id FROM doctor WHERE hospital=? and name=?"
+    :result_findDoctorId=changeRecordSet(:sql_findDoctorId,S(:hospital),S(:doctorName))
+    :doctorId=id
+
+debugMsg("doctorId===================="#:doctorId)
+
+    ///插入新的病历信息
+    :sql_saveMedicalRecord="INSERT INTO medical_record(id,clientId,clientName,hospital,doctorName,doctorId,checkTime,checkResult) VALUES (?,?,?,?,?,?,?,?)"
+    :result_saveMedicalRecord=changeRecordSet(:sql_saveMedicalRecord,S(:medicalRecordId),S(:clientId),S(:clientName),S(:hospital),S(:doctorName),S(:doctorId),S(:checkTime),S(:checkResult))
+    :recordNum = recordCount()
+
+    =:result_saveMedicalRecord
+%>

@@ -1,12 +1,263 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>�人��ѧ-����Ժ</title>
-<meta http-equiv="Content-Language" content="zh-CN">
-<meta name="renderer" content="webkit">
-<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=gb2312">
-<meta http-equiv="refresh" content="0.2;url=/pages/home/sie_web/index.html">
-    
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Xenon Boostrap Admin Panel" />
+	<meta name="author" content="" />
+
+	<title>心脏高清度电动力学分析系统</title>
+
+	<link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+	<link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="/assets/css/xenon-core.css">
+	<link rel="stylesheet" href="/assets/css/xenon-forms.css">
+	<link rel="stylesheet" href="/assets/css/xenon-components.css">
+	<link rel="stylesheet" href="/assets/css/xenon-skins.css">
+	<link rel="stylesheet" href="/assets/css/custom.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/component.css">
+	<script src="/assets/js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9] -->
+	<script src="/assets/js/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="/assets/js/respond/1.4.2/respond.min.js"></script>
+	<!--[endif]-->
+	<script src="https://pv.sohu.com/cityjson?ie=utf-8"></script>
+	<!--framework-->
+	<script type="text/javascript" src="Scripts/StationJSLib.js"></script>
+
 </head>
-<body>
+
+<body class="page-body login-page login-light">
+<div class="container">
+	<div class="main">
+		<ul id="cbp-bislideshow" class="cbp-bislideshow">
+			<li><img src="/images/1.jpg" alt="image01"/></li>
+			<li><img src="/images/2.jpg" alt="image02"/></li>
+			<li><img src="/images/3.jpg" alt="image03"/></li>
+			<li><img src="/images/4.jpg" alt="image04"/></li>
+			<li><img src="/images/5.jpg" alt="image05"/></li>
+		</ul>
+		<div id="cbp-bicontrols" class="cbp-bicontrols">
+			<span class="cbp-biprev"></span>
+			<span class="cbp-bipause"></span>
+			<span class="cbp-binext"></span>
+		</div>
+	</div>
+</div>
+
+<div class="login-container">
+
+	<div class="row">
+		<div class="col-sm-3"></div>
+		<div class="col-sm-6">
+
+			<script type="text/javascript">
+
+              var obj= new Array();
+
+              //返回参数验证函数,验证相应的开发结果
+              function passResult(results){
+                console.log(results);
+                var fig = results[0].substring(0,6); 	//获取对应的返回头信息
+
+                if(fig=="failed"){
+                  alert("登录失败："+results[0].substring(7)); //根据相应返回头信息进行相应的解释
+                }
+                else{
+                  const userId = results[0];
+                  const userToken = results[1];
+                  const loginName = results[2];
+                  const classification = results[3];
+                  const userName = results[4];
+                  const loginId = results[5];
+
+                  sessionStorage.setItem('userId',userId);
+                  sessionStorage.setItem('userToken',userToken);
+                  sessionStorage.setItem('classification',classification);
+                  sessionStorage.setItem('userName',userName);
+                  sessionStorage.setItem('loginName',loginName);
+                  sessionStorage.setItem('loginId',loginId);
+                  if (classification == "1"){
+                    location.href="pages/home/person/personManage.html";
+                  }
+                  else if (classification == "2"){
+                    location.href="pages/home/medicalRecord/medicalRecordsList.html";
+                  }
+                  else if (classification == "3"){
+                    location.href="pages/home/clientMedicalRecord/clientMedicalRecords.html";
+                  }
+                  else {
+                    alert("登录出错！请联系管理员。error 200-classification")
+				  }
+                }
+              }
+
+              jQuery(document).ready(function($)
+              {
+                cbpBGSlideshow.init();
+                // Reveal Login form
+                setTimeout(function(){ $(".fade-in-effect").addClass('in'); }, 1);
+
+                //启动进行相应的检查
+                if($.cookie('cookiesjqsavepwd') == "1")
+                {
+                  $("#isSavaPasswd").attr("checked","checked");
+                  $("#username").attr("value", $.cookie('cookiesjqname'));
+                  $("#passwd").attr("value", $.cookie('cookiesjqpwd'));
+                }
+
+                if($.cookie('cookiesjqsavepwd') == "2")
+                {
+                  $("#username").attr("value", $.cookie('cookiesjqname'));
+                }
+
+                // Validation and Ajax action
+                $("form#login").validate({
+                  rules: {
+                    username: {
+                      required: true
+                    },
+                    passwd: {
+                      required: true
+                    }
+                  },
+                  messages: {
+                    username: {
+                      required: '请输入你的用户名'
+                    },
+                    passwd: {
+                      required: '请输入你的密码'
+                    }
+                  },
+                  // Form Processing via AJAX
+                  submitHandler: function(form)
+                  {
+                    show_loading_bar(70); // Fill progress bar to 70% (just a given value)
+                    var loginName = $(form).find('#username').val();//用户名
+                    var password = $(form).find('#passwd').val();//密码
+                    console.log(loginName,password);
+
+                    //是否进行本地密码保存
+                    if($(form).find('#isSavaPasswd')[0].checked)
+                    {
+                      //保存用户名密码
+                      $.cookie('cookiesjqname', loginName, { expires: 7 });
+                      $.cookie('cookiesjqpwd', password, { expires: 7 });
+                      $.cookie('cookiesjqsavepwd', 1, { expires: 7 });
+                    }
+                    else
+                    {
+                      //不保存密码，仅保存用户名
+                      $.removeCookie('cookiesjqpwd');
+                      $.cookie('cookiesjqname', loginName, { expires: 7 });
+                      $.cookie('cookiesjqsavepwd', 2, { expires: 7 });
+
+                    }
+                    //计算补允用户名
+                    console.log(loginName,password);
+                    login(loginName,password,passResult);	//登录login
+                  }
+                });
+                // Set Form focus
+                $("form#login .form-group:has(.form-control):first .form-control").focus();
+              });
+			</script>
+
+			<!-- Errors container -->
+			<div class="errors-container">
+
+			</div>
+
+			<!-- Add class "fade-in-effect" for login form effect -->
+			<form method="post" role="form" id="login" class="login-form fade-in-effect">
+
+				<div class="login-header" style="text-align: center;">
+					<p style="font-size: 16px;">心脏高清度电动力学分析系统</p>
+					<p style="font-size: 16px;">Cardiac HD Electrodynamic Analysis System</p>
+				</div>
+
+
+				<div class="form-group">
+					<label class="control-label" for="username">用户名</label>
+					<input type="text" class="form-control" name="username" id="username" autocomplete="off" />
+				</div>
+
+				<div class="form-group">
+					<label class="control-label" for="passwd">密码</label>
+					<input type="password" class="form-control" name="passwd" id="passwd" autocomplete="off" />
+				</div>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="isSavaPasswd">保存密码
+					</label>
+				</div>
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary  btn-block text-left">
+						<i class="fa-lock"></i>
+						登录
+					</button>
+				</div>
+
+				<div style="float:none;margin-left: 75px" >
+					<!--<a class="btn btn-primary btn-icon btn-icon-standalone" style="padding-left:0;" onclick="addUser()">-->
+						<!--<i class="fa-plus" style="font-size:17px"></i>-->
+						<!--<span>用户注册 </span>-->
+					<!--</a>-->
+
+					<!--<a class="btn btn-primary btn-icon btn-icon-standalone" style="padding-left:0;" onclick="addDoctor()">-->
+						<!--<i class="fa-plus" style="font-size:17px"></i>-->
+						<!--<span>医生注册</span>-->
+					<!--</a>-->
+				</div>
+
+				<script type="text/javascript">
+                  //医生注册
+                  function addDoctor() {
+                    location.href="pages/home/person/doctor/addDoctor.html";
+				  }
+                  //用户注册
+                  function addUser() {
+                    location.href="pages/home/medicalRecord/clientSignUp.html";
+                  }
+				</script>
+
+				<div class="login-footer">
+					<div class="info-links" style="font-size: 13px;">
+						<a href="#">武汉大学开发</a>
+					</div>
+				</div>
+			</form>
+			<!-- External login -->
+		</div>
+		<div class="col-sm-3"></div>
+	</div>
+
+</div>
+
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/jquery-validate/jquery.validate.min.js"></script>
+<script src="/assets/js/toastr/toastr.min.js"></script>
+
+
+<!-- JavaScripts initializations and stuff -->
+<script src="/assets/js/xenon-custom.js"></script>
+<script src="/assets/js/modernizr.custom.js"></script>
+
+<script src="/assets/js/jquery.imagesloaded.min.js"></script>
+<script src="/assets/js/cbpBGSlideshow.min.js"></script>
 </body>
 </html>

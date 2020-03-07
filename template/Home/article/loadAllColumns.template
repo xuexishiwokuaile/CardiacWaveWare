@@ -1,0 +1,35 @@
+<%
+    /// 文 件 名：getAllColumns
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/10 11:59  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+///获取所有栏目
+<%
+    debugMsg("[DEBUGMSG]:getAllColumns.template 位置:77777777:"+"进入---------------")
+    	:sql = "select * from columns where 1=? ORDER BY parent_id,sort ASC"
+    	:resultRecord = changeRecordSet(:sql,S(1))
+    	:recordNum = recordCount()
+      :result_records_array=""
+      If :resultRecord=="ok"
+          :result_record_item=jsonAddItem("", "name", S("所有栏目"))
+          :result_record_item=jsonAddItem(:result_record_item, "id", S("0"))
+          :result_record_item=jsonAddItem(:result_record_item, "pId", S("-1"))
+          :result_records_array = jsonAddArrayItem(:result_records_array, :result_record_item)
+          Repeat
+            :result_record_item=jsonAddItem("", "name", S(name))
+            :result_record_item=jsonAddItem(:result_record_item, "id", S(id))
+            :result_record_item=jsonAddItem(:result_record_item, "pId", S(parent_id))
+            :result_records_array = jsonAddArrayItem(:result_records_array, :result_record_item)
+          EndRepeat
+    ///      :result_records_items = jsonAddItem("", "data", :result_records_array)
+          =:result_records_array
+      Else
+          =:resultRecord
+      EndIf
+%>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>文章管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!--layui配置 -->
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--拦截未登录-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--Ztree-->
+    <script src="/assets/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css">
+    <!--zoolina系统基础系统配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <!--其他-->
+    <!--富文本编辑器-->
+    <script type="application/javascript" src="/assets/js/kindeditor/kindeditor-all.js"></script>
+    <script charset="utf-8" src="/assets/js/kindeditor/lang/zh-CN.js"></script>
+
+    <style>
+        .ztree li span.button.switch {height:23px}
+        .card-outer {
+            display: flex;
+        }
+
+        .article-table {
+            padding-left: 20px;
+            font-size: 14px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .layui-table-tool-temp {
+            display: flex;
+        }
+
+        .layui-table-cell {
+            height: auto !important;
+            white-space: normal !important;
+        }
+
+        .editor-user {
+            padding: 20px;
+        }
+
+        .layui-form-selected dl {
+            width: 120px;
+        }
+        .add-article {
+            padding: 20px 20px 10px 20px;
+        }
+        .table-header-btn{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .layui-btn-container .layui-btn {
+            margin-bottom: 0px!important;
+        }
+
+        .layui-form-item .layui-input-inline{
+            width: 240px!important;
+        }
+
+        .file-input-position{
+            margin-top: 5px;
+        }
+
+        .appendix-list-title{
+            /*margin-top: -10px;*/
+        }
+        .appendix-list a{
+            color: #0000FF;
+            cursor: pointer;
+        }
+        .checkColumn{
+            margin-top: 40px;
+            margin-left: 100px;
+        }
+
+    </style>
+    <script type="text/javascript">
+      let checkedColumn = '';//存放选中栏目所有信息
+      let checkedColumnId = '';
+      let checkedColumnParentId = '';
+      let editor = "";   //富文本编辑器
+      $(function() {
+        //获取栏目信息
+        var setting = {
+          data: {
+            simpleData: {
+              enable: true,
+            },
+          },
+          async: {
+            enable: true,
+            type: 'get',
+            dataType: 'json',
+            url: '/Home/article/iGetColumns.template',
+            // dataFilter: filter
+          },
+          callback: {//请求成功后回调
+            onClick: onclickTree,//点击相关节点触发的事件
+            onAsyncSuccess: ztreeOnAsyncSuccess,//异步加载成功后执行的方法,展开所有节点
+          },
+          view:{
+            showIcon: false,
+          }
+        };
+
+        //点击树触发的事件
+        function onclickTree(event, treeId, treeNode) {
+          // alert (treeNode);
+
+          checkedColumn = treeNode; //当前节点的所有信息
+          checkedColumnId = treeNode.id; //当前节点的id
+          checkedColumnParentId = treeNode.pId; //当前节点的pid
+          $("#_columns_id").val(checkedColumn.id);
+          // alert (checkedColumnId);
+          //重载表格
+          _reload();
+        }
+
+        //获取树成功后进行的回调操作
+        function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+          //只显示所有一级栏目
+          var zTree_Menu = $.fn.zTree.getZTreeObj("tree");
+          var node = zTree_Menu.getNodeByParam("id",0);//获取指定ID的节点
+          zTree_Menu.expandNode(node, true, false);//指定选中ID节点展开
+        }
+        $.fn.zTree.init($('#tree'), setting);
+      });
+
+      //重载表格
+      function _reload() {
+        layui.use('table', function() {
+          let keywords = $('#searchInput').val();
+          var table = layui.table;
+          table.reload('articleTable', {
+            url: '/Home/article/listArticle.template',
+            where: { //设定异步数据接口的额外参数，任意设
+              keywords: keywords,
+              columnsId: $("#_columns_id").val(),
+            }
+            , page: {
+              curr: 1, //重新从第 1 页开始
+            },
+          });
+        });
+      }
+
+      //加载table
+      layui.use(['table', 'form', 'jquery'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        table.render({
+          elem: '#articleTable'
+          , url: '/Home/article/listArticle.template'
+          , cols: [
+            [
+              {type: 'checkbox', fixed: 'left'}
+              , {field: 'title', title: '标题', align: 'center', templet: '#titleTpl'}
+              , {field: 'publisher', title: '发布者', width: 100,align: 'center'}
+              , {field: 'article_type', title: '栏目', width: 120,align: 'center'}
+              , {field: 'modify_date', title: '修改时间', width: 180,sort: true, align: 'center'}
+              , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 120,align: 'center'},
+            ]]
+          , page: true,
+        });
+
+        //监听行工具事件
+        table.on('tool(articleTable)', function(obj) {
+          var data = obj.data;
+          console.log(data);
+          if (obj.event === 'del') {
+            layer.confirm('确定删除该文章？', function(index) {
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok$^@^$UPDATED=') {
+                  _reload();
+                  layer.close(layer.index);
+                } else {
+                  layer.msg('删除失败', function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              getFromWS('/Home/article/delArticle.template', 'id=' + data.id, obj, Result);
+              layer.close(index);
+            });
+          } else if (obj.event === 'edit') {
+            //编辑文章
+            // console.log(data);
+            //获取文章的详细信息
+            let articleDetailObj = new Array();
+            let articleDetailResult = function(){
+              if(articleDetailObj[0] != "bad"){
+                let details = JSON.parse(articleDetailObj[0]);
+                // console.log(details[0]);
+                //更新弹出层
+                layer.open({
+                  type: 1,
+                  area: ['840px', '660px'],
+                  shadeClose: true, //点击遮罩关闭
+                  title: '编辑文章',
+                  content: $('#add-article'),
+                  zIndex:80,
+                  success:function(layer,index) {
+                    //初始化文本编辑器
+                    editor = KindEditor.create('#editor_id',{
+                      filterMode:false,
+                      allowFileManager:true,
+                      uploadJson: kindeditUploadUrl(),
+                      afterUpload: kindeditAfterUpload,
+                      pasteType: 1,  //无格式粘贴
+                      afterBlur:function() { this.sync();}
+                    });
+                    //更新栏目
+                    $("#add-article-column").val(details[0].columns_name);
+                    $("#add-article-column").attr("data-columnId",details[0].article_type);
+                    //更新标题
+                    $("#articleName").val(details[0].title);
+                    //更新文章id
+                    $("#articleId").val(details[0].id);
+                    //更新排序
+                    $("#articleSort").val(details[0].sort);
+                    //更新作者
+                    $("#articleAuthor").val(details[0].publisher);
+                    //更新是否置顶
+                    $("#add-article-top").val(details[0].on_top);
+                    //更新是否发布
+                    $("#add-article-publish").val(details[0].on_public);
+                    //更新封面图
+                    $(".cover-img").attr("src",`/downloadFile.spe?dtype=PostgresXL&amp;mode=attachment&amp;fileid=${details[0].pic_id}`);
+                    $("#CoverId").val(details[0].pic_id);
+                    $(".cover-img").css("display","inline-block");
+                    //更新附件
+                    let appendixArray = details[0].appendix_id.split(';');
+                    console.log("附件的数量为："+appendixArray);
+                    for(let i=0;i<appendixArray.length - 1;i++){
+                      //获取附件的名称
+                      let fileNameObj = new Array();
+                      let fileNameResult = function(){
+                        if(fileNameObj[0] != "bad"){
+                          $(".appendix-lists").append(`
+                            <div class="appendix-list"><a href="/downloadFile.spe?dtype=PostgresXL&amp;mode=attachment&amp;fileid=${appendixArray[i]}">${fileNameObj[0]}</a><span style="margin-left: 100px;cursor: pointer" id="deleteAppendix" fileId="${appendixArray[i]}">删除</span></div>
+                          `);
+                        }
+                      };
+                      getFromWS("/Home/article/getAppendix.template","id="+appendixArray[i],fileNameObj,fileNameResult);
+                    }
+                    $(".appendix-lists-outer").css("display","inline-block");
+                    //更新文章内容
+                    editor.html(details[0].content);
+                    //更新select
+                    form.render('select');
+                  },
+                  end:function() {
+                    //当弹窗关闭时，清除掉文本编辑器，否则再次打开弹窗时，编辑器将不可编辑
+                    editor.remove("#editor_id");
+                    //初始化
+                    $(".appendix-lists").empty();
+                    $("#add-article-column").val("");
+                    $("#articleName").val("");
+                    $("#articleId").val("");
+                    $("#articleSort").val("");
+                    $("#articleAuthor").val("");
+                    $("#add-article-top").val("");
+                    $("#add-article-publish").val("");
+                    $(".cover-img").css("display","none");
+                    $("#CoverId").val("");
+                    KindEditor.instances[0].html("");
+                  }
+                });
+              }
+            };
+            getFromWS('/Home/article/loadArticleDetails.template','id='+data.id,articleDetailObj,articleDetailResult);
+          }
+        });
+        //新增文章-弹出
+        $("#addArticle").click(function() {
+          layer.open({
+            type: 1,
+            area: ['840px', '660px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增文章',
+            content: $('#add-article'),
+            zIndex:80,
+            success:function(layer,index) {
+              //初始化文本编辑器
+              editor = KindEditor.create('#editor_id',{
+                filterMode:false,
+                allowFileManager:true,
+                uploadJson: kindeditUploadUrl(),
+                afterUpload: kindeditAfterUpload,
+                pasteType: 1,  //无格式粘贴
+                afterBlur:function() { this.sync();}
+              });
+              //写入作者
+              $("#articleAuthor").val(sessionStorage.getItem('loginName'))
+            },
+            end:function() {
+              //当弹窗关闭时，清除掉文本编辑器，否则再次打开弹窗时，编辑器将不可编辑
+              editor.remove("#editor_id");
+              $(".appendix-lists").empty();
+              $("#add-article-column").val("");
+              $("#articleName").val("");
+              $("#articleId").val("");
+              $("#articleSort").val("");
+              $("#articleAuthor").val("");
+              $("#add-article-top").val("");
+              $("#add-article-publish").val("");
+              $(".cover-img").css("display","none");
+              $("#CoverId").val("");
+            }
+          });
+        });
+        // 栏目树弹出层
+        $("#add-article-column").focus(function(){
+          ///加载树
+          var setting = {
+            data: {
+              simpleData: {
+                enable: true,
+              },
+            },
+            async: {
+              enable: true,
+              type: 'get',
+              dataType: 'json',
+              url: '/Home/article/iGetColumns.template',
+              // dataFilter: filter
+            },
+            callback: {//请求成功后回调
+              onClick: onclickTree,//点击相关节点触发的事件
+              onAsyncSuccess: ztreeOnAsyncSuccess,//异步加载成功后执行的方法,展开所有节点
+            },
+            view:{
+              showIcon: false,
+            }
+          };
+
+          //点击树触发的事件
+          function onclickTree(event, treeId, treeNode) {
+            checkedColumn = treeNode; //当前节点的所有信息
+            checkedColumnId = treeNode.id; //当前节点的id
+            checkedColumnParentId = treeNode.pId; //当前节点的pid
+          }
+          //获取树成功后进行的回调操作
+          function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+            //只显示所有一级栏目
+            var zTree_Menu = $.fn.zTree.getZTreeObj("selectColumnTree");
+            var node = zTree_Menu.getNodeByParam("id",0);//获取指定ID的节点
+            zTree_Menu.expandNode(node, true, false);//指定选中ID节点展开
+          }
+          $.fn.zTree.init($('#selectColumnTree'), setting);
+
+          layer.open({
+            type: 1,
+            area: ['260px', '360px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '选择栏目',
+            content: $('#selectColumn'),
+            zIndex: 80,
+          });
+        });
+        //选择栏目-点击
+        $(".checkColumn").click(function() {
+          //关闭当前弹窗
+          layer.close(layer.index);
+          //赋值
+          $("#add-article-column").val(checkedColumn.name);
+          $("#add-article-column").attr("data-columnId",checkedColumn.id);
+          if (checkedColumn.id == "0"){
+            layer.msg("不允许选择该栏目", function() {
+              //关闭后的操作
+            });
+            $("#add-article-column").val("");
+            $("#add-article-column").attr("data-columnId","");
+          }
+
+        });
+        // 监听新建、修改文章-提交
+        layui.use(['jquery', 'form'], function() {
+          var form = layui.form;
+          //监听提交
+          form.on('submit(addArticle)', function(data) {
+            console.log(JSON.stringify(data.field));
+            console.log(data.field);
+            //获取附件的id
+            let len = $(".appendix-lists > .appendix-list").length;
+            let appendixIds = "";
+            for(let i=0;i<len;i++){
+              let fileId = $($(".appendix-lists > .appendix-list > span")[i]).attr('fileId');
+              appendixIds = fileId +";"+ appendixIds
+            }
+            //获取栏目的ID
+            let columnId = $("#add-article-column").attr("data-columnId");
+            //如果是编辑文章，获取文章的ID
+            let articleId = $("#articleId").val();
+            if(articleId){
+              //文章的ID存在，说明是编辑文章
+              let saveObj = new Array();
+              let ResultSave = function(){
+                if(saveObj[0] == "ok$^@^$UPDATED="){
+                  _reload();
+                  layer.close(layer.index);
+                }else {
+                  layer.msg(saveObj[0], function() {
+                    //关闭后的操作
+                  });
+                  return false;
+                }
+              };
+              getFromWS("/Home/article/updateArticle.template","article_type="+columnId+"$^@^$on_top="+data.field.isTop+"$^@^$title="+data.field.articleName+"$^@^$publisher="+sessionStorage.getItem('loginName')+"$^@^$sort="+data.field.articleSort+"$^@^$content="+data.field.content+"$^@^$pic_id="+data.field.CoverId+"$^@^$appendix_id="+appendixIds+"$^@^$on_public="+data.field.isPublish+"$^@^$id="+articleId,saveObj,ResultSave);
+            }else{
+              //新建文章
+              let saveObj = new Array();
+              let ResultSave = function(){
+                if(saveObj[0] == "ok$^@^$UPDATED="){
+                  window.location.reload();
+                }else {
+                  layer.msg(saveObj[0], function() {
+                    //关闭后的操作
+                  });
+                  return false;
+                }
+              };
+              getFromWS("/Home/article/addArticle.template","article_type="+columnId+"$^@^$on_top="+data.field.isTop+"$^@^$title="+data.field.articleName+"$^@^$publisher="+sessionStorage.getItem('loginName')+"$^@^$sort="+data.field.articleSort+"$^@^$content="+data.field.content+"$^@^$pic_id="+data.field.CoverId+"$^@^$appendix_id="+appendixIds+"$^@^$on_public="+data.field.isPublish,saveObj,ResultSave);
+            }
+            return false;
+          });
+        });
+        //批量删除
+        $("#batchDelete").click(function() {
+          var checkStatus = table.checkStatus('articleTable');
+          var data = checkStatus.data;
+          console.log(data);
+          if (data == '') {
+            layer.msg('请选择要删除的文章', function() {
+              //关闭后的操作
+            });
+          } else {
+            layer.confirm('确定批量删除这些文章？', function(index) {
+              let articleIds = '';
+              let articleCount = 0;
+              for (var i = 0; i < data.length; i++) {
+                articleIds = articleIds + data[i].id + ',';
+                articleCount++;
+              }
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok$^@^$UPDATED=') {
+                  _reload();
+                  layer.close(layer.index);
+                }else{
+                  layer.msg('删除失败', function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              getFromWS('/Home/article/sDelArticle.template',
+                  'ids=' + articleIds + '$^@^$articleCount=' + articleCount, obj, Result);
+              layer.close(index);
+            });
+          }
+        });
+        //搜索
+        $("#search").click(function() {
+          var data = $('#searchInput').val();
+            //重载表格
+            layui.use('table', function() {
+              var table = layui.table;
+              table.reload('articleTable', {
+                url: '/Home/article/listArticle.template',
+                where: { //设定异步数据接口的额外参数，任意设
+                  keywords: data,
+                }
+                , page: {
+                  curr: 1, //重新从第 1 页开始
+                },
+              });
+            });
+        });
+        //获取文件名称
+        function getFileName(path) {
+          var pos1 = path.lastIndexOf('/');
+          var pos2 = path.lastIndexOf('\\');
+          var pos = Math.max(pos1, pos2);
+          if (pos < 0) {
+            return path;
+          }
+          else {
+            return path.substring(pos + 1);
+          }
+        }
+        /**
+         * 上传封面
+         */
+        $("#uploadCoverBtn").click(function() {
+          if ($("#uploadCoverInput").val()) {
+            var preview = $(".cover-img")[0];
+            var file = $("#uploadCoverInput")[0].files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function() {
+              preview.src = reader.result;
+              $(".cover-img").css("display","inline-block");
+            };
+
+            if (file) {
+              reader.readAsDataURL(file);
+            } else {
+              preview.src = "";
+            }
+            //上传图片
+            var setPicId = function (fileId_pic) {
+              if (fileId_pic) {
+                $("#CoverId").val(fileId_pic);
+              }
+            };
+            uploadToDatabase("uploadCoverInput", setPicId, "databaseType=Sqldb");
+          } else {
+            alert("请选择封面")
+          }
+        });
+        /**
+         * 删除图片
+         */
+        $("#deleteCoverBtn").click(function() {
+          let fileId = $("#CoverId").val();
+          let deleteObj = new Array();
+          let deleteResult = function(){
+            console.log(deleteObj[0]);
+            if(deleteObj[0]=="ok$^@^$UPDATED="){
+              $("#CoverId").val("");
+              let preview = $(".cover-img")[0];
+              preview.src = "";
+              $(".cover-img").css("display","none");
+              $("#uploadCoverInput").val("");
+            }else{
+              alert("删除失败");
+            }
+          };
+          getFromWS("/Home/article/delAppendix.template","id="+fileId,deleteObj,deleteResult);
+        });
+        /**
+         * 上传附件
+         */
+        $("#uploadAppendixBtn").click(function() {
+          if ($("#uploadAppendixInput").val()) {
+            var setAppendixId = function (fileId_appendix) {
+              if (fileId_appendix) {
+                let fileName = getFileName($("#uploadAppendixInput").val());
+                $(".appendix-lists-outer").css("display","inline-block");
+                $(".appendix-lists").append(`
+                    <div class="appendix-list"><a href="/downloadFile.spe?dtype=PostgresXL&mode=attachment&fileid=${fileId_appendix}">${fileName}</a><span style="margin-left: 100px;cursor: pointer" id="deleteAppendix" fileId="${fileId_appendix}">删除</span></div>
+                `);
+                $("#uploadAppendixInput").val("");
+              }
+            };
+            uploadToDatabase("uploadAppendixInput", setAppendixId, "databaseType=Sqldb");
+          } else {
+            alert("请选择文件")
+          }
+        })
+        /**
+         * 删除附件
+         */
+        $(".appendix-lists").on("click","#deleteAppendix",function(){
+          let fileId=$(this).attr("fileId");
+          let deleteObj = new Array();
+          let deleteResult = function(){
+            console.log(deleteObj[0]);
+            if(deleteObj[0]=="ok$^@^$UPDATED="){
+              $("#deleteAppendix").parent().remove();
+            }else{
+              alert("删除失败");
+            }
+          };
+          getFromWS("/Home/article/delAppendix.template","id="+fileId,deleteObj,deleteResult);
+        });
+      });
+    </script>
+</head>
+<body>
+<input type="hidden" value="0" id="_columns_id">
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+        </div>
+        <div class="layui-card-body card-outer">
+            <div class="zTreeDemoBackground left">
+                <ul id="tree" class="ztree"></ul>
+            </div>
+            <div class="article-table">
+                <div class="table-header-btn">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-sm" id="addArticle" >新增文章</button>
+                        <button class="layui-btn layui-btn-sm" id="batchDelete">批量删除</button>
+                    </div>
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchInput" autocomplete="off"
+                                   placeholder="标题 / 发布者 / 时间">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search">搜索</button>
+                    </div>
+                </div>
+                <!--表格-标题-自定义的模板-->
+                <script type="text/html" id="titleTpl">
+                    {{# if(d.on_top == 1){ }}
+                        {{d.title}}<i class="layui-icon layui-icon-praise" style="color: #FF5722;font-size: 13px;margin-left: 6px"></i>
+                    {{# }else{ }}
+                        {{d.title}}
+                    {{# } }}
+                </script>
+                <table class="layui-hide" id="articleTable" lay-filter="articleTable"></table>
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/Scripts/StationJSLib-kindeditor.js"></script>
+</body>
+<!--新增、修改文章-弹出层-->
+<div id="add-article" class="add-article" style="display: none;z-index: -1!important;">
+    <form class="layui-form add-depart-from-position">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">标&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="articleName" required lay-verify="required" placeholder="请输入标题"
+                           autocomplete="off" class="layui-input" id="articleName">
+                    <!--如果是修改文章，则将文章的ID存放在这，提交时，可通过有无文章ID判断是新建文章还是修改文章-->
+                    <input type="hidden" id="articleId" style="display: none;">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">栏&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="columns" required lay-verify="required" placeholder="请选择栏目"
+                           autocomplete="off" class="layui-input" id="add-article-column" data-columnId="">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">排&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="articleSort" required lay-verify="number" placeholder="请输入排序"
+                           autocomplete="off" class="layui-input" id="articleSort" value="0">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">作&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;者</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="articleAuthor" required lay-verify="required" disabled
+                           autocomplete="off" class="layui-input" id="articleAuthor">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;顶</label>
+                <div class="layui-input-inline">
+                    <select name="isTop" id="add-article-top" lay-verify="required">
+                        <option value="0">否</option>
+                        <option value="1">是</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">发&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;布</label>
+                <div class="layui-input-inline">
+                    <select name="isPublish" id="add-article-publish" lay-verify="required">
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline" style="position: relative">
+                <label class="layui-form-label">封&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;面</label>
+                <div class="layui-input-inline" >
+                    <input type="file" name="articleCover"
+                           autocomplete="off" class="file-input-position" id="uploadCoverInput" accept="image/*">
+                    <!--存放封面的id-->
+                    <input type="hidden" id="CoverId" name="CoverId" lay-verify="required">
+                </div>
+                <button class="layui-btn layui-btn-primary layui-btn-sm" type="button" id="uploadCoverBtn">上传封面</button>
+                <button class="layui-btn layui-btn-primary layui-btn-sm" type="button" id="deleteCoverBtn">删除封面</button>
+            </div>
+            <div class="layui-inline">
+                <img src="" class="cover-img" style="width:140px;height: 100px;position: absolute;top: -20px;display: none"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件</label>
+            <div class="layui-input-inline" >
+                <input type="file" name="articleAppendix"
+                       autocomplete="off" class="file-input-position" id="uploadAppendixInput">
+            </div>
+            <button class="layui-btn layui-btn-primary layui-btn-sm" type="button" id="uploadAppendixBtn">上传文件</button>
+        </div>
+        <div class="layui-form-item appendix-lists-outer" style="display: none;">
+            <label class="layui-form-label appendix-list-title">附件列表</label>
+            <div class="layui-inline appendix-lists" style="margin-top: 8px">
+                <!--<div class="appendix-list"><a>1.xxx.png</a></div>-->
+            </div>
+        </div>
+        <textarea id="editor_id" name="content" style="width:700px;height:300px;">
+
+        </textarea>
+        <div class="layui-form-item">
+            <div class="layui-input-block add-depart-button-position">
+                <button class="layui-btn" lay-submit lay-filter="addArticle">确定</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="selectColumn" class="selectColumn" style="display: none;">
+    <div class="zTreeDemoBackground left">
+        <ul id="selectColumnTree" class="ztree"></ul>
+    </div>
+    <button type="button" class="layui-btn layui-btn-sm checkColumn">确定</button>
+</div>
+</html>

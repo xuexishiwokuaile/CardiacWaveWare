@@ -1,0 +1,13 @@
+<%
+    /// 文 件 名：randomString
+    /// 描    述：相应的随时数的使用例子(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/3/11 16:12  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+    =randomString(10, 20)
+%>

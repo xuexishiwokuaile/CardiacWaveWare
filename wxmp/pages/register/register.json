@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "header-cmp": "/components/header/header",
+    "footer-cmp": "/components/footer/footer",
+    "wux-cell-group": "../../components/dist/cell-group/index",
+    "wux-cell": "../../components/dist/cell/index",
+    "wux-select": "../../components/dist/select/index"
+  }
+}

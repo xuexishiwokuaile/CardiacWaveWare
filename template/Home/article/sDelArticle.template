@@ -1,0 +1,25 @@
+<%
+    /// 文 件 名：batchDeleteArticle
+    /// 描    述：批量删除文章(用一句话描述该文件做什么)  
+    /// 项目名称：sie_web      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/12 20:56  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:batchDeleteArticle.template 位置:14:"+"传过来的ids="+:ids+"批量删除的数量articleCount="+:articleCount)
+    split(:ids, ",", &id)
+
+    :sql_batch_delete = "DELETE FROM article WHERE id = ?"
+    :i=0
+    While :i < :articleCount
+        :resultRecord = execSQL(:sql_batch_delete,S(:id[:i]))
+        debugMsg("[DEBUGMSG]:batchDeleteArticle.template 位置:21:"+":resultRecord==========="+:resultRecord)
+        :i = :i + 1
+    EndWhile
+    =:resultRecord
+%>

@@ -1,0 +1,10 @@
+<%
+    :sqlStr="select * from doctor where 1=?"
+    :x=changeRecordSet(:sqlStr,S(1))
+
+    Repeat
+      ///循环主体
+      =S(id)
+      =S(login_name)
+    EndRepeat
+%>

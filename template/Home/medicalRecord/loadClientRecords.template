@@ -1,0 +1,206 @@
+<%
+  #include "common/commonFilter.template"
+  #include "apply_report/monthSelectCss.template"
+%>
+<%
+   debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:6:"+"doctorId=="+:doctorId)
+   ///根据doctorId查询医院名称
+   :sql_selectHospital = "SELECT hospital FROM doctor WHERE id=?"
+   :result_medicalRecords = changeRecordSet(:sql_selectHospital,S(:doctorId)
+   debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:10:"+"===result_medicalRecords"+:result_medicalRecords)
+   :hospital = hospital
+   debugMsg(":hospital=================="#:hospital)
+   If :result_medicalRecords == "bad"
+       /// 通过doctorId  在 doctor 表中找不到记录 ， 说明该Id 是 monitorId  或  管理员
+       /// 先通过monitorId 查出该monitor邀请的所有 clientId
+       :sql_client_id = "SELECT ID FROM CLIENT WHERE MONITOR_ID = ?"
+       :resultRecord = changeRecordSet(:sql_client_id,S(:doctorId))
+       debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:18:"+":resultRecord========"+:resultRecord)
+       :recordNum = recordCount()
+       If :resultRecord == "bad"
+           ///判断是否是管理员
+           :sql_is_admin = "SELECT * FROM ST_PASSPORTS WHERE ID = ?"
+           :resultRecord = changeRecordSet(:sql_is_admin,S(:doctorId))
+           If :resultRecord == "ok"
+               ///管理员查询所有病案信息
+               :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate,isChecked FROM medical_record ORDER BY id DESC"
+               :result_medicalRecords = changeRecordSet(:sql_medicalRecords)
+
+               %>
+               <table class="table table-bordered table-striped" id="example-2" >
+                <thead>
+                  <tr>
+                    <th class="no-sorting">
+                      <input type="checkbox" class="cbr">
+                    </th>
+                    <th>姓名</th>
+                    <th>编号</th>
+                    <th>就诊时间</th>
+                    <th>快捷操作</th>
+                  </tr>
+                </thead>
+
+                <tbody class="middle-align">
+                   <%Repeat%>
+                   <tr id = "<%=id%>">
+                     <td>
+                       <input type="checkbox" class="cbr" value="<%=:s_bid%>" name="isSubmit">
+                     </td>
+                     <td>
+                       <%=clientName%>
+                     </td>
+                     <td>
+                       <%=number%>
+                         <%If isUpdate=="false"%><span class="label label-success">最新更新</span><%EndIf%>
+                         <%If isUpdate=="true"%><span class="label label-info">已经检查</span><%EndIf%>
+                         <%If isChecked=="false"%><span class="label label-success" style="margin-left:10px">尚未检查心脏波</span><%EndIf%>
+                         <%If isChecked=="true"%><span class="label label-info" style="margin-left:10px">已经检查心脏波</span><%EndIf%>
+                     </td>
+                     <td>
+                       <%=checkTime%>
+                     </td>
+                     <%:s_title = title%>
+                     <td>
+                       <a href="#" class="btn btn-success btn-sm btn-icon icon-left" onclick="editClientRecord('<%=clientId%>','<%=id%>')">补充信息</a>
+                       <a href="#" class="btn btn-info btn-sm btn-icon icon-left" onclick="check('<%=clientId%>','<%=id%>')">检查</a>
+                       <a class="btn btn-primary btn-sm btn-icon icon-left" onclick="delMedicalRecord('<%=id%>')">检查报告</a>
+                     </td>
+                   </tr>
+                   <%EndRepeat%>
+                </tbody>
+               </table>
+            <%
+           EndIf
+       Else
+          /// monitor在查询病案信息
+          :i = 0
+          Repeat
+            ///保存client的id
+            :ArrayAllId[:i]=id
+            :i += 1
+          EndRepeat
+          /// 再通过client的Id  从 medical_record中查询病案
+          %>
+          <table class="table table-bordered table-striped" id="example-2" >
+             <thead>
+               <tr>
+                 <th class="no-sorting">
+                   <input type="checkbox" class="cbr">
+                 </th>
+                 <th>姓名</th>
+                 <th>编号</th>
+                 <th>就诊时间</th>
+                 <th>快捷操作</th>
+               </tr>
+             </thead>
+
+             <tbody class="middle-align">
+          <%
+          :j = 0
+          While :j <= :recordNum - 1
+             :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate,isChecked FROM medical_record WHERE clientid=? ORDER BY id DESC"
+             :resultRecord = changeRecordSet(:sql_medicalRecords,S(:ArrayAllId[:j]))
+          %>
+               <tr id = "<%=id%>">
+                 <td>
+                   <input type="checkbox" class="cbr" value="<%=:s_bid%>" name="isSubmit">
+                 </td>
+                 <td>
+                   <%=clientName%>
+                 </td>
+                 <td>
+                   <%=number%>
+                     <%If isUpdate=="false"%><span class="label label-success">最新更新</span><%EndIf%>
+                     <%If isUpdate=="true"%><span class="label label-info">已经检查</span><%EndIf%>
+                     <%If isChecked=="false"%><span class="label label-success" style="margin-left:10px">尚未检查心脏波</span><%EndIf%>
+                     <%If isChecked=="true"%><span class="label label-info" style="margin-left:10px">已经检查心脏波</span><%EndIf%>
+                 </td>
+                 <td>
+                   <%=checkTime%>
+                 </td>
+                 <%:s_title = title%>
+                 <td>
+                   <a href="#" class="btn btn-success btn-sm btn-icon icon-left" onclick="editClientRecord('<%=clientId%>','<%=id%>')">补充信息</a>
+                   <a href="#" class="btn btn-info btn-sm btn-icon icon-left" onclick="check('<%=clientId%>','<%=id%>')">检查</a>
+                   <a class="btn btn-primary btn-sm btn-icon icon-left" onclick="delMedicalRecord('<%=id%>')">检查报告</a>
+                 </td>
+               </tr>
+          <%
+             :j += 1
+             debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:73:"+"j==========================="+:j)
+          EndWhile
+          %>
+             </tbody>
+           </table>
+          <%
+       EndIf
+   Else
+      ///  :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate FROM medical_record WHERE hospital=? ORDER BY CASE WHEN isUpdate='true' THEN 1 WHEN isUpdate='false' THEN 2 END,CAST(number AS BIGINT) DESC"
+      :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate,isChecked FROM medical_record WHERE hospital=? ORDER BY id DESC"
+      :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:hospital))
+
+      debugMsg(":clientId=============="#clientId)
+      %>
+      <table class="table table-bordered table-striped" id="example-2" >
+      	<thead>
+      		<tr>
+      			<th class="no-sorting">
+      				<input type="checkbox" class="cbr">
+      			</th>
+      			<th>姓名</th>
+      			<th>编号</th>
+      			<th>就诊时间</th>
+      			<th>快捷操作</th>
+      		</tr>
+      	</thead>
+
+      	<tbody class="middle-align">
+          <%Repeat%>
+          <tr id = "<%=id%>">
+            <td>
+              <input type="checkbox" class="cbr" value="<%=:s_bid%>" name="isSubmit">
+            </td>
+            <td>
+              <%=clientName%>
+            </td>
+            <td>
+              <%=number%>
+                <%If isUpdate=="false"%><span class="label label-success">最新更新</span><%EndIf%>
+                <%If isUpdate=="true"%><span class="label label-info">已经检查</span><%EndIf%>
+                <%If isChecked=="false"%><span class="label label-success" style="margin-left:10px">尚未检查心脏波</span><%EndIf%>
+                <%If isChecked=="true"%><span class="label label-info" style="margin-left:10px">已经检查心脏波</span><%EndIf%>
+            </td>
+            <td>
+              <%=checkTime%>
+            </td>
+            <%:s_title = title%>
+            <td>
+              <a href="#" class="btn btn-success btn-sm btn-icon icon-left" onclick="editClientRecord('<%=clientId%>','<%=id%>')">补充信息</a>
+              <a href="#" class="btn btn-info btn-sm btn-icon icon-left" onclick="check('<%=clientId%>','<%=id%>')">检查</a>
+              <a class="btn btn-primary btn-sm btn-icon icon-left" onclick="delMedicalRecord('<%=id%>')">检查报告</a>
+            </td>
+          </tr>
+          <%EndRepeat%>
+      	</tbody>
+      </table>
+      <%
+   EndIf
+
+
+%>
+
+<style>
+    .dataTables_filter{
+        float:right
+    }
+    .dataTables_paginate{
+        float:right
+    }
+</style>
+
+<script>
+	$("#example-2").dataTable({
+		order: [],
+		"pageLength": 50,
+	});
+</script>

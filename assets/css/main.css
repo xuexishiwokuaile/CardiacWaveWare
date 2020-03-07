@@ -1,0 +1,35 @@
+.moneyicon{
+padding-left: 10px !important;
+padding-right: 0 !important;
+font-size:30px !important;
+color: red
+}
+.moneytext{
+  color: red !important
+}
+.mailbox-env .mail-env .mail-table > tbody > tr.unread a.newstitle{color:#646565!important;font-weight: bold;}
+.newstitle{max-width: 100%!important;}
+.col-name{width: 15%;text-align: center;}
+.col-time{width: 18%!important}
+.col-subject{width: 67%}
+.mail-select-options{padding-left: 15px;}
+.profile-env .user-info-sidebar .user-img {
+    display:inline-table!important;
+    margin-bottom: 0!important
+}
+.profile-env .user-info-sidebar .user-name {
+    display:inline-table!important;
+    margin-left: 10px;
+        text-align: left;
+
+}
+.profile-env .user-info-sidebar .user-title{
+  margin-bottom: 0;
+  font-size: 16px!important;
+  color: #864a2a!important
+
+}
+.profile-env {
+    margin-top: 20px!important;
+}
+.waitnum{min-width: 20px!important;padding:4px!important;margin-top: -3px!important}

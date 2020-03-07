@@ -1,0 +1,11 @@
+<%
+    ///程序代码
+    :sql_selectClient = "SELECT st.id,st.name,cl.height,cl.weight,cl.smoking,cl.drinking,cl.hypertension,cl.diabetes FROM st_passports st,client cl WHERE st.login_name=? AND st.id=cl.id"
+    :result_selectClient = changeRecordSet(:sql_selectClient,S(:login_name))
+
+    =:result_selectClient
+
+debugMsg(":login_name==============="#S(:login_name))
+debugMsg(":result_selectClient==============="#:result_selectClient)
+
+%>

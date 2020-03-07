@@ -1,0 +1,25 @@
+<%
+      ///判断说明：
+      If :classification == 2
+          ///判断主体
+          :sqlStr = "delete from st_passports where id = ?"
+          :x = execSQL(:sqlStr,S(:id))
+          :sqlDoc = "delete from doctor where id = ?"
+          :x = execSQL(:sqlDoc,S(:id))
+      Else
+          ///分支主体
+          If :classification == 3
+                :sqlStr = "delete from st_passports where id = ?"
+                :x = execSQL(:sqlStr,S(:id))
+                :sqlClient = "delete from client where id = ?"
+                :x = execSQL(:sqlClient,S(:id))
+          Else
+                :sqlStr = "delete from st_passports where id = ?"
+                :x = execSQL(:sqlStr,S(:id))
+          EndIf
+      EndIf
+%>
+
+
+
+

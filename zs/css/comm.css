@@ -1,0 +1,25 @@
+/* 导入萍方字体 */
+@font-face {
+	font-family: 'PingFang-SC-Regular';
+	src: url(../assets/font/PingFang-SC-Regular.ttf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'PingFang-SC-Light';
+	src: url(../assets/font/PingFang-SC-Light.ttf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'PingFangSC-Semibold';
+	src: url(../assets/font/PingFangSC-Semibold.ttf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'DFPLiJinHeiW8';
+	src: url(../assets/font/华康俪金黑W8.TTF);
+	font-weight: normal;
+	font-style: normal;
+}

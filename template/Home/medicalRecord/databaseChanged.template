@@ -1,0 +1,8 @@
+<%
+    ///程序代码
+    :sql_medicalRecordNum = "SELECT id FROM medical_record WHERE 1=?"
+    :result_medicalRecordNum = changeRecordSet(:sql_medicalRecordNum,1)
+    :recordNum = recordCount()
+
+    =:recordNum
+%>

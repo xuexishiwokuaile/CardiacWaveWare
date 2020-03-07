@@ -1,0 +1,25 @@
+<%
+    /// 文 件 名：iUpdateResult
+    /// 描    述：用户更新用户信息相应的操作类，主要的作用是补允用户的实际测量信息
+    /// 项目名称：zoolina-cardiac-wave
+    /// 作    者：武汉大学国家网络安全学院@沈家强
+    /// 发布日期：2019/1/29 11:55
+    /// 文件版本：V1.0
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved.
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+///提交测试代码
+///http://192.168.10.251/Home/medicalRecord/iUpdateResult.template?id=2018310881580002620&picture=2019018590740000001,2019018590740001001,&blood=[{"vessel":"LAD","part":"中段","narrow":"50%以下"}]&height=176&weight=80&drinking=是&smoking=是&hypertension=无&diabetes=二型
+
+  ///更新相應的病案信息
+  :sql="UPDATE medical_record r SET r.picture=?,r.blood=?,r.isupdate='true'  WHERE r.id= ?"
+  execSQL(:sql,S(:picture),S(:blood),S(:id))
+
+  :sqlClient="UPDATE client c SET c.height=?, c.weight=?, drinking=?, smoking=?, hypertension=?, diabetes=? WHERE c.id=(SELECT r.clientid FROM MEDICAL_RECORD r WHERE r.id=?)"
+  :result = execSQL(:sqlClient,S(:height),S(:weight),S(:drinking),S(:smoking),S(:hypertension),S(:diabetes),S(:id));
+
+  :=result
+%>

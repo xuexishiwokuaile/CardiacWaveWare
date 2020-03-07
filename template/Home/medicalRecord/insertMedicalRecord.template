@@ -1,0 +1,32 @@
+<%
+   ///生成新的病历id
+   :id = tuid();
+    debugMsg("[DEBUGMSG]:insertMedicalRecord.template 位置:4:"+"doctorId==="+:doctorId+"===monitor_id="+:monitor_id)
+   ///根据login_name查询登录用户的详细信息
+   :sql_selectClient = "SELECT id,name FROM st_passports WHERE login_name=?"
+   :result_selectClient = changeRecordSet(:sql_selectClient,S(:login_name))
+   :clientId = id
+   :clientName = name
+
+   If :doctorId == "__error__" || :doctorId == "null" && :monitor_id != "__error__"
+       /// 表示该用户扫的是  monitor 的二维码
+       /// 先通过 monitor_id 查出所属的医院的id
+       :sql_get_doctor_id = "SELECT hospital_id FROM MONITOR WHERE ID = ?"
+       :resultRecord_get_doctor_id = changeRecordSet(:sql_get_doctor_id,S(:monitor_id))
+       :doctorId = hospital_id
+   EndIf
+
+   ///根据doctorId查询相应的医院和医生信息
+   :sql_selectDoctor = "SELECT id,name,hospital FROM doctor WHERE id=?"
+   :result_selectDoctor = changeRecordSet(:sql_selectDoctor,S(:doctorId))
+   :doctorId = id
+   :doctorName = name
+   :hospital = hospital
+
+   ///向病历表中插入新的病案信息信息
+   :sql_insertMedicalRecord = "INSERT INTO medical_record(id,clientId,clientName,doctorId,doctorName,hospital,number,checkTime,isUpdate,isChecked) VALUES(?,?,?,?,?,?,?,?,'false','false')"
+   :result_insertMedicalRecord = changeRecordSet(:sql_insertMedicalRecord,S(:id),S(:clientId),S(:clientName),S(:doctorId),S(:doctorName),S(:hospital),S(:number),S(:checkTime))
+
+debugMsg("result_insertMedicalRecord=========="#:result_insertMedicalRecord)
+
+%>

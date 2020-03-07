@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模块管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <!--    验证码插件-->
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js"></script>
+
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+
+    <script type="text/javascript">
+        layui.use('element', function(){
+            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+            //监听导航点击
+            element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });
+        });
+
+        let checkedItems = '';//存放选中栏目所有信息
+        function _reload(){
+            // console.log(checkedItems);
+            //重载表格
+            layui.use('table', function() {
+                var table = layui.table;
+                table.reload('module-table', {
+                    url: '/Home/module/listAllModules.template',
+                    page: {
+                        curr: 1, //重新从第 1 页开始
+                    },
+                });
+            });
+        }
+        //加载表格
+        let use = layui.use(['table', 'form', 'jquery'], function() {
+            var table = layui.table;
+            var form = layui.form;
+            var $ = layui.$;
+
+            table.render({
+                elem: '#module-table'
+                , cellMinWidth: 260
+                , url: '/Home/module/listAllModules.template'
+                , cols: [
+                    [
+                        {type: 'checkbox', fixed: 'left'}
+                        , {field: 'ID1', title: '序号', align: 'center',width:300}
+                        , {field: 'ROLE', title: '类型', align: 'center',width:500}
+                        , {field: 'NAME', title: '模块名称', align: 'center'},
+                    ]]
+                , done: function() {
+                    $("[data-field='classification']").css('display', 'none');
+                }
+                , page: true,
+            });
+            //自定义表单验证规则
+            form.verify({
+                //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+                loginName: [
+                    /[^\u4e00-\u9fa5]+/
+                    , '登录名不能是中文',
+                ],
+            });
+
+            //更改模块显示选项
+            $('#changeDisplayOption').click(function() {
+                let checkStatus = table.checkStatus('module-table');
+                let data = checkStatus.data;
+                if (data == '') {
+                    layer.msg('请选择要更改显示选项的模块', function() {
+                        //关闭后的操作
+                    });
+                } else {
+                    layer.confirm('确定更改这些模块的显示选项？', function(index) {
+                        let moduleIds = '';
+                        let modulesCount = 0;
+                        for (var i = 0; i < data.length; i++) {
+                            moduleIds = moduleIds + data[i].ID1 + ',';
+                            modulesCount++;
+                        }
+                        //去掉最后一个 ，
+                        //layer.close(layer.index);
+                        moduleIds = moduleIds.substr(0, moduleIds.length - 1);
+                        let obj = new Array();
+                        let Result = function() {
+                            if (obj[0] == 'ok') {
+                                _reload();
+                                layer.close(layer.index);
+                            } else {
+                                layer.msg(`更改失败，${obj[0]}`, function() {
+                                    //关闭后的操作
+                                });
+                            }
+                        };
+                        getFromWS('Home/module/updateModules.template',
+                            'ids=' + moduleIds + '$^@^$modulesCount=' + modulesCount, obj, Result);
+
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<ul class="layui-nav" style="background:white">
+    <li class="layui-nav-item layui-this">
+        <a href="javascript:;" style="color: black">选择类型</a>
+        <dl class="layui-nav-child">
+            <dd><a href="/pages/home/admin/src/views/module/module.html">管理员</a></dd>
+            <dd><a href="/pages/home/admin/src/views/module/module2.html">监测机构</a></dd>
+            <dd><a href="/pages/home/admin/src/views/module/module3.html">监测员</a></dd>
+            <dd><a href="/pages/home/admin/src/views/module/module4.html">用户</a></dd>
+        </dl>
+    </li>
+</ul>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <h2>模块管理</h2>
+        </div>
+        <br>
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="user-table">
+                <div class="table-header-btn" style="display: flex;align-items: center;padding: 4px 0">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn u-btn layui-btn-sm" id="changeDisplayOption">确定更改</button>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <table class="layui-hide" id="module-table" lay-filter="module-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

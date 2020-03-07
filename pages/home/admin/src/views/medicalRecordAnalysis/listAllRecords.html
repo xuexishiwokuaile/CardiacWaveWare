@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>病历列表</title>
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <script type="text/javascript" src="/assets/js/qrcode.min.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <!--相应的图像显示对应的内容-->
+    <script src="/Scripts/echarts.min.js"></script>
+    <script>
+      //加载表格
+      let use = layui.use(['table', 'jquery'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+        table.render({
+          elem: '#list-table'
+          , url: '/Home/medicalRecordAnalysis/listRecords.template'
+          , cellMinWidth: 260
+          , response: {
+            countName: 'total', //规定数据总数的字段名称，默认：count
+          }
+          , cols: [
+            [
+              {type: 'checkbox', fixed: 'left'}
+              , {field: 'clientname', title: '姓名', width: 120, align: 'center'}
+              , {field: 'time', title: '检测时间', align: 'center'}
+              , {field: 'quantitativepeak', title: '定量峰值', width: 140, align: 'center'}
+              , {field: 'distributionfour', title: '极性分布4', width: 140, align: 'center'}
+              , {field: 'distributionfive', title: '极性分布5', width: 140, align: 'center'}
+              , {field: 'distributionsix', title: '极性分布6', width: 140, align: 'center'}
+              , {fixed: 'right', title: '操作', toolbar: '#record-table-bar', align: 'center', width: 160},
+            ]]
+          , page: true,
+          request: {
+            pageName: 'currentPage' //页码的参数名称，默认：page
+            , limitName: 'pageSize', //每页数据量的参数名，默认：limit
+            countName: 'total', //规定数据总数的字段名称，默认：count
+          },
+        });
+
+        //搜索
+        $('#search').click(function() {
+          var data = $('#searchName').val();//搜索的关键字
+          //重载表格
+          layui.use('table', function() {
+            var table = layui.table;
+            table.reload('list-table', {
+              url: '/Home/medicalRecordAnalysis/listRecords.template',
+              where: { //设定异步数据接口的额外参数，任意设
+                keyWord: data,
+              }
+              , page: {
+                curr: 1, //重新从第 1 页开始
+              },
+            });
+          });
+        });
+        //监听工具条
+        table.on('tool(records-table)', function(obj) {
+          var data = obj.data;
+          analysisSrc(data.medicalRecordId);
+          if (obj.event === 'analysis') {
+            layer.open({
+              type: 1,
+              area: ['1030px', '450px'],
+              shadeClose: true, //点击遮罩关闭
+              title: '高频信号心电图',
+              content: $('#analysis-charts'),
+            });
+            form.render();
+          } else if (obj.event === 'del') {
+            layer.confirm('确定删除该条记录吗？', function(index) {
+              delOneRecord(data.id);
+              layer.close(index);
+            });
+          } else if (obj.event === 'down') {
+            donwnloadSrc(data.medicalRecordId);
+          }
+        });
+      });
+
+      /**
+       * 下载相应的源始分析文件
+       * @param medicalRecordId
+       */
+      function donwnloadSrc(id) {
+        var obj_tran = new Array();
+        var processResult = function() {
+          if (obj_tran[0] == 'bad') {
+            layer.msg('未发现相应的下载文件ID', function() {
+              //关闭后的操作
+            });
+            return;
+          }
+          window.location.href = '/one/downloadFile.spe?dtype=Sqldb&mode=attachment&fileid=' + obj_tran[0];
+        };
+        getFromWS('Home/medicalRecord/getWaveFormId.template', 'id=' + id, obj_tran, processResult);
+      }
+
+      /**
+       * 删除一条记录
+       * @param id
+       */
+      function delOneRecord(id) {
+        var obj = new Array();
+        var Result = function(){
+          if(obj[0] == "ok"){
+            window.location.reload();
+          }else{
+            layer.msg('删除失败', function() {
+              //关闭后的操作
+            });
+          }
+        };
+        getFromWS('Home/medicalRecordAnalysis/deleteOneRecord.template', 'id=' + id, obj, Result);
+      }
+
+      /**
+       * 相应原始数据的分析图
+       * @param medicalRecordId
+       */
+      function analysisSrc(id){
+        var obj_tran = new Array();
+        var processResult = function(){
+          var json_obj = JSON.parse(obj_tran[0]);
+          strArray = json_obj.data.split("\r\n");
+          // 基于准备好的dom，初始化echarts实例
+          var myChart = echarts.init(document.getElementById('chart_main'));
+          option = {
+            xAxis: {
+              type: 'category',
+              data: (function() {
+                var res = [];
+                for (var i = 0; i < strArray.length; i++)
+                {
+                  res.push(i)
+                }
+                return res;
+              })(),
+            },
+            yAxis: {
+              type: 'value'
+            },
+            tooltip : {
+              trigger: 'axis',
+              formatter: "相应的值x:y <br/>{b} : {c}"
+            },
+            legend: {
+              x: 'left',
+              data: ["2的指数", "3的指数"]
+            },
+            toolbox: {
+              show : true,
+              feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+              }
+            },
+            calculable : true,
+            series: [{
+              showSymbol: true,
+              symbol: 'none',
+              symbolSize: 0,   //设定实心点的大小
+              data: (function() {
+                var res = [];
+                for (var i = 0; i < strArray.length; i++)
+                {
+                  res.push(strArray[i])
+                }
+                return res;
+              })(),
+              markLine : {
+                data : [
+                  {type : 'average', name: '平均值'}
+                ]
+              },
+              animationEasing:name,
+              animationDuration:1000,
+              type: 'line'
+            }]
+          }
+          myChart.setOption(option);
+        }
+        getFromWS("/Home/medicalRecordAnalysis/iGetSrcWaveData.template","medicalRecordId="+id,obj_tran, processResult);
+      }
+    </script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <h2>病历列表</h2>
+        </div>
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="user-table">
+                <div class="table-header-btn personManage-btns" style="padding: 4px 0;">
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchName" autocomplete="off"
+                                   placeholder="病人姓名">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search" style="margin: auto 0!important;">搜索</button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="list-table" lay-filter="records-table"></table>
+                <script type="text/html" id="record-table-bar">
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    <a class="layui-btn layui-btn-xs" lay-event="down">下载</a>
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="analysis">分析</a>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<div id="analysis-charts" class="analysis-charts" style="display: none;">
+    <div id="chart_main" style="width: 1000px;height:400px;"></div>
+</div>
+</html>

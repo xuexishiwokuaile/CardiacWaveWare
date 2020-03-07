@@ -1,0 +1,20 @@
+///相应的检查登录过滤器,用户没有相应的身份权限直接退出
+<%
+    ///统一判断是否用户已经登录
+    :login=checkLogin(:userId,:userToken)
+    debugMsg("[DEBUGMSG]:checkLoginFilter.template 位置:5:"+"login=="+:login+"==:userId=="+:userId+"==:userToken=="+:userToken)
+    If :login!="ok"
+            %>
+              <script>
+                      sessionStorage.setItem('userId'," ");
+                      sessionStorage.setItem('userToken'," ");
+                      sessionStorage.setItem('classification'," ");
+                      sessionStorage.setItem('loginName'," ");
+                      location.href = "../index.html";
+
+              </script>
+            <%
+    EndIf
+%>
+
+

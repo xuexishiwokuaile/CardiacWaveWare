@@ -1,0 +1,15 @@
+<%
+    /// 文 件 名：simulateLogin
+    /// 描    述：模拟登录，获取相应的userId,userToken(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/11 0011 11:11  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+///    'loginName='+loginName+'$^@^$passwd='+pwd
+    :txt = executeRemoteService("wave.zoolina.cn","CoreService/login","loginName=admin$^@^$passwd=csewhu2019",443,"https")
+    =:txt
+
+%>

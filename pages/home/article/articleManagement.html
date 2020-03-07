@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="心脏高精度动力学分析系统"/>
+    <meta name="author" content=""/>
+    <title>系统后台管理</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css"/>
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/assets/css/xenon-core.css"/>
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css"/>
+    <link rel="stylesheet" href="/assets/css/xenon-components.css"/>
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css"/>
+    <link rel="stylesheet" href="/assets/css/foundsDeclareList.css"/>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/assets/css/default/default.css"/>
+
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <script src="/Scripts/kindeditor.js"></script>
+    <script src="/assets/js/jquery.ztree.core.js"></script>
+    <script type="text/javascript" src="js/articleManagement.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        //检查登录
+        _checkLogin();
+
+        //左侧的栏目列表
+        _getLeftList();
+
+        //加载左侧菜单
+        loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=文章管理$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+        //加载相应的公共页头
+        loadFromWS("Home/menu/topNavContent.template", "userName=" + sessionStorage.getItem('userName'), "nav-content-inner");
+
+        //监听bootstrap批量移动、删除、批量复制的modal，解决缓存bug
+        $("#deleteModal").on("hidden.bs.modal", function() {
+          window.location.reload();
+        });
+      });
+    </script>
+</head>
+
+<body class="page-body">
+<div style="display:none">
+    <input type="text" value="0" id="bufferArticleId">
+    <input type="text" value="no" id="bufferIfTravelInfo">
+</div>
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <div id="nav-content-inner">
+        </div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">文章管理</h1>
+                <p class="description">Management Of Article</p></div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="articleManagement.html">
+                            <i class="fa-home"></i>Home</a>
+                    </li>
+                    <li>
+                        <a href="systemManage.html">System Manage</a>
+                    </li>
+                    <li class="active">
+                        <strong>Management Of Article</strong></li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">文章管理</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                      
+                    	<h4 style="margin-bottom:20px;">
+							<span style="color:#000">栏目列表</span>
+						</h4>
+                      
+                        <div id="treeview-selectable" class="treeview">
+
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="panel-heading">
+							<h4 style="margin-bottom:20px;">
+								<span style="color:#000">文章列表</span>
+								<button  id="batchDelete" class="btn btn-purple btn-icon btn-icon-standalone" style="margin-left:5px;float:right" onclick="batchDelete()">
+										<i class="fa-trash" style="font-size:17px"></i>
+										<span>批量删除</span>
+								</button>
+								<button  id="batchEdit" class="btn btn-purple btn-icon btn-icon-standalone" style="margin-left:5px;float:right" onclick="batchEdit()">
+										<i class="fa-edit" style="font-size:17px"></i>
+										<span>批量移动</span>
+								</button>
+								<button  id="batchCopy" class="btn btn-purple btn-icon btn-icon-standalone" style="margin-left:5px;float:right" onclick="batchCopy()">
+										<i class="fa-copy" style="font-size:17px"></i>
+										<span>批量复制</span>
+								</button>
+							    <button class="btn btn-secondary btn-icon btn-icon-standalone"
+							       style="margin-left:5px;float:right" onclick="setArticle(0)">
+									<i class="fa-plus" style="font-size:17px"></i>
+									<span >新增文章</span>
+							    </button>
+							</h4>
+                            <div class="panel-body">
+                                <table class="table table-bordered table-striped" id="example-2">
+                                    <thead>
+                                    <tr>
+										<th class="no-sorting">
+											<input type="checkbox" class="cbr">
+										</th>
+                                        <th>标题</th>
+                                        <th>发布者</th>
+                                        <th>修改日期</th>
+                                        <th>栏目</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="articlePanel" class="middle-align">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="main-footer sticky footer-type-1">
+                <div class="footer-inner">
+                    <div class="footer-text">&copy; 2018
+                        <strong>技术支持</strong>
+                        <a href="#" target="_blank">武汉樱顶网络安全技术中心</a>- Collect from
+                        <a href="#" title="心脏高精度动力学分析系统" target="_blank">心脏高精度动力学分析系统</a></div>
+                    <div class="go-up">
+                        <a href="#" rel="go-top">
+                            <i class="fa-angle-up"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<!--编辑文章-->
+<div class="modal fade" id="modal-article">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="closeDia()">&times;</button>
+                <h4 class="modal-title">编辑文章</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-4" class="control-label">标题: </label>
+                            <input type="text" class="form-control" id="title" placeholder="标题"
+                                   style="display:inline-block;width:30%">
+                            <input type="text" id="articleId" style="display:none">
+                            <input type="text" id="bufferPicIds" value="" style="display:none">
+							<li class="title" style="display:inline-block">&nbsp;&nbsp;类型：<input id="typeSel" type="text" readonly value="" style="width:120px;"/>
+								<a id="menuBtn" style="color:blue" href="#" onclick="showMenu('文章编辑'); return false;">选择类型</a>
+							</li>
+							<input type="text" id="type" value="" style="display:none">
+                            </select>
+						    <label for="field-4" class="control-label">发布者: </label>
+                            <input class="form-control" id="publisher" readonly="readonly"
+                                   style="display:inline-block;width:15%"><br/>
+                            <label for="field-4" class="control-label">置顶: </label>
+                            <select class="form-control" id="topArticle" style="display:inline-block;width:10%">
+								<option value="0">否</optin>
+								<option value="1">是</optin>
+                            </select>
+			                <label for="field-4" class="control-label" style="margin-left: 37px;">公示: </label>
+                            <select class="form-control" id="publicArticle" style="display:inline-block;width:10%">
+								<option value="0">是</optin>
+								<option value="1">否</optin>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-4" class="control-label">图片: </label>
+                            <input type="text" value="0" id="picId" style="display:none">
+                            <input type="text" id="picName" class="form-control" style="display:none;width:30%" readonly>
+							<img id="picImg" src="" style="width:150px;height:60px">
+                            <input type="file" id="picInput" value="上传图片"
+                                   style="display:inline-block;width:70px;color: transparent;"
+                                   onchange="updatePicName()">
+                            <input type="button" value="删除图片" onclick="deletePic()">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-4" class="control-label">附件: </label>
+                            <input type="text" value="" id="appendixId" style="display:none">
+                            <input type="text" id="appendixName" class="form-control"
+                                   style="display:inline-block;width:30%" readonly>
+                            <input type="file" id="appendixInput" value="选择附件"
+                                   style="display:inline-block;width:70px;color: transparent;"
+                                   onchange="updateAppendixName()">
+                            <input type="button" value="上传文件" onclick="uploadAppendix()">
+<!--
+                            <input type="button" value="删除文件" onclick="deleteAppendix()">
+-->							
+                        </div>
+						<!--此div用来先显示已经上传的附件，可以删除和下载-->
+                        <div class="form-group" id="appendix-group">
+                        </div>
+                    </div>
+                    <!--文章内容-->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-4" class="control-label">文章内容: </label>
+                            <textarea class="form-control" id="articleContent" style="height:300px">
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" onclick="closeDia()">关闭</button>
+                <button type="button" class="btn btn-info" onclick="doSave()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--删除文章-->
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header noborder">
+                <h4 class="modal-title">确定删除此篇文章？</h4>
+            </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" id="removeItem">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteAppendixModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header noborder">
+                <h4 class="modal-title">确定删除？</h4>
+            </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" id="removeAppendix">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--批量删除文章-->
+<div class="modal fade" id="bitchDeleteModal">
+    <div class="modal-dialog" style="width:400px;margin-top: 200px;">
+        <div class="modal-content">
+            <div class="modal-header noborder">
+                <h4 class="modal-title">确定删除这些文章？</h4>
+            </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" onclick="saveBatchDelete()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--批量移动-->
+<div class="modal fade" id="batchEditModal">
+    <div class="modal-dialog" style="width:600px">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">批量移动</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="field-5" class="control-label">移动到栏目: </label>
+								<li class="title" style="display:inline-block">&nbsp;&nbsp;
+									类型：<input id="type2Sel" type="text" readonly value="" style="width:120px;"/>
+									&nbsp;<a id="menuBtn" style="color:blue" href="#" onclick="showMenu('批量移动'); return false;">选择</a>
+								</li>
+                                    <input id="type2" style="display:none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" onclick="saveBatchEdit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--批量复制-->
+<div class="modal fade" id="batchCopyModal">
+    <div class="modal-dialog" style="width:600px">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">批量复制</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="field-5" class="control-label">复制到栏目: </label>
+								<li class="title" style="display:inline-block">&nbsp;&nbsp;
+									类型：<input id="type3Sel" type="text" readonly value="" style="width:120px;"/>
+									&nbsp;<a id="menuBtn" style="color:blue" href="#" onclick="showMenu('批量复制'); return false;">选择</a>
+								</li>
+                                    <input id="type3" style="display:none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" onclick="saveBatchCopy()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="menuContent" class="menuContent" style="display:none; position: absolute;z-index: 1050;background-color:white">
+	<ul id="typeTree" class="ztree" style="margin-top:0; width:160px;"></ul>
+</div>
+<!-- Imported styles on this page -->
+<link rel="stylesheet" href="/assets/js/datatables/dataTables.bootstrap.css"/>
+<link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<!-- JavaScripts initializations and stuff -->
+<script src="/assets/js/xenon-custom.js"></script>
+</body>
+</html>

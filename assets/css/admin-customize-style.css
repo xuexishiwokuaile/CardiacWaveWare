@@ -1,0 +1,36 @@
+/*
+    这里是在layui样式基础上，自己修改/添加的样式文件
+ */
+
+
+/*layui-btn的margin-bottom*/
+.u-btn{
+    margin-bottom: 6px!important;
+    width: 90px!important;
+    height: 30px!important;
+}
+
+/*admin-personManage新增管理员弹出层的样式*/
+.add-admin .layui-inline,
+.add-doctor .layui-inline,
+.add-monitor .layui-inline,
+.add-user .layui-inline{
+    margin: 10px;
+}
+.u-btn-center{
+    margin-left: 156px;
+}
+.u-input{
+    width: 50%!important;
+}
+/*左树，右表的布局*/
+.u-table-outer .layui-card-body{
+    padding: 10px 10px 10px 100px!important;
+}
+
+/*自适应样式*/
+@media screen and (max-width:911px) {
+    .personManage-btns{
+        display: block!important;
+    }
+}

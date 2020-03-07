@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "我的报告",
+  "usingComponents": {
+    "wux-cell-group": "/components/dist/cell-group/index",
+        "wux-cell": "/components/dist/cell/index",
+        "wux-divider": "/components/dist/divider/index",
+        "wux-search-bar": "/components/dist/search-bar/index"
+  },
+  "backgroundTextStyle": "dark"
+}

@@ -1,0 +1,28 @@
+<%
+    ///程序代码
+    :sql_editMedicalRecord="SELECT clientName,hospital,doctorName,checkTime,checkResult FROM medical_record WHERE id=?"
+    :result_editMedicalRecord = changeRecordSet(:sql_editMedicalRecord,S(:id))
+    :recordNum = recordCount()
+
+    =:result_editMedicalRecord
+%>
+  $_@_$
+<%
+	=clientName
+%>
+  $_@_$
+<%
+	=hospital
+%>
+  $_@_$
+<%
+	=doctorName
+%>
+  $_@_$
+<%
+	=checkTime
+%>
+  $_@_$
+<%
+	=checkResult
+%>

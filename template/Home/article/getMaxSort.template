@@ -1,0 +1,20 @@
+<%
+    /// 文 件 名：getMaxSort
+    /// 描    述：获取最大排序(用一句话描述该文件做什么)  
+    /// 项目名称：html      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/27 21:58  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+    :sql_max="SELECT CAST(max(CAST(sort AS int)) AS varchar) AS num FROM columns WHERE parent_id =?"
+    :resultRecord = changeRecordSet(:sql_max,S(:id))
+    If num == "__null__"
+      = ""
+    Else
+      = num + 10
+    EndIf
+%>

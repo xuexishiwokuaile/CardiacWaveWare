@@ -1,0 +1,24 @@
+<%
+    /// 文 件 名：saveArticle
+    /// 描    述：保存文章(用一句话描述该文件做什么)  
+    /// 项目名称：sie_web      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/12 11:32  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+  debugMsg("[DEBUGMSG]:saveArticle.template 位置:13:"+"传入的参数：栏目的ID，article_type="+:article_type+"=on_top="+:on_top+"=title="+:title+"=publisher="+:publisher)
+  debugMsg("[DEBUGMSG]:saveArticle.template 位置:14:"+"传入的参数：sort="+:sort+"=content="+:content+"=pic_id="+:pic_id+"=appendix_id="+:appendix_id+"=on_public="+:on_public)
+  ///如果选择的栏目，还有子栏目，则不允许选择新建在该栏目下
+  :sql_have_child = "select * from columns where parent_id = ?"
+  :resultRecord = changeRecordSet(:sql_have_child,S(:article_type))
+  :recordNum = recordCount()
+  :id = tuid()
+  :startDate = serverDate("yyyy-MM-dd hh:mm:ss")
+  :sql_saveArticle = "INSERT INTO article(id,article_type,on_top,title,publisher,sort,count,content,pic_id,appendix_id,content_text,on_public,publish_date,modify_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  :resultRecord = execSQL(:sql_saveArticle,S(:id),S(:article_type),S(:on_top),S(:title),S(:publisher),S(:sort),S("0"),S(:content),S(:pic_id),S(:appendix_id),S("0"),S(:on_public),S(:startDate),S(:startDate))
+  =:resultRecord
+%>

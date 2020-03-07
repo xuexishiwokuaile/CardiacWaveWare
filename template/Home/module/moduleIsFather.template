@@ -1,0 +1,17 @@
+<%
+    debugMsg(:columnsId)
+    :sql_isFather = "SELECT NAME FROM MODULE_COLUMNS WHERE ORIGINAL != '0' AND ID = ?"
+    :result_module = changeRecordSet(:sql_isFather,S(:columnsId))
+    debugMsg(:result_module)
+    ///查询结果为ok
+    If :result_module == "ok"
+        :result_isFather = "false"
+    Else
+        :result_isFather = "true"
+    EndIf
+
+    :result_json = jsonAddItem("","isFather",S(:result_isFather))
+    :result_json_Array = jsonAddArrayItem("",:result_json)
+
+    Exit :result_json_Array
+%>

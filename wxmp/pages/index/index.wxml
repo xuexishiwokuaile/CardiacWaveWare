@@ -1,0 +1,53 @@
+<!-- 组件  主页 --> 
+<view class="outer">
+    <header-cmp class="header">
+        <!-- 插槽 -->
+        <text class="sm-title2">远离高危疾病，全民护心行动</text>
+        <view class="title2-bottom"></view>
+    </header-cmp>
+    <view class="index-container">
+        <view class="hr"></view>
+        <view class="item-outer">
+            <view class="items">
+                <view class="item">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-jiance-iron.png" />
+                    <view class="item-text">心脏监测</view>
+                </view>
+                <view class="item" bind:tap="toReport">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-baogao-iron.png" />
+                    <view class="item-text">我的报告</view>
+                </view>
+                <view class="item" bind:tap="toHospital">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-yiyuan-iron.png" />
+                    <view class="item-text">附近医院</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+            <view class="items">
+                <view class="item" bind:tap="toCommunity">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-shequ-iron.png" />
+                    <view class="item-text">心康社区</view>
+                </view>
+                <view class="item"  bind:tap="toShop">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-shancgeng-iron.png" />
+                    <view class="item-text">心康商城</view>
+                </view>
+                <view class="item" bind:tap="toCenter">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/index-gerenzhongxin-iron.png" />
+                    <view class="item-text">个人中心</view>
+                </view>
+            </view>
+            <view class="hr"></view>
+        </view>
+        <view class="user-manage" wx:if="{{isDoctor == 1 ||isDoctor == 2}}">
+            <view class="user-manage-text">用户管理</view>
+        </view>
+    </view>
+    <view class="footer">
+        <view class="question-cooperation">
+            <view class="question-cooperation-text">问题反馈</view>
+            <view class="question-cooperation-text">合作洽谈</view>
+        </view>
+        <footer-cmp></footer-cmp>
+    </view>
+</view>

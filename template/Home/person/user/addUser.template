@@ -1,0 +1,82 @@
+<%
+    /// 文 件 名：iAddClient
+    /// 描    述：管理员后台，用户注册(用一句话描述该文件做什么)
+    /// 项目名称：cardiac
+    /// 作    者：武汉大学国家网络安全学院@沈家强
+    /// 发布日期：2019/5/8 14:01
+    /// 文件版本：V1.0
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved.
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    ///传入：姓名、性别、密码、手机号、身高。体重。吸烟、饮酒、糖尿病、高血压、年龄、机构
+    debugMsg("==addClient.template=="#"==:name="#:name#"==:phone="#:phone#"==:height="#:height#"==:weight="#:weight#"==:gender="#:gender#"==:drinking="#:drinking#"==:smoking="#:smoking#"==:hypertension="#:hypertension#"==:diabetes="#:diabetes#"==:department="#:department+"=login_name="+:login_name)
+    ///先判断用户名是否重复（手机号）
+    :sql_insertClient="SELECT * FROM ST_PASSPORTS WHERE LOGIN_NAME=?"
+    :result_insertClient=changeRecordSet(:sql_insertClient,S(:login_name))
+    :recordNum = recordCount()
+
+    If :recordNum == 0
+        ///用户名没有重复,开始注册
+        /// 因为在后台新增用户的话，是没有这些字段的（截止20190701）
+        If :height == "__error__"
+            :height = ""
+        EndIf
+        If :weight == "__error__"
+            :weight = ""
+        EndIf
+        If :gender == "__error__"
+            :gender = ""
+        EndIf
+        If :drinking == "__error__"
+            :drinking = ""
+        EndIf
+        If :smoking == "__error__"
+            :smoking = ""
+        EndIf
+        If :hypertension == "__error__"
+            :hypertension = ""
+        EndIf
+        If :department == "__error__"
+            :department = ""
+        EndIf
+        If :age == "__error__"
+            :age = ""
+        EndIf
+        If :diabetes == "__error__"
+            :diabetes = ""
+        EndIf
+
+        ///获取ID
+        :clientId = tuid()
+        ///获取number 用于排序
+        :sql_max="SELECT CAST(max(CAST(number AS int)) AS VARCHAR) AS NUM FROM ST_PASSPORTS"
+        :resultRecord = changeRecordSet(:sql_max)
+        If :resultRecord == "ok"
+            :num = num+10
+        Else
+            :num=0
+        EndIf
+
+        ///向client中插入新的数据
+        :sql_insertClient="INSERT INTO client(id,phone,height,weight,gender,drinking,smoking,hypertension,diabetes,age,name,number) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
+        :result_insertClient=execSQL(:sql_insertClient,S(:clientId),S(:phone),S(:height),S(:weight),S(:gender),S(:drinking),S(:smoking),S(:hypertension),S(:diabetes),S(:age),S(:name),S(:num))
+        ///向st_passports中插入新的数据
+        :sql_insertStPassports="INSERT INTO st_passports(id,login_name,passwd,classification,name,number) VALUES(?,?,md5(?),?,?,?)"
+        :result_insertStPassports=execSQL(:sql_insertStPassports,S(:clientId),S(:login_name),S(:passwd),S(:classification),S(:name),S(:num))
+        ///ok$^@^$UPDATED=
+        If :result_insertStPassports=="ok$^@^$UPDATED=" && :result_insertClient=="ok$^@^$UPDATED="
+            ///注册成功
+            debugMsg("[DEBUGMSG]:iAddClient.template 位置:74:"+"注册成功===================")
+            ="ok"
+        Else
+            debugMsg("==addClient.template=="#"==:name="#:name#"==:phone="#:phone#"==:height="#:height#"==:weight="#:weight#"==:gender="#:gender#"==:drinking="#:drinking#"==:smoking="#:smoking#"==:hypertension="#:hypertension#"==:diabetes="#:diabetes#"==:department="#:department+"=login_name="+:login_name)
+            ="result_insertClient" + :result_insertClient
+        EndIf
+    Else
+        ///用户名重复
+        ="rpt"
+    EndIf
+%>

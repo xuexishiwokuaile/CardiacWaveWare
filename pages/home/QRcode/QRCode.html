@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="心脏高精度动力学分析系统"/>
+    <meta name="author" content=""/>
+    <title>心脏高精度电动力学分析系统</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/systemManage.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <script type="text/javascript" src="http://static.runoob.com/assets/qrcode/qrcode.min.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.js"></script>
+</head>
+
+<body class="page-body">
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <!--相应的顶部导航区相应的内容-->
+        <div id="nav-content-inner">
+        </div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">二维码生成</h1>
+                <p class="description">QRcode produce</p>
+            </div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="main.html"><i class="fa-home"></i>Home</a>
+                    </li>
+                    <li>
+                        <a href="QRCode.html">QRCode</a>
+                    </li>
+                    <li class="active">
+                        <strong>QRCode</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"></div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <h4 class="school">
+                        二维码管理
+                        <div style="float:right">
+                            <a class="btn btn-secondary btn-icon btn-icon-standalone" onclick="addqrcode();">
+                                <i class="fa-plus" style="font-size:10px"></i>
+                                <span>新增二维码</span>
+                            </a>
+                        </div>
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-body" id="loadQRCodes">
+            </div>
+            <script type="text/javascript">
+
+              var opts = {
+                'closeButton': true,
+                'debug': false,
+                'positionClass': 'toast-bottom-right',
+                'onclick': null,
+                'showDuration': '300',
+                'hideDuration': '1000',
+                'timeOut': '5000',
+                'extendedTimeOut': '1000',
+                'showEasing': 'swing',
+                'hideEasing': 'linear',
+                'showMethod': 'fadeIn',
+                'hideMethod': 'fadeOut',
+              };
+
+              function addqrcode() {
+                var objCurnum = new Array();
+                var curNum;
+                var processResultCur = function() {
+                  if (objCurnum[0] == '__null__') {
+                    curNum = 1;
+                    $('#addid').val(curNum);
+                  } else {
+                    curNum = Number(objCurnum[0]) + 1;
+                    $('#addid').val(curNum);
+                  }
+                };
+                getFromWS('Home/QRcode/getCurMaxID.template', '', objCurnum, processResultCur);
+                $('#addqrcodemodal').modal('show');
+              }
+            </script>
+        </div>
+        <footer class="main-footer sticky footer-type-1">
+            <div class="footer-inner">
+                <div class="footer-text">
+                    &copy; 2018
+                    <strong>heart</strong>
+                    </a> 心脏高精度电动力学分析系统 - Collect from <a href="http://sdev.whu.edu.cn/" title="网页模板" target="_blank">武汉大学</a>
+                </div>
+                <div class="go-up">
+                    <a href="#" rel="go-top">
+                        <i class="fa-angle-up"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<div class="modal fade" id="addqrcodemodal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">新增二维码</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="field-5" class="control-label">编号</label>
+                            <input type="text" class="form-control" name='phone' id="addid" disabled>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">宽度</label>
+                            <input type="text" class="form-control" name='phone' id="addwidth" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">高度</label>
+                            <input type="text" class="form-control" name='name' id="addheight" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">网址</label>
+                            <input type="text" class="form-control" name='name' id="addtext" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">标题</label>
+                            <input type="text" class="form-control" name='name' id="addMark" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="addqrcodesave">确定</button>
+            </div>
+        </div>
+    </div>
+</div><!--add-->
+
+</div>
+<link rel="stylesheet" href="/assets/js/uikit/uikit.css">
+<link rel="stylesheet" href="/assets/js/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="/assets/js/multiselect/css/multi-select.css">
+<div class="bottom-script-inner" id="bottom-script-inner">
+</div>
+<script>
+  jQuery(document).ready(function($) {
+    var loadBottomScripts = function() {
+      loadFromWS('Home/bottomscripts.template', 'sid=' + sessionStorage.getItem('loginName') + '$^@^$session=' +
+          getAllSessionItems() + '$^@^$path=' + window.location.pathname, 'bottom-script-inner');
+    };
+    loadFromWS('Home/menu/LeftSideMenu.template', 'Item=系统管理$^@^$item=二维码$^@^$loginName=' +
+        sessionStorage.getItem('loginName'), 'sidebar-menu-inner');
+    //加载相应的公共页头
+    loadFromWS('Home/menu/topNavContent.template', 'userName=' + sessionStorage.getItem('userName'),
+        'nav-content-inner');
+    loadFromWS('Home/QRcode/loadQRCodes.template', '', 'loadQRCodes');
+  });
+
+  $('#addqrcodesave').on('click', function() {
+    var id = $('#addid').val();
+    var width = $('#addwidth').val();
+    var height = $('#addheight').val();
+    var text = $('#addtext').val();
+    var mark = $('#addMark').val();
+    if (width == '' || height == '' || text == '') {
+      toastr.error('二维码信息填写不完整', '添加二维码失败！', opts);
+      return;
+    }
+    if (isNaN(width) || isNaN(height)) {
+      width = 200;
+      height = 200;
+    } else {
+      if (width < 10 || height < 10 || width > 500 || height > 500) {
+        width = 200;
+        height = 200;
+      }
+    }
+    var obj = new Array();
+    var processResult = function() {
+      if (obj[0] != 'ok$^@^$UPDATED=') {
+        toastr.error('添加二维码失败！', opts);
+        return;
+      }
+      else {
+        $('#addqrcodemodal').modal('hide');
+        toastr.success('添加完成', '添加二维码成功！', opts);
+        setTimeout(function() {
+          loadFromWS('Home/QRcode/loadQRCodes.template', '', 'loadQRCodes');
+        }, 0);
+      }
+    };
+    var postdata = 'id=' + id + '$^@^$width=' + width + '$^@^$height=' + height + '$^@^$text=' + text + '$^@^$mark=' +
+        mark;
+    console.log(postdata);
+    getFromWS('Home/QRcode/addQRcode.template', postdata, obj, processResult);
+  });
+
+</script>
+<!-- Bottom Scripts -->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/uikit/js/uikit.min.js"></script>
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/assets/js/selectboxit/jquery.selectBoxIt.min.js"></script>
+<script src="/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<script src="/assets/js/select2/select2.min.js"></script>
+
+</body>
+</html>

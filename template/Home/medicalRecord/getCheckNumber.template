@@ -1,0 +1,31 @@
+<%
+    ///
+    :sql_selectCheckNumber = "SELECT number FROM medical_record WHERE number=?"
+    :result_selectCheckNumber = changeRecordSet(:sql_selectCheckNumber,S(:number))
+
+    :checkNumber = :number
+
+debugMsg("checkNumber=============="#:checkNumber)
+
+    =:result_selectCheckNumber
+
+    ///如果数据库中有当天的0001号号码，则取最大的号码+1获得从检查号码
+    If :result_selectCheckNumber == "ok"
+        :sql_getMaxNumber = "SELECT max(number) AS maxNumber FROM medical_record WHERE 1=?"
+        :result_getMaxNumber = changeRecordSet(:sql_getMaxNumber,1)
+
+debugMsg(":result_getMaxNumber==============="#:result_getMaxNumber)
+debugMsg(":maxNumber==============="#maxNumber)
+        %>
+        $_@_$
+        <%
+        =maxNumber
+
+    ///如果数据库中没有当天的0001号码，则将当天的0001号作为检查号码
+    Else
+        %>
+        $_@_$
+        <%
+        =:checkNumber
+    EndIf
+%>

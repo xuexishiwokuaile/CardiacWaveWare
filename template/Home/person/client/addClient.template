@@ -1,0 +1,25 @@
+<%
+    ///确认登录名是否重复
+    :sql_selectLoginName="SELECT * FROM st_passports WHERE login_name=?"
+    :result_selectLoginName=changeRecordSet(:sql_selectLoginName,S(:login_name))
+
+    If :result_selectLoginName == "bad"
+
+        If :monitor_id == "__error__"
+            :monitor_id = ""
+        EndIf
+
+        ///向st_passports中插入新的数据
+        :sql_insertStPassports="INSERT INTO st_passports(id,login_name,passwd,classification,name,number) VALUES(?,?,md5(?),?,?,?)"
+        :result_insertStPassports=execSQL(:sql_insertStPassports,S(:id),S(:login_name),S(:passwd),S(:classification),S(:name),S(:number))
+
+        ///向client中插入新的数据
+        :sql_insertClient="INSERT INTO client(id,phone,height,weight,gender,drinking,smoking,hypertension,diabetes,age,monitor_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
+        :result_insertClient=execSQL(:sql_insertClient,S(:id),S(:phone),S(:height),S(:weight),S(:gender),S(:drinking),S(:smoking),S(:hypertension),S(:diabetes),S(:age),S(:monitor_id))
+
+    Else
+        ///登录名重复返回rpt
+        :x="rpt"
+        =:x
+    EndIf
+%>

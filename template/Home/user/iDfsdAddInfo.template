@@ -1,0 +1,70 @@
+<%#include "common/commonFunction.template"%>
+
+<%
+    /// 文 件 名：validatePhone
+    /// 描    述：提供给崔骐深圳合作方对应的外部录入接口
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/1/27 17:57  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+    :strResult = "error"
+    :strMsg = ""
+
+    ///1. 确认当前用户是不是新用户
+    ///2. 如果是不是新用户（phone在系统中已经注册，哪么直接写入相应的结果），
+
+
+    If :phone =="" || :phone =="__null__" || strlen(:phone) !=11
+        :strMsg = "phone 未发现，或格式不正确"
+    Else
+        :sqlFindPerson = "SELECT * FROM ST_PASSPORTS WHERE login_name=?"
+        :strResultFindPerson = execSQL(:sqlFindPerson, S(:phone))
+
+        ///当前人员的系统id
+        :persoinId = ""
+        :personName = ""
+
+        ///如果存在当前人员的情况
+        If getSplitPart(:strResultFindPerson,"$^@^$",0) == "ok" && getSplitPart(:strResultFindPerson,"$^@^$",1) !="__error__"
+            :strTemp = getSplitPart(:strResultFindPerson,"$^@^$",1);
+
+            ///系统当中人员对应的ID
+            :persoinId = getSplitPart(:strTemp,"=",1);
+            :strTemp = getSplitPart(:strResultFindPerson,"$^@^$",4);
+            :personName = getSplitPart(:strTemp,"=",1);
+
+        Else
+            :id = tuid()
+            :sql_insertStPassports="INSERT INTO st_passports(id,login_name,passwd,name,number,classification) VALUES(?,?,md5(?),?,?,'3')"
+            :result_insertStPassports=execSQL(:sql_insertStPassports,S(:id),S(:phone),S(:phone),S(:clientName),S(:clientId))
+
+            ///向client中插入新的数据
+            :sql_insertClient="INSERT INTO client(id,phone,gender,age, name) VALUES(?,?,?,?,?)"
+            :result_insertClient=execSQL(:sql_insertClient,S(:id),S(:phone),S(:sex),S(:age),S(:clientName))
+
+            :persoinId = :id
+            :personName= :clientName
+        EndIf
+
+        :idMedicalRecord = tuid()
+        ///添加相应的病案信息
+        :sql_insertMedicalRecord = "INSERT INTO medical_record(id,clientId,clientName,checkTime,waveFormId,waveDataId,waveViewId,doctorId,doctorName,hospital,number,isUpdate,isChecked,) VALUES(?,?,?,?,?,?,?,'2019023127610036320','深圳东方德思','深圳东方德思','2019023127610036320','false','true')"
+        :strResultAddRecord = execSQL(:sql_insertMedicalRecord, S(:idMedicalRecord), S(:persoinId), S(:personName), S(:time),S(:waveFormId),S(:waveDataId),S(:waveViewId))
+
+        ///添加相应结果病例信息
+        :id = tuid()
+        :sql_addAnalysis="INSERT into medical_record_analysis(id,clientId,clientName,time,totalpeak,quantitativePeak,distributionone,distributiontwo,distributionthree,distributionfour,distributionfive,distributionsix,age,sex,medicalrecordid) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        :resultAddAnalysisRecord=execSQL(:sql_addAnalysis,S(:id),S(:persoinId),S(:personName),S(:time),S(:totalPeak),S(:quantitativePeak),S(:distributionone),S(:distributiontwo),S(:distributionthree),S(:distributionfour),S(:distributionfive),S(:distributionsix),S(:age),S(:sex),S(:idMedicalRecord))
+
+        :strResult = getSplitPart(:resultAddAnalysisRecord,"$^@^$",0)
+        :strMsg = "END"
+    EndIf
+
+    :result_json = jsonAddItem("", "result", S(:strResult))
+    :result_json = jsonAddItem(:result_json, "msg", S(:strMsg))
+     =:result_json
+%>

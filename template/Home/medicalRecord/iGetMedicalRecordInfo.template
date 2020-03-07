@@ -1,0 +1,29 @@
+/// 获取相应的病历和病案
+<%
+      :sql_medicalRecords = "SELECT clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,blood,number,isUpdate,isChecked,waveformid,wavedataid FROM medical_record WHERE id = ? "
+      :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:id))
+       ///查询结果ok或bad：
+       If :result_medicalRecords == "ok"
+           ///ok
+                ///获取一条信息
+                :result_records_item = jsonAddItem("", "blood", S(blood))
+                :result_records_item = jsonAddItem(:result_records_item, "checkResult", S(checkResult))
+                :result_records_item = jsonAddItem(:result_records_item, "checkTime", S(checkTime))
+                :result_records_item = jsonAddItem(:result_records_item, "doctorId", S(doctorId))
+                :result_records_item = jsonAddItem(:result_records_item, "doctorName", S(doctorName))
+                :result_records_item = jsonAddItem(:result_records_item, "clientId", S(clientId))
+                :result_records_item = jsonAddItem(:result_records_item, "clientName", S(clientName))
+                :result_records_item = jsonAddItem(:result_records_item, "number", S(number))
+                :result_records_item = jsonAddItem(:result_records_item, "isUpdate", S(isUpdate))
+                :result_records_item = jsonAddItem(:result_records_item, "isChecked", S(isChecked))
+                :result_records_item = jsonAddItem(:result_records_item, "waveformid", S(waveformid))
+                :result_records_item = jsonAddItem(:result_records_item, "wavedataid", S(wavedataid))
+            debugMsg("[DEBUGMSG]:iGetMedicalRecordInfo.template 位置:23:"+:result_records_item)
+            ///返回相应的结果
+            =:result_records_item
+       Else
+           ///bad
+           :result = "no records found"
+           =:result
+       EndIf
+%>

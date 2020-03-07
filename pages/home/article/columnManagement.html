@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="心脏高精度动力学分析系统" />
+    <meta name="author" content="" />
+    <title>系统后台管理</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic" />
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css" />
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="/assets/css/xenon-core.css" />
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css" />
+    <link rel="stylesheet" href="/assets/css/xenon-components.css" />
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css" />
+    <link rel="stylesheet" href="/assets/css/foundsDeclareList.css" />
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/uploadfile.js"></script>
+    <script type="text/javascript" src="/Scripts/kindeditor.js"></script>
+    <script type="text/javascript" src="js/columnManagement.js"></script>
+    <style>
+        /*删除、新增、修改 按钮 停靠右边的样式*/
+        .editorgan{
+            margin-right:10px;
+            float: right;
+        }
+    </style>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        //检查登录
+        _checkLogin();
+
+        ///页面加载时获取栏目列表
+        _getColumns();
+
+        //加载左侧菜单
+        loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=栏目管理$^@^$loginName=" + sessionStorage.getItem(
+            'loginName'), "sidebar-menu-inner");
+        //加载相应的公共页头
+        loadFromWS("Home/menu/topNavContent.template", "userName=" + sessionStorage.getItem('userName'), "nav-content-inner");
+
+        //监听bootstrap中新增、编辑和删除栏目的modal，解决缓存bug
+        $("#addmodal,#editmodal,#deleteModal").on("hidden.bs.modal", function() {
+          window.location.reload();
+        });
+
+      });
+    </script>
+</head>
+
+<body class="page-body">
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <div id="nav-content-inner">
+        </div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">栏目管理</h1>
+                <p class="description">Management Of Column</p>
+            </div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="columnManagement.html">
+                            <i class="fa-home"></i>Home</a>
+                    </li>
+                    <li>
+                        <a href="systemManage.html">System Manage</a>
+                    </li>
+                    <li class="active">
+                        <strong>Management Of Column</strong></li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="panel-heading">
+                    <input type="hidden" value="" id="firstColumCount" />
+                    <a href="javascript:;" onclick="addmodal0();" class="btn btn-secondary btn-icon btn-icon-standalone" style="margin-left:0;margin-bottom:20px">
+                        <i class="fa-plus" style="font-size:17px"></i>
+                        <span>新增栏目</span>
+                    </a>
+                    <div id="treeview-selectable" class=""></div>
+                </div>
+            </div>
+            <footer class="main-footer sticky footer-type-1">
+                <div class="footer-inner">
+                    <div class="footer-text">&copy; 2018
+                        <strong>技术支持</strong>
+                        <a href="#" target="_blank">武汉樱顶网络安全技术中心</a>- Collect from
+                        <a href="#" title="心脏高精度动力学分析系统" target="_blank">心脏高精度动力学分析系统</a></div>
+                    <div class="go-up">
+                        <a href="#" rel="go-top">
+                            <i class="fa-angle-up"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addmodal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">添加栏目</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">栏目名称</label>
+                            <input type="text" class="form-control" id="columnName" name='columnName'>
+                            <label for="field-5" class="control-label">栏目排序</label>
+                            <input type="text" class="form-control" id="columnSort" value="0" name='columnName'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="addsave">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editmodal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">修改栏目名称</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">栏目名称</label>
+                            <input type="text" class="form-control" id="newName" name='departmentname'>
+                            <label for="field-5" class="control-label">栏目排序</label>
+                            <input type="text" class="form-control" id="newSort" name='departmentname'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="editsave">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header noborder">
+                <h4 class="modal-title">确定删除？</h4>
+            </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" id="removeItem">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="/assets/js/datatables/dataTables.bootstrap.css" />
+<link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/xenon-custom.js"></script>
+</body>
+</html>

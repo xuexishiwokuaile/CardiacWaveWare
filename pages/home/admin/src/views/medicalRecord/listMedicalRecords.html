@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>心脏高精度电动力学分析系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-kindeditor.js"></script>
+    <!--  加载拦截系统-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--    验证码插件-->
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <!--其他-->
+    <script type="application/javascript" src="/assets/js/kindeditor/kindeditor-all.js"></script>
+    <script charset="utf-8" src="/assets/js/kindeditor/lang/zh-CN.js"></script>
+
+    <script type="text/javascript">
+      ///默认是管理员
+      let classification = "";
+      let doctorId = "";
+      let clientId = "";
+      ///第一执行函数
+      $(function() {
+        classification = sessionStorage.getItem('classification');
+        doctorId = sessionStorage.getItem('loginId');
+      });
+
+      //加载表格
+      let use = layui.use(['table','form','upload', 'jquery','element'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+        var userId = localStorage.getItem('userId');
+        var userToken = localStorage.getItem('userToken');
+        var upload = layui.upload;
+        var $ = layui.$;
+        table.render({
+          elem: '#medical-table'
+          , url: '/Home/medicalRecord/listMedicalRecords.template'
+          , where: {
+            classification: classification,
+            doctorId: doctorId,
+          }
+          , cellMinWidth: 200
+          , cols: [
+            [
+              {field: 'name', title: '姓名', width: 200, align: 'center'}
+              , {field: 'number', title: '编号', align: 'center'}
+              , {field: 'name', title: '检查情况', align: 'center', templet: '#badge'}
+              , {field: 'time', title: '就诊时间', align: 'center'},
+              , {fixed: 'right', title: '快捷操作', toolbar: '#barDemo', width: 200},
+            ]]
+          , page: true,
+        });
+
+        //搜索
+        $('#search').click(function() {
+          var data = $('#searchUser').val();//搜索的关键字
+          //重载表格
+          layui.use('table', function() {
+            var table = layui.table;
+            table.reload('medical-table', {
+              url: '/Home/medicalRecord/listMedicalRecords.template',
+              where: { //设定异步数据接口的额外参数，任意设
+                keywords: data,
+              }
+              , page: {
+                curr: 1, //重新从第 1 页开始
+              },
+            });
+          });
+        });
+
+        // 行工具栏事件
+        table.on('tool(medical-table)', function(obj) {
+          var data = obj.data;
+          var layEvent = obj.event;
+          if(layEvent === 'add'){
+              if (data != 0) {
+                var medicalId = data.id;
+                var clientId = data.clientId;
+                let obj = new Array();
+                let Result = function() {
+                  if (obj[0] != 'bad') {
+                    var json_medicalRecord = JSON.parse(obj[0]);
+                    var blood = json_medicalRecord[0].blood;
+                    if (blood.length >= 160) {
+                      var json_blood = JSON.parse(json_medicalRecord[0].blood);
+                      $('#add-information select[ name=\'bloodVessel_1\']').val(json_blood[0].vessel);
+                      $('#add-information select[ name=\'bloodPart_1\']').val(json_blood[0].part);
+                      $('#add-information select[ name=\'bloodNarrow_1\']').val(json_blood[0].narrow);
+                      $('#add-information select[ name=\'bloodVessel_2\']').val(json_blood[1].vessel);
+                      $('#add-information select[ name=\'bloodPart_2\']').val(json_blood[1].part);
+                      $('#add-information select[ name=\'bloodNarrow_2\']').val(json_blood[1].narrow);
+                      $('#add-information select[ name=\'bloodVessel_3\']').val(json_blood[2].vessel);
+                      $('#add-information select[ name=\'bloodPart_3\']').val(json_blood[2].part);
+                      $('#add-information select[ name=\'bloodNarrow_3\']').val(json_blood[2].narrow);
+                      $('#add-information select[ name=\'bloodVessel_4\']').val(json_blood[3].vessel);
+                      $('#add-information select[ name=\'bloodPart_4\']').val(json_blood[3].part);
+                      $('#add-information select[ name=\'bloodNarrow_4\']').val(json_blood[3].narrow);
+                    } else if (blood.length >= 120) {
+                      var json_blood = JSON.parse(json_medicalRecord[0].blood);
+                      $('#add-information select[ name=\'bloodVessel_1\']').val(json_blood[0].vessel);
+                      $('#add-information select[ name=\'bloodPart_1\']').val(json_blood[0].part);
+                      $('#add-information select[ name=\'bloodNarrow_1\']').val(json_blood[0].narrow);
+                      $('#add-information select[ name=\'bloodVessel_2\']').val(json_blood[1].vessel);
+                      $('#add-information select[ name=\'bloodPart_2\']').val(json_blood[1].part);
+                      $('#add-information select[ name=\'bloodNarrow_2\']').val(json_blood[1].narrow);
+                      $('#add-information select[ name=\'bloodVessel_3\']').val(json_blood[2].vessel);
+                      $('#add-information select[ name=\'bloodPart_3\']').val(json_blood[2].part);
+                      $('#add-information select[ name=\'bloodNarrow_3\']').val(json_blood[2].narrow);
+                      $('#add-information select[ name=\'bloodVessel_4\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_4\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_4\']').val('无');
+                    } else if (blood.length >= 80) {
+                      var json_blood = JSON.parse(json_medicalRecord[0].blood);
+                      $('#add-information select[ name=\'bloodVessel_1\']').val(json_blood[0].vessel);
+                      $('#add-information select[ name=\'bloodPart_1\']').val(json_blood[0].part);
+                      $('#add-information select[ name=\'bloodNarrow_1\']').val(json_blood[0].narrow);
+                      $('#add-information select[ name=\'bloodVessel_2\']').val(json_blood[1].vessel);
+                      $('#add-information select[ name=\'bloodPart_2\']').val(json_blood[1].part);
+                      $('#add-information select[ name=\'bloodNarrow_2\']').val(json_blood[1].narrow);
+                      $('#add-information select[ name=\'bloodVessel_3\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_3\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_3\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_4\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_4\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_4\']').val('无');
+                    } else if (blood.length >= 40) {
+                      var json_blood = JSON.parse(json_medicalRecord[0].blood);
+                      $('#add-information select[ name=\'bloodVessel_1\']').val(json_blood[0].vessel);
+                      $('#add-information select[ name=\'bloodPart_1\']').val(json_blood[0].part);
+                      $('#add-information select[ name=\'bloodNarrow_1\']').val(json_blood[0].narrow);
+                      $('#add-information select[ name=\'bloodVessel_2\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_2\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_2\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_3\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_3\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_3\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_4\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_4\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_4\']').val('无');
+                    } else {
+                      $('#add-information select[ name=\'bloodVessel_1\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_1\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_1\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_2\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_2\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_2\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_3\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_3\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_3\']').val('无');
+                      $('#add-information select[ name=\'bloodVessel_4\']').val('无');
+                      $('#add-information select[ name=\'bloodPart_4\']').val('无');
+                      $('#add-information select[ name=\'bloodNarrow_4\']').val('无');
+                    }
+
+                    //更新弹出层的表单
+                    $('#add-information input[ name=\'name\' ] ').val(data.name);
+                    $('#add-information input[ name=\'doctor\' ] ').val(data.doctor);
+                    $('#add-information input[ name=\'hospital\' ] ').val(data.hospital);
+                    $('#add-information input[ name=\'time\' ] ').val(data.time);
+                    // $('#add-information input[ name=\'id\' ] ').val(data.id);
+                    $('#add-information input[ name=\'id\' ] ').val(data.clientId);
+                    $('#add-information input[ name=\'height\' ] ').val(data.height);
+                    $('#add-information input[ name=\'weight\' ] ').val(data.weight);
+                    $('#add-information select[ name=\'smoking\' ] ').val(data.smoke);
+                    $('#add-information select[ name=\'drinking\' ] ').val(data.drink);
+                    $('#add-information select[ name=\'hypertension\' ] ').val(data.hypertension);
+                    $('#add-information select[ name=\'diabetes\' ] ').val(data.diabetes);
+                    $('#add-information input[ name=\'checkResult\' ] ').val(data.checkResult);
+                    // $('#add-information input[ name=\'picture\']').val(data.picture);
+                    $('#add-information div[ name=\'image\']').val(data.picture);
+                    form.render();
+
+                    //加载图片
+                    const picture = (data.picture).substring(0, (data.picture).lastIndexOf(','));
+                    if (picture == "" || picture == ",") {
+                      // $("#images").hide();
+                    } else {
+                      let pictureArray = picture.split(",")
+                      $.each(pictureArray, function(index, picture) {
+                        $("#image").
+                            append("<img style='width: 90%' id='img" + picture + "' ondblclick=\"deletePicture('" +
+                                medicalId + "','" + picture +
+                                "');\" src=\"/one/downloadFile.spe?dtype=Sqldb&amp;mode=html&amp;fileid=" + picture +
+                                "\">");
+                      })
+                    }
+                  }
+                };
+                getFromWS('Home/medicalRecord/loadClientRecord.template', 'id=' + data.id, obj, Result);
+
+                layer.open({
+                  type: 1,
+                  area: ['90%', '90%'],
+                  shadeClose: true, //点击遮罩关闭
+                  title: '就诊记录',
+                  content: $('#add-information'),
+                  end: function() {
+                    location.reload();//弹出层结束后，刷新主页面
+                  }
+                });
+              } else {
+                layer.msg("请选择一项！")
+              }
+
+              //上传提交
+              form.on('submit(submit)', function(data) {
+                var height = data.field.height;
+                var weight = data.field.weight;
+                var checkResult = data.field.checkResult;
+                var json_blood = [];
+                var blood_1 = {};
+                var blood_2 = {};
+                var blood_3 = {};
+                var blood_4 = {};
+                var strBlood = "["
+                let i = 0;
+                $(".mBloodVessel").each(function() {
+                  i++;
+                  if ($(this).val() != "无") {
+                    strBlood = strBlood + "{\"vessel\": \"" + $(this).val() + "\", \"part\": \"" +
+                        $("[name=bloodPart_" + i + "]").val() + "\", \"narrow\": \"" +
+                        $("[name=bloodNarrow_" + i + "]").val() + "\"},"
+                  } else {
+                    strBlood = strBlood + "{\"vessel\": \"无\", \"part\": \"无\", \"narrow\": \"无\"},"
+                  }
+                })
+                var strBlood = strBlood.substring(0, strBlood.length - 1) + "]"
+                paras = "id=" + medicalId + "$^@^$clientId=" + data.field.id + "$^@^$height=" + height +
+                    "$^@^$weight=" + weight + "$^@^$checkResult=" + checkResult + "$^@^$smoking=" + data.field.smoking +
+                    "$^@^$drinking=" + data.field.drinking +
+                    "$^@^$hypertension=" + data.field.hypertension + "$^@^$diabetes=" + data.field.diabetes +
+                    "$^@^$blood=" + strBlood;
+                $.ajax({
+                  type: "post",
+                  dataType: "json",
+                  async: false,
+                  data: paras,
+                  url: "/Home/medicalRecord/updateClientRecord.template",
+                  success: function(result) {
+                    console.log(result.msg)
+                    if (result.msg == "ok") {
+                      alert("上传成功！")
+                    } else {
+                      alert("上传失败！")
+                    }
+                  },
+                  error: function(error) {
+                    console.log(error)
+                    alert("上传失败：" + error)
+                  }
+                })
+              });
+          }
+
+              //检查报告
+            else if(layEvent === 'report'){
+              if (data != 0) {
+                layer.open({
+                  type: 2,
+                  area: ['90%', '90%'],
+                  shadeClose: true, //点击遮罩关闭
+                  title: '就诊记录',
+                  content: "../../../../medicalRecord/report.html?medicalRecordId=" + data.id,
+                });
+              } else {
+                layer.msg("请选择一项！")
+              }
+          }
+
+          //图片上传
+          var uploadInst = upload.render({
+            elem: '#picture'
+            , url:  'uploadFile.spe?databaseType=Sqldb&userId='+userId+'&userToken=' + userToken
+            ,accept: 'images'
+            ,multiple: true
+            ,done: function(res){
+              let pictureId = res;
+              let transArray = new Array();
+              let ResultImage = function(){
+                //设置相应的图片相应的id
+                $("#image").append("<img style=\"width: 90%\" id='img"+pictureId+"' ondblclick=\"deletePicture('"+medicalId+"','"+pictureId+"');\" src=\"/one/downloadFile.spe?dtype=Sqldb&mode=html&fileid=" + pictureId + "\">")
+              }
+              paras = "id=" + data.id + "$^@^$" +  "picture=" + pictureId+',';
+              getFromWS("Home/medicalRecord/addClientPicture.template",paras, transArray,ResultImage);
+            }
+            ,error: function(){
+              //请求异常回调
+              console.log("失败！")
+             }
+          });
+          element.init();
+        });
+      });
+
+      /**
+       * 删除图片
+       */
+      function deletePicture(medicalId,picture){
+        let pictureId = picture;
+        let id = medicalId;
+        let transArray = new Array();
+        var ansswer = confirm("是否删除？");
+        if (ansswer){
+          let ResultImage = function(){
+            $("#img"+pictureId).remove()
+          }
+          paras = "id=" + id + "$^@^$" +  "picture=" + pictureId + ',';
+          getFromWS("Home/medicalRecord/delClientPicture.template",paras, transArray,ResultImage);
+        };
+      }
+    </script>
+    <script type="text/html" id="badge">
+        {{#  if(d.isUpdate == 'false' && d.isChecked == 'false'){ }}
+        <span class="layui-badge layui-bg-green">最近更新</span>
+        <span class="layui-badge layui-bg-green">尚未检查心脏波</span>
+        {{#  } else if(d.isUpdate == 'true' && d.isChecked == 'false'){ }}
+        <span class="layui-badge layui-bg-blue">已经检查</span>
+        <span class="layui-badge layui-bg-green">尚未检查心脏波</span>
+        {{#  } else if(d.isUpdate == 'false' && d.isChecked == 'true'){ }}
+        <span class="layui-badge layui-bg-green">最近更新</span>
+        <span class="layui-badge layui-bg-blue">已经检查心脏波</span>
+        {{#  } else{ }}
+        <span class="layui-badge layui-bg-blue">已经检查</span>
+        <span class="layui-badge layui-bg-blue">已经检查心脏波</span>
+        {{#  } }}
+    </script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card u-table-outer">
+        <div class="layui-form layui-card-header">
+            <h2>病案列表</h2>
+        </div>
+        <div class="layui-card-body-no-tree card-outer" style="position: relative;padding:10px;">
+            <div class="user-table" style="z-index:999;">
+                <div class="table-header-btn" style="width: 100%;display: flex;align-items: center;padding: 4px 0">
+                    <div class="search-outer" style="width: 100%">
+                        <div class="layui-inline" style="width: 70%">
+                            <input class="layui-input" name="id" id="searchUser" autocomplete="off" placeholder="姓名/编号">
+                        </div>
+                        <button class="layui-btn" id="search" style="width: 25%">查询</button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="medical-table" lay-filter="medical-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--补充信息弹出层-->
+<div id="add-information" class="add-information" style="display: none;">
+    <form class="layui-form" action=""method="POST" enctype="multipart/form-data">
+        <div class="layui-form-item" style="width: 90%">
+            <div class="layui-inline" style="display: none;">
+                <div class="layui-input-inline">
+                    <input type="text" name="id" class="layui-input">
+                </div>
+            </div>
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" style="width: 90%;cursor: not-allowed" disabled >
+            </div>
+        </div>
+        <div class="layui-form-item" style="width: 90%">
+            <label class="layui-form-label">医院</label>
+            <div class="layui-input-block">
+                <input type="text" name="hospital" lay-verify="required" autocomplete="off" class="layui-input" style="width: 90%;cursor: not-allowed" disabled >
+            </div>
+        </div>
+        <div class="layui-form-item" style="width: 90%">
+            <label class="layui-form-label">主治医生</label>
+            <div class="layui-input-block">
+                <input type="text" name="doctor" lay-verify="required" autocomplete="off" class="layui-input" style="width: 90%;cursor: not-allowed" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="width: 90%">
+            <label class="layui-form-label">检查时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="time" lay-verify="required" autocomplete="off" class="layui-input" style="width: 90%;cursor: not-allowed" disabled  >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-inline" style="width: 40%;margin-left: 0px;">
+                <label class="layui-form-label">身高</label>
+                <div class="layui-input-block">
+                    <input type="text" name="height" required lay-verify="required" placeholder="请输入身高" autocomplete="off" class="layui-input" style="width: 120px">
+                </div>
+            </div>
+            <div class="layui-input-inline" style="width: 40%;margin-left: 0px;">
+                <label class="layui-form-label">体重</label>
+                <div class="layui-input-block">
+                    <input type="text" name="weight" required lay-verify="required" placeholder="请输入体重" autocomplete="off" class="layui-input" style="width: 120px">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">是否抽烟</label>
+                <div class="layui-input-inline" style="width: 60%">
+                    <select name="smoking" lay-verify="required" lay-filter="smoking">
+                        <option value="是">是</option>
+                        <option value="否" >否</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">是否喝酒</label>
+                <div class="layui-input-inline" style="width: 60%">
+                    <select name="drinking" id="drinking" lay-verify="required" lay-filter="drinking">
+                        <option value="是">是</option>
+                        <option value="否">否</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">高血压</label>
+                    <div class="layui-input-inline" style="width: 60%">
+                        <select name="hypertension" lay-verify="required" lay-filter="hypertension">
+                            <option value="无">无</option>
+                            <option value="一级">一级</option>
+                            <option value="二级">二级</option>
+                            <option value="三级">三级</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">糖尿病</label>
+                    <div class="layui-input-inline" style="width: 60%">
+                        <select name="diabetes" lay-verify="required" lay-filter="diabetes">
+                            <option value="无">无</option>
+                            <option value="一型">一型</option>
+                            <option value="二型">二型</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="blood-1">
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">血管1</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodVessel_1" class="mBloodVessel" lay-verify="required" lay-filter="bloodVessel_1">
+                            <option value="无">无</option>
+                            <option value="LM">LM</option>
+                            <option value="LAD">LAD</option>
+                            <option value="LCX">LCX</option>
+                            <option value="RCA">RCA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">部位1</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodPart_1" lay-verify="required" lay-filter="bloodPart_1">
+                            <option value="无">无</option>
+                            <option value="近段">近段</option>
+                            <option value="中段">中段</option>
+                            <option value="远段">远段</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">狭窄程度1</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodNarrow_1" lay-verify="required" lay-filter="bloodNarrow_1">
+                            <option value="无">无</option>
+                            <option value="50%以下">50%以下</option>
+                            <option value="50%~70%">50%~70%</option>
+                            <option value="70%以上">70%以上</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="blood-2">
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">血管2</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodVessel_2" class="mBloodVessel" lay-verify="required" lay-filter="bloodVessel_2">
+                            <option value="无">无</option>
+                            <option value="LM">LM</option>
+                            <option value="LAD">LAD</option>
+                            <option value="LCX">LCX</option>
+                            <option value="RCA">RCA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">部位2</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodPart_2"  lay-verify="required" lay-filter="bloodPart_2">
+                            <option value="无">无</option>
+                            <option value="近段">近段</option>
+                            <option value="中段">中段</option>
+                            <option value="远段">远段</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">狭窄程度2</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodNarrow_2" lay-verify="required" lay-filter="bloodNarrow_2">
+                            <option value="无">无</option>
+                            <option value="50%以下">50%以下</option>
+                            <option value="50%~70%">50%~70%</option>
+                            <option value="70%以上">70%以上</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="blood-3">
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">血管3</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodVessel_3" class="mBloodVessel"  lay-verify="required" lay-filter="bloodVessel_3">
+                            <option value="无">无</option>
+                            <option value="LM">LM</option>
+                            <option value="LAD">LAD</option>
+                            <option value="LCX">LCX</option>
+                            <option value="RCA">RCA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">部位3</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodPart_3" lay-verify="required" lay-filter="bloodPart_3">
+                            <option value="无">无</option>
+                            <option value="近段">近段</option>
+                            <option value="中段">中段</option>
+                            <option value="远段">远段</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">狭窄程度3</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodNarrow_3" lay-verify="required" lay-filter="bloodNarrow_3">
+                            <option value="无">无</option>
+                            <option value="50%以下">50%以下</option>
+                            <option value="50%~70%">50%~70%</option>
+                            <option value="70%以上">70%以上</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="blood-4">
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">血管4</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodVessel_4" class="mBloodVessel"  lay-verify="required" lay-filter="bloodVessel_4">
+                            <option value="无">无</option>
+                            <option value="LM">LM</option>
+                            <option value="LAD">LAD</option>
+                            <option value="LCX">LCX</option>
+                            <option value="RCA">RCA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">部位4</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodPart_4" lay-verify="required" lay-filter="bloodPart_4">
+                            <option value="无">无</option>
+                            <option value="近段">近段</option>
+                            <option value="中段">中段</option>
+                            <option value="远段">远段</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 30%">
+                    <label class="layui-form-label">狭窄程度4</label>
+                    <div class="layui-input-inline" style="width: 200px">
+                        <select name="bloodNarrow_4" lay-verify="required" lay-filter="bloodNarrow_4">
+                            <option value="无">无</option>
+                            <option value="50%以下">50%以下</option>
+                            <option value="50%~70%">50%~70%</option>
+                            <option value="70%以上">70%以上</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" style="width: 100%">
+                    <label class="layui-form-label">检查结果</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="checkResult" required lay-verify="required" autocomplete="off" class="layui-input" style="width: 90%">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div id="laydateDemo"></div>
+            </div>
+            <div class="layui-tab-item">
+                <div id="pageDemo"></div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: flex;align-items: center;justify-content: center">
+            <div class="layui-upload-drag" type="file" id="picture" name="picture">
+                <i class="layui-icon" style="width: 50%">&#xe67c;</i>
+                <p>点击上传，或将文件拖拽到此处</p>
+                <p>双击图片即可删除图片</p>
+            </div>
+        </div>
+        <div class="layui-form-item" id="images" name="images" style="display: flex;align-items: center;justify-content: center">
+            <div style="text-align: center" id="image" name="image"></div>
+        </div>
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:90%;margin: 10px 5% 20px 5%">提交检查结果</button>
+    </form>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">补充信息</a>
+    <a class="layui-btn layui-btn-xs" lay-event="report">检查报告</a>
+</script>
+</body>
+</html>

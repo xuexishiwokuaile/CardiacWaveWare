@@ -1,0 +1,262 @@
+#%RAML 1.0
+title: 武汉大学国家网络安装学院心电波项目接口文档(内部)
+baseUri: http://sdev.whu.edu.cn/zf_wave/
+version: v1
+protocols: [ HTTP, HTTPS ]
+
+/Home/hostpitals:
+  description: 列出所有当前系统中保存的医疗机构和对应的信息
+  /iList.template:
+    description: 根据相应的信息（地理位置）获取对应的医疗机构列表
+    get:
+      description: get方式获取当前位置附近的医院，如果传递了相应的经度和纬度，哪么就计算相应的距离，不传递信息就显示所有的信息。例如查询点附近50公里的数据：http://sdev.whu.edu.cn/zf_wave/Home/hostpitals/iList.template?currentPage=0&pageSize=2&start=0&longitude=114.266164&latitude=30.583931
+      queryParameters:
+        currentPage:
+          type: number
+          description: 当前页码
+          required: true
+        pageSize:
+          type: number
+          description: 每页多少条数据
+          required: true
+        start:
+          type: number
+          description: 开启对应的页码
+          required: true
+        keyWord:
+          type: string
+          description: 相应的搜索对应的关键词(搜索位置：名称，省，市，备注),不输入搜索到所有值
+          required: false
+        longitude:
+          type: number
+          description: 经度信息，如果未录入相应的信息，哪么就显示所有信息，否则就显示一定范围内的医疗机构(参考：114.266164)
+          required: false
+        latitude:
+          type: number
+          description: 纬度信息，如果未录入信息，哪么就显示所有信息，否则就显示一定范围内的医疗机构(参考：30.583931)
+          required: false
+      responses:
+              200:
+                body:
+                  application/json:
+                    example: |
+                      {
+                        "data":
+                        [ {
+                          "address": "湖北省孝感市安陆市g316",
+                          "city": "孝感市",
+                          "cnumber": "10",
+                          "description": "Artis zee III ceiling",
+                          "id": "1552222563264",
+                          "latitude": "31.269483",
+                          "longitude": "113.711439",
+                          "name": "湖北安陆市普爱医院",
+                          "name_eng": "HB/Anlu City Puai Hospital",
+                           "province": "湖北省",
+                           "remark": "治疗"
+                           },
+                          {
+                            "address": "湖北省武汉市汉阳区龙阳大道38号",
+                            "city": "武汉市",
+                            "cnumber": "100",
+                            "description": "MAGNETOM ESSENZA Dot",
+                            "id": "1552222564603",
+                            "latitude": "30.551301",
+                            "longitude": "114.209279",
+                            "name": "慈铭体检",
+                            "name_eng": "HB/Ciming Health Checkup Management",
+                            "province": "湖北省",
+                            "remark": ""
+                            } ],
+                          "currentPage": 0,
+                          "pageSize": 2,
+                          "start": 0,
+                          "total": 552
+                        }
+
+/Home/medicalRecord:
+  description: 所有关于病案信息的操作的类，主要是集中在病案相关内容上
+  /iGetMedicalRecords.template:
+    description: 病历列表,相应的针对不同角色看到不同的内容。如果当前人员是医院用户的话，看到的本机构的数据。当前人员是普通用户只能看到自己的数据。当前人员是管理员看到所有数据。
+    get:
+      description: get方式获取当前数据http://sdev.whu.edu.cn/zf_wave/Home/medicalRecord/iGetMedicalRecords.template?hospital=%E5%8D%8F%E5%92%8C%E5%8C%BB%E9%99%A2&page=0&number_per_page=5&isChecked=false&classification=2&clientid=2018290899570001083&keyword=2018
+      queryParameters:
+        hospital:
+          type: string
+          description: 当前医院或医疗机构的中文名称
+          required: true
+        page:
+          type: number
+          description: 页码，决定获取数据起始位置
+          required: true
+        number_per_page:
+          type: number
+          description: 每页数据个数
+          required: true
+        isChecked:
+          type: boolean
+          description: 是否做了心电检查,true已经检查，false还未检查
+          required: true
+        classification:
+          type: number
+          description: 相应的角色信息，是什么角色
+          required: true
+        clientid:
+          type: string
+          description: 当前登录人员对应的id信息
+          required: true
+        keyword:
+          type: string
+          description: 相应的搜索信息，支持模糊搜索
+          required: true
+      responses:
+              200:
+                body:
+                  application/json:
+                    example: |
+                      {
+                        "data": [
+                                  { "blood": "__null__", "checkResult": "__null__", "checkTime": "2019-04-15 09:31:49", "clientId": "2019067115900003743", "clientName": "沈家强", "doctorId": "2", "doctorName": "协和医院", "id": "2019092791100018362", "isChecked": "true", "isUpdate": "false", "number": "201904150003", "wavedataid": "2019092791650000002", "waveformid": "2019092791640000002", "wavefilterid": "2019092791640000002", "waveviewid": "2019092791650001002" },
+                                  { "blood": "__null__", "checkResult": "__null__", "checkTime": "2019-04-15 09:30:11", "clientId": "2019067115900003743", "clientName": "沈家强", "doctorId": "2", "doctorName": "协和医院", "id": "2019092790120018353", "isChecked": "true", "isUpdate": "false", "number": "201904150002", "wavedataid": "2019092790630001002", "waveformid": "2019092790630000002", "wavefilterid": "2019092791640000002","waveviewid": "2019092790630002002" },
+                                  { "blood": "__null__", "checkResult": "__null__", "checkTime": "2019-04-15 09:28:38", "clientId": "2019067115900003743", "clientName": "沈家强", "doctorId": "2", "doctorName": "协和医院", "id": "2019092789180018344", "isChecked": "true", "isUpdate": "false", "number": "201904150001", "wavedataid": "2019092789780001002", "waveformid": "2019092789780000002", "wavefilterid": "2019092791640000002","waveviewid": "2019092789780002002" },
+                                  { "blood": "__null__", "checkResult": "__null__", "checkTime": "2019-04-09 15:15:02", "clientId": "2019021117750034608", "clientName": "崔一", "doctorId": "2", "doctorName": "协和医院", "id": "2019087813030015606", "isChecked": "true", "isUpdate": "false", "number": "20190400090003", "wavedataid": "2019087813740000001", "waveformid": "2019087813720000001", "wavefilterid": "2019092791640000002","waveviewid": "2019087814020000001" },
+                                  { "blood": "__null__", "checkResult": "__null__", "checkTime": "2019-04-09 15:09:37", "clientId": "2019021117750034608", "clientName": "崔一", "doctorId": "2", "doctorName": "协和医院", "id": "2019087809780015593", "isChecked": "true", "isUpdate": "false", "number": "20190400090002", "wavedataid": "2019087810920001001", "waveformid": "2019087810920000001", "wavefilterid": "2019092791640000002","waveviewid": "2019087811540000001" }
+                                ],
+                        "totalItems": 62
+                      }
+  /iSetWave.template:
+    description: 上传心脏波形信息和分析数据文件。
+    get:
+      description: get保存相应的信息：http://sdev.whu.edu.cn/zf_wave/Home/medicalRecord/iSetWave.template?id=2019092791100018362&waveFormId=2019092791640000002&waveDataId=2019092791650000002&waveViewId=2019092791650001002&waveFilterId=2019092791640000002
+      queryParameters:
+        id:
+          type: string
+          description: 对应病历的ID
+          required: true
+        waveFormId:
+          type: string
+          description: 心脏波形图的数据ID
+          required: true
+        waveFilterId:
+          type: string
+          description: 相应的过滤算法过滤后的数据
+          required: true
+        waveDataId:
+          type: string
+          description: 心脏波形图分析之后的数据ID
+          required: true
+        waveViewId:
+          type: string
+          description: 对应的心脏波型数据
+          required: true
+      responses:
+              200:
+                body:
+                  application/json:
+                    example: |
+                      {
+                        "status":"ok"
+                      }
+
+
+/Home/medicalRecordAnalysis:
+  description: 关于分析结果对应的接口，一般用于获取相应的分析后，记录相应的结果如：极性分布和相应的定量峰值
+  /iAddAnalysis.template:
+    description: 增加分析结果
+    get:
+        description: 测量完毕后提供相应的结果值，用于记录相应人员的检查结果：http://sdev.whu.edu.cn/zf_wave/Home/medicalRecordAnalysis/iAddAnalysis.template?clientId=2018290899570001083&clientName=宦光文&time=2019-04-11 18:27:57&totalPeak=16383386&quantitativePeak=38388.734375&distributionone=0.516786&distributiontwo=0.123076&distributionthree=0.093192&distributionfour=0.266947&distributionfive=0.204313&distributionsix=0.113893&age=28&sex=男&medicalRecordId=2019072315630006770&longitude=114.266164&latitude=30.583931&address=湖北省武汉市地址大学
+        queryParameters:
+          clientId:
+            type: number
+            description: 当前提交人员对应的ID
+            required: true
+          clientName:
+            type: string
+            description: 用户名称（中文 ）
+            required: true
+          age:
+            type: number
+            description: 年龄（参考：29）
+            required: false
+          sex:
+            type: string
+            description: 性别（参考：男）
+            required: false
+          time:
+            type: string
+            description: 记录时间
+            required: false
+          totalPeak:
+            type: string
+            description: 总锋值
+            required: true
+          quantitativePeak:
+            type: string
+            description: 定量锋值
+            required: true
+          distributionone:
+            type: string
+            description: 极性分布1
+            required: true
+          distributiontwo:
+            type: string
+            description: 极性分布2
+            required: true
+          distributionthree:
+            type: string
+            description: 极性分布3
+            required: true
+          distributionfour:
+            type: string
+            description: 极性分布4
+            required: true
+          distributionfive:
+            type: string
+            description: 极性分布5
+            required: true
+          distributionsix:
+            type: string
+            description: 极性分布6
+            required: true
+          medicalRecordId:
+            type: string
+            description: 对应的检查相应的处理单ID
+            required: true
+          longitude:
+            type: number
+            description: 经度信息，如果未录入相应的信息，哪么就显示所有信息，否则就显示一定范围内的医疗机构(参考：114.266164)
+            required: false
+          latitude:
+            type: number
+            description: 纬度信息，如果未录入信息，哪么就显示所有信息，否则就显示一定范围内的医疗机构(参考：30.583931)
+            required: false
+          address:
+            type: string
+            description: 相应的测量时的地址信息
+            required: false
+        responses:
+              200:
+                body:
+                  application/json:
+                    example: |
+                      {
+                        ok$^@^$UPDATED=
+                      }
+  /iGetSrcWaveData.template:
+    description: 获取数据库当中，相应的波形图参数，以字符串的形式返回，自形处理
+    get:
+      description: 获取数据库当中，相应的波形图参数，以字符串的形式返回，自形处理 http://sdev.whu.edu.cn/zf_wave/Home/medicalRecordAnalysis/iGetSrcWaveData.template?medicalRecordId=2019026473930039395
+      queryParameters:
+        medicalRecordId:
+          type: string
+          description: 相应的病案对应的ID,通过相应的ID搜索对应的图像资源点ID
+          required: true
+      responses:
+        200:
+          body:
+            application/json: |
+              {
+                "checkTime": "2019-01-31 15:23:13",
+                "data": "-2186\r\n-2129\r\n-2031\r\n-1994...",
+                "name": "中文姓名" }
+              }

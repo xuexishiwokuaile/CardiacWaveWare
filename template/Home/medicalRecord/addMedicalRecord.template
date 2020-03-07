@@ -1,0 +1,23 @@
+<%
+    ///程序代码
+    :id = tuid()
+    If :doctorId == "__error__" || :doctorId == "null" && :monitor_id != "__error__"
+        /// 表示该用户扫的是  monitor 的二维码
+        /// 先通过 monitor_id 查出所属的医院的id
+        :sql_get_doctor_id = "SELECT hospital_id FROM MONITOR WHERE ID = ?"
+        :resultRecord_get_doctor_id = changeRecordSet(:sql_get_doctor_id,S(:monitor_id))
+        :doctorId = hospital_id
+    EndIf
+    /// 再查出医院的信息
+    :sql_selectDoctor = "SELECT name,hospital FROM doctor WHERE id=?"
+    :result_selectDoctor = changeRecordSet(:sql_selectDoctor,S(:doctorId))
+    :doctorName = name
+    :hospital = hospital
+    debugMsg("doctorName=========="#:doctorName)
+    debugMsg("hospital==========="#:hospital)
+
+    :sql_insertMedicalRecord = "INSERT INTO medical_record(id,clientId,clientName,doctorId,doctorName,hospital,checkTime,number,isUpdate,isChecked) VALUES(?,?,?,?,?,?,?,?,'false','false')"
+    :result_insertMedicalRecord = changeRecordSet(:sql_insertMedicalRecord,S(:id),S(:clientId),S(:clientName),S(:doctorId),S(:doctorName),S(:hospital),S(:checkTime),S(:number))
+
+    =:result_insertMedicalRecord
+%>

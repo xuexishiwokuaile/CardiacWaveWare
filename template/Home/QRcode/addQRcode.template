@@ -1,0 +1,12 @@
+<%
+      debugMsg("[DEBUGMSG]:addQRcode.template 位置:14:"+"传入的参数为：id="+:id+"=width="+:width+"=text="+:text+"=mark="+:mark)
+      :sql_add_QRcode="INSERT INTO qrcode(id,width,height,text,mark) VALUES(?,?,?,?,?)"
+      :sql_check_id="SELECT * FROM qrcode WHERE id = ?"
+      :result_check_id = changeRecordSet(:sql_check_id,S(:id))
+      If :result_check_id == "bad"
+          :resultRecord=execSQL(:sql_add_QRcode,S(:id),S(:width),S(:height),S(:text),S(:mark))
+          =:resultRecord
+      Else
+          ="该序号已存在"
+      EndIf
+%>

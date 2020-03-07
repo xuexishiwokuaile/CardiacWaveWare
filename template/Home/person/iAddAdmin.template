@@ -1,0 +1,30 @@
+<%
+    /// 文 件 名：iAddAdmin
+    /// 描    述：添加人员（管理员），传入：login_name passwd classification name(用一句话描述该文件做什么)
+    /// 项目名称：20190316修改心电波      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/6/30 22:06  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:iAddPerson.template 位置:14:"+"传入的参数为：login_name="+:login_name+"=passwd="+:passwd+"=classification="+:classification+"=name="+:name)
+    :id=tuid()
+    ///获取对应classification下的number
+    :sql_max="SELECT CAST(max(CAST(number AS int)) AS VARCHAR) AS NUM FROM ST_PASSPORTS"
+    :resultRecord = changeRecordSet(:sql_max)
+    :number = num + 10
+    ///插入数据库,先判断用户名是否重复
+    :sqlStr="select * from st_passports where login_name=?"
+    :x=changeRecordSet(:sqlStr,S(:login_name))
+    If :x == "bad"
+      :sqlStr="insert into st_passports(id,login_name,passwd,classification,name,number) values(?,?,md5(?),?,?,?)"
+      :resultRecord =execSQL(:sqlStr,S(:id),S(:login_name),S(:passwd),S(:classification),S(:name),S(:number))
+      =:resultRecord
+    Else
+      ="登录名重复"
+    EndIf
+%>

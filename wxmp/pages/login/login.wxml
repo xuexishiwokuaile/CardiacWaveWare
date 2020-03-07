@@ -1,0 +1,30 @@
+<view class="outer">
+    <header-cmp class="header"></header-cmp>
+    <view class="login-container">
+        <view class="logo">
+            <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/logo.png" />
+        </view>
+        <form bindsubmit="formSubmit" bindreset="formReset">
+            <view class="login-name-outer login-input-outer">
+                <view class="login-name-text">账号</view>
+                <view class="login-name-input">
+                    <input class="inputText" name="userName" placeholder="请输入账号" placeholder-class="placeholder-text" />
+                </view>
+            </view>
+            <view class="login-pwd-outer login-input-outer">
+                <view class="login-pwd-text">密码</view>
+                <view class="login-pwd-input">
+                    <input class="inputText" name="pwd" placeholder="请输入密码" placeholder-class="placeholder-text" password="true" />
+                </view>
+            </view>
+            <view class="register-link" bind:tap="toRegister">
+                没有账号？
+                <text class="to-register">注册</text>
+            </view>
+            <view class="btn-area">
+                <button form-type="submit">登录</button>
+            </view>
+        </form>
+    </view>
+    <footer-cmp class="footer"></footer-cmp>
+</view>

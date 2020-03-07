@@ -1,0 +1,22 @@
+<%
+    /// 文 件 名：wxAuthorize.template
+    /// 描    述：相应的微信授权对应的测试类(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/29 0029 23:55  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+  :_USER_WEIXIN_GZ_APP_appID="wxea78f2e6198b2d73"
+  :_USER_WEIXIN_GZ_APP_appsecret="301fc60a56470e43e7ffe5a98e0df998"
+  :returnURL="https%3a%2f%2fwave.zoolina.cn%2fexamples2%2fwx%2fwxAuthorizeReturn.template"
+  :URL="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+:_USER_WEIXIN_GZ_APP_appID+"&redirect_uri="+:returnURL+"&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
+
+  debugMsg("[DEBUGMSG]:wxAuthorize.template 位置:14:"+" 开始测试写程序")
+
+  executeRemoteService("https://open.weixin.qq.com","connect/oauth2/authorize?appid="+:_USER_WEIXIN_GZ_APP_appID+"&redirect_uri="+:returnURL+"&response_type=code&scope=SCOPE&state=STATE#wechat_redirect","",443)
+%>

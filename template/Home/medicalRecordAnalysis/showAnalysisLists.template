@@ -1,0 +1,70 @@
+<%
+      ///计算共有多少条数据
+      :sql_recordsTotal = "SELECT * FROM MEDICAL_RECORD_ANALYSIS WHERE (clientname LIKE ?) or (time LIKE ?)"
+      :totalSql = changeRecordSet(:sql_recordsTotal,S("%"+:keyWord+"%"),S("%"+:keyWord+"%"))
+      :totalItems = recordCount();
+
+      :sql_Records = "SELECT * FROM MEDICAL_RECORD_ANALYSIS WHERE (clientname LIKE ?) or (time LIKE ?) ORDER BY time DESC LIMIT ?,?"
+      :result_Records = changeRecordSet(:sql_Records,S("%"+:keyWord+"%"),,S("%"+:keyWord+"%"), S(:start),S(:pageSize))
+
+      :result_records_array=""
+
+      ///查询结果ok或bad：
+      If :result_Records == "ok"
+          ///ok
+          Repeat
+              ///每次循环存入一条病历信息
+              :result_records_item = jsonAddItem("", "clientname", S(clientname))
+              :result_records_item = jsonAddItem(:result_records_item, "time", S(time))
+              :result_records_item = jsonAddItem(:result_records_item, "quantitativepeak", S(quantitativepeak))
+              If quantitativepeak > 60000
+                  :result_records_item = jsonAddItem(:result_records_item, "peakNature", '阳性')
+               Else
+                  :result_records_item = jsonAddItem(:result_records_item, "peakNature", '阴性')
+               EndIf
+
+               If quantitativepeak > 60000
+                   ///阳性
+                   If quantitativepeak >= 60000 && quantitativepeak < 100000
+                       ///60000 ~ 150000
+                       :result_records_item = jsonAddItem(:result_records_item, "peakNatureExplain", '心肌疲劳预警')
+                   Else
+                         If quantitativepeak >= 100000 && quantitativepeak < 150000
+                             ///100000 ~ 150000
+                             :result_records_item = jsonAddItem(:result_records_item, "peakNatureExplain", '输出冠脉粥样硬化风险')
+                         Else
+                             ///150000 以上
+                             :result_records_item = jsonAddItem(:result_records_item, "peakNatureExplain", '冠脉粥样硬化，冠脉血流状态50%以下改变高度风险')
+                         EndIf
+                   EndIf
+               Else
+                   ///阴性
+                   :result_records_item = jsonAddItem(:result_records_item, "peakNatureExplain", '')
+               EndIf
+              :result_records_item = jsonAddItem(:result_records_item, "distributionfour", S(distributionfour))
+              :result_records_item = jsonAddItem(:result_records_item, "distributionfive", S(distributionfive))
+              :result_records_item = jsonAddItem(:result_records_item, "distributionsix", S(distributionsix))
+              If distributionfour>0.17 || distributionfive>0.15 || distributionsix>0.09
+                   ///阳性
+                   :result_records_item = jsonAddItem(:result_records_item, "distributionNature", '阳性')
+                   :result_records_item = jsonAddItem(:result_records_item, "distributionNatureExplain", '心肌炎，心肌病 ，心肌组织可出现炎症细 胞浸润 ，心肌细胞变性，坏死，纤维组织增生，进行性肌营养不良等')
+               Else
+                   ///阴性
+                   :result_records_item = jsonAddItem(:result_records_item, "distributionNature", '阴性')
+                   :result_records_item = jsonAddItem(:result_records_item, "distributionNatureExplain", '')
+               EndIf
+              :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+          EndRepeat
+      EndIf
+
+      ///bad
+      :result_records_items = jsonAddItem("", "data", :result_records_array)
+      :result_records_items = jsonAddItem(:result_records_items, "currentPage", :currentPage)
+      :result_records_items = jsonAddItem(:result_records_items, "pageSize", :pageSize)
+      :result_records_items = jsonAddItem(:result_records_items, "start", :start))
+      :result_records_items = jsonAddItem(:result_records_items, "total", :totalItems)
+      =:result_records_items
+%>
+
+
+

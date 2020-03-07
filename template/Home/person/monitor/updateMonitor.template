@@ -1,0 +1,27 @@
+<%
+    /// 文 件 名：updateMonitor
+    /// 描    述：修改监测员数据(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/5 9:59  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+    debugMsg("[DEBUGMSG]:upMonitor.template 位置:MMMMMMMMMMMM:"+"传入的参数为：login_name="+:login_name+"=passwd="+:passwd+"=name="+:name+"=id="+:id)
+    :sql_updateSt = "UPDATE st_passports SET name=?,login_name=?,passwd=? where id = ?"
+    :resultStRecord =execSQL(:sql_updateSt,S(:name),S(:login_name),S(:passwd),S(:id))
+    :sql_updateMonitor = "UPDATE monitor SET name=?,hospital=?,department=?,phone=? where id = ?"
+    :resultMonitorRecord =execSQL(:sql_updateMonitor,S(:name),S(:organization),S(:depart),S(:phone),S(:id))
+    If :resultStRecord == "ok$^@^$UPDATED="
+      If :resultMonitorRecord == "ok$^@^$UPDATED="
+        ="ok"
+      Else
+        =:resultMonitorRecord
+      EndIf
+    Else
+      =:resultStRecord
+    EndIf
+%>

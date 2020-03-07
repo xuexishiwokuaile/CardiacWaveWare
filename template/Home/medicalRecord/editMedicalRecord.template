@@ -1,0 +1,67 @@
+<%
+    ///获取检查的病历信息
+    :sql_editMedicalRecord="SELECT clientName,hospital,doctorName,checkTime,checkResult,number FROM medical_record WHERE id=?"
+    :result_editMedicalRecord = changeRecordSet(:sql_editMedicalRecord,S(:id))
+    :recordNum = recordCount()
+
+    =:result_editMedicalRecord
+
+    debugMsg(":result=========="#:result_editMedicalRecord)
+%>
+  $_@_$
+<%
+	=clientName
+%>
+  $_@_$
+<%
+	=hospital
+%>
+  $_@_$
+<%
+	=doctorName
+%>
+  $_@_$
+<%
+	=checkTime
+%>
+  $_@_$
+<%
+	=number
+%>
+<%
+    ///获取病人的基本信息
+    :sql_selectClient = "SELECT smoking,drinking,height,weight,hypertension,diabetes FROM client WHERE id=?"
+    :result_selectClient = changeRecordSet(:sql_selectClient,S(:clientId))
+%>
+  $_@_$
+<%
+	=height
+%>
+  $_@_$
+<%
+	=weight
+%>
+  $_@_$
+<%
+	=smoking
+%>
+  $_@_$
+<%
+	=drinking
+%>
+  $_@_$
+<%
+	=hypertension
+%>
+  $_@_$
+<%
+	=diabetes
+%>
+<%
+    ///修改isUpdate
+    :sql_isUpdate = "UPDATE medical_record SET isUpdate=? WHERE id=?"
+    :result_isUpdate = changeRecordSet(:sql_isUpdate,S(:isUpdate),S(:id))
+
+debugMsg("isUpdate========================="#:isUpdate)
+
+  %>

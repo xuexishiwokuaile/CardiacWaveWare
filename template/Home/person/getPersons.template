@@ -1,0 +1,101 @@
+<%
+
+  debugMsg("[DEBUGMSG]:getPersons.template 位置:3:"+"id"+:id)
+
+  If :search == "__null__"
+  	 :search = ""
+  EndIf
+	///判断说明：
+	If :id == -1
+	    ///判断主体
+	      :sql_classification_num = "select st.id,st.login_name,st.name,st.number from st_passports st,cardiac_classification cl where st.classification=cl.id and cl.types='administrator' and coalesce(login_name,'')||coalesce(name,'') ~ ?"
+	      :sql_classification = "select st.id,st.login_name,st.name,st.number from st_passports st,cardiac_classification cl where st.classification=cl.id and cl.types='administrator' and coalesce(login_name,'')||coalesce(name,'') ~ ? ORDER BY CAST(st.number AS INT) LIMIT ? OFFSET ?"
+
+      	:resultRecord = changeRecordSet(:sql_classification_num,S(:search))
+        :recordNum = recordCount()
+        :num = :recordNum
+      	:resultRecord = changeRecordSet(:sql_classification,S(:search),:length,:start)
+      	:recordNum = recordCount()
+        ///拼接datatables需要的返回字符串
+      	:res="{\"sEcho\":"#:sEcho#",\"iTotalRecords\":"#:num#",\"iTotalDisplayRecords\":"#:num#",\"aaData\":["
+        :i = 0
+
+      	Repeat
+      	  ///判断说明：
+      	  If :i < :recordNum-1
+      	      :id = id
+      	      :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"],"
+      	      :i += 1
+      	  Else
+      	      :id = id
+      	      :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"]"
+      	  EndIf
+      	EndRepeat
+
+      	:res=:res#"]}"
+
+      	debugMsg("[DEBUGMSG]:getPersons.template 位置:37:"+"res:"+:res)
+      	=:res
+	Else
+	   ///分支主题：
+	   ///判断说明：
+	   If :id == -2
+          :sql_classification_num = "select st.id,st.login_name,st.name,st.number from st_passports st,cardiac_classification cl where st.classification=cl.id and cl.types='user' and coalesce(login_name,'')||coalesce(name,'') ~ ?"
+          :sql_classification = "select st.id,st.login_name,st.name,st.number from st_passports st,cardiac_classification cl where st.classification=cl.id and cl.types='user' and coalesce(login_name,'')||coalesce(name,'') ~ ? ORDER BY CAST(st.number AS INT) LIMIT ? OFFSET ?"
+
+          :resultRecord = changeRecordSet(:sql_classification_num,S(:search))
+          :recordNum = recordCount()
+          :num = :recordNum
+          :resultRecord = changeRecordSet(:sql_classification,S(:search),:length,:start)
+          :recordNum = recordCount()
+          ///拼接datatables需要的返回字符串
+          :res="{\"sEcho\":"#:sEcho#",\"iTotalRecords\":"#:num#",\"iTotalDisplayRecords\":"#:num#",\"aaData\":["
+          :i = 0
+
+          Repeat
+            ///判断说明：
+            If :i < :recordNum-1
+                :id = id
+                :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"],"
+                :i += 1
+            Else
+                :id = id
+                :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"]"
+            EndIf
+          EndRepeat
+
+          :res=:res#"]}"
+          =:res
+	   Else
+	       ///分支主体
+          :sql_classification_num = "select st.id,st.login_name,st.name,st.number from st_passports st where st.classification=?  and coalesce(login_name,'')||coalesce(name,'') ~ ?"
+          :sql_classification = "select st.id,st.login_name,st.name,st.number from st_passports st where st.classification=?  and coalesce(login_name,'')||coalesce(name,'') ~ ? ORDER BY CAST(st.number AS INT) LIMIT ? OFFSET ?"
+
+          :resultRecord = changeRecordSet(:sql_classification_num,S(:id),S(:search))
+           :recordNum = recordCount()
+           :num = :recordNum
+          :resultRecord = changeRecordSet(:sql_classification,S(:id),S(:search),:length,:start)
+          :recordNum = recordCount()
+
+
+           ///拼接datatables需要的返回字符串
+          :res="{\"sEcho\":"#:sEcho#",\"iTotalRecords\":"#:num#",\"iTotalDisplayRecords\":"#:num#",\"aaData\":["
+           :i = 0
+
+          Repeat
+            ///判断说明：
+            If :i < :recordNum-1
+                :id = id
+                :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"],"
+                :i += 1
+            Else
+                :id = id
+                :res=:res#"[\""#:id#"\",\""#number#"\",\""#login_name#"\",\""#name#"\"]"
+            EndIf
+          EndRepeat
+
+          :res=:res#"]}"
+          =:res
+	   EndIf
+	EndIf
+%>

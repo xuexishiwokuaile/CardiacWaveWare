@@ -1,0 +1,22 @@
+<%
+    /// 文 件 名：updateAdmin
+    /// 描    述：修改管理员信息(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/2 12:06  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:updateAdmin.template 位置:14:"+"传入的参数为：login_name="+:login_name+"=passwd="+:passwd+"=name="+:name)
+    :sql_updateAdmin = "UPDATE st_passports SET name=?,login_name=?,passwd=? where id = ?"
+    :resultRecord =execSQL(:sql_updateAdmin,S(:name),S(:login_name),S(:passwd),S(:id))
+    If :resultRecord == "ok$^@^$UPDATED="
+        ="ok"
+    Else
+      =:resultRecord
+    EndIf
+%>

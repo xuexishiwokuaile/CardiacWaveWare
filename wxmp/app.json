@@ -1,0 +1,32 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/report/report",
+    "pages/login/login",
+    
+    "pages/reportList/reportList",
+    "pages/register/register",
+    "pages/test/test",
+    "pages/historyReport/historyReport",
+    "pages/index/index",
+    "pages/nearbyHospital/nearbyHospital",
+    "pages/navigation/navigation",
+    "pages/cardiacMonitoring/cardiacMonitoring",
+    "pages/personalCenter/personalCenter",
+    "pages/userManage/userManage",
+    "pages/community/community",
+    "pages/shareReport/shareReport"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "ECG ALG 心康互联",
+    "navigationBarTextStyle": "black"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": " "
+    }
+  },
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,25 @@
+<%
+    /// 文 件 名：addHostpital
+    /// 描    述：添加相应的hostpital(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/3/9 14:34  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+
+    debugMsg("[DEBUGMSG]:addHostpital.template 位置:12:"+"cnumber="+:cnumber+"$^@^$name="+:name+"$^@^$address="+:address+"$^@^$province="+:province+"$^@^$city="+:city+"$^@^$longitude="+:longitude+"$^@^$latitude="+:latitude+"$^@^$remark="+:remark)
+
+    ///如果没有ID，就是新建相应的内容，如果有就更新数据
+    If :id == "" || :id == "__error__"
+        ///产生相应的ＩＤ
+        :id = tuid();
+        :sqlStr="INSERT INTO hospitals(id,cnumber,name,address,province,city,longitude,latitude,remark) values(?,?,?,?,?,?,?,?,?)"
+        :resultRecord=execSQL(:sqlStr,S(:id),S(:cnumber),S(:name),S(:address),S(:province),S(:city),S(:longitude),S(:latitude),S(:remark))
+    Else
+        :sqlStr="UPDATE hospitals SET cnumber=?,name=?,address=?,province=?,city=?,longitude=?,latitude=?,remark=? WHERE id=?"
+        :resultRecord=execSQL(:sqlStr,S(:cnumber),S(:name),S(:address),S(:province),S(:city),S(:longitude),S(:latitude),S(:remark), S(:id))
+    EndIf
+    =:resultRecord
+%>

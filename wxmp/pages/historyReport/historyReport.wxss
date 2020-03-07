@@ -1,0 +1,55 @@
+/* pages/historyReport/historyReport.wxss */
+
+
+.outer{
+    width: 700rpx;
+    /* border: 1rpx solid red; */
+    margin: 0 auto;
+}
+
+
+/* 检查结果 */
+.btns-bg{
+    width: 200rpx;
+    height: 80rpx;
+}
+.histor-case{
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/case-btn.png?sign=3f92a5fdef583dd545927636bccad566&t=1562589595");
+    background-size: 200rpx;
+    margin-bottom: 10rpx;
+}
+.btns-text{
+    font-size: 30rpx;
+    height: 80rpx;
+    line-height: 70rpx;
+    padding: 0 40rpx;
+    color: #faf8f8;
+}
+
+
+
+/* 横线 */
+.hr {
+    border-top: 1px solid #f3f1f0;
+    width: 680rpx;
+    margin: 0rpx auto;
+}
+
+.items{
+    width: 700rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 28rpx;
+    color: #606064;
+}
+.item{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* border: 1rpx solid red; */
+}
+
+.item > view{
+    margin: 20rpx 0 0 10rpx;
+}

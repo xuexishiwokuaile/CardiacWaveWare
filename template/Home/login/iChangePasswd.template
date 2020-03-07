@@ -1,0 +1,8 @@
+<% 
+  :sql_changePasswd="UPDATE st_passports SET passwd=? WHERE id=?
+  :result_changePasswd=changeRecordSet(:sql_changePasswd,S(:new_passwd),S(:id))
+
+  :result_callback = ""
+  :result_callback =jsonAddItem("","status",S(:result_changePasswd))
+  =:result_callback
+%>

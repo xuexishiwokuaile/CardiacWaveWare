@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>二维码管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--拦截未登录-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--Ztree-->
+    <script src="/assets/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css">
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <!--    验证码插件-->
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js"></script>
+    <!--    二维码插件-->
+    <script type="text/javascript" src="/assets/js/qrcode.min.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <script type="text/javascript">
+      let checkedItems = '';//存放选中栏目所有信息
+      function _reload(){
+        // console.log(checkedItems);
+        let keywords = $('#searchInput').val();  //搜索的关键字
+        //重载表格
+        layui.use('table', function() {
+          var table = layui.table;
+          table.reload('QRcode-table', {
+            url: '/Home/QRcode/listQRcode.template',
+            where: { //设定异步数据接口的额外参数，任意设
+              keywords: keywords,
+            }
+            , page: {
+              curr: 1, //重新从第 1 页开始
+            },
+          });
+        });
+      }
+      //关闭按钮
+      function _close(){
+        layer.close(layer.index);
+      }
+      //加载表格
+      let use = layui.use(['table', 'form', 'jquery'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        table.render({
+          elem: '#QRcode-table'
+          , cellMinWidth: 260
+          , url: '/Home/QRcode/listQRcode.template'
+          , cols: [
+            [
+              {type: 'checkbox', fixed: 'left'}
+              , {field: 'id', title: '序号', align: 'center', width: 70}
+              , {field: 'mark', title: '标题', align: 'center', width: 200}
+              , {field: 'width', title: '宽度', align: 'center', width: 100}
+              , {field: 'height', title: '高度', align: 'center', width: 100}
+              , {field: 'text', title: '网址', align: 'center'}
+              , {fixed: 'right', title: '操作', toolbar: '#QRcode-table-bar', align: 'center', width: 70},
+            ]]
+          , done: function() {
+            $("[data-field='classification']").css('display', 'none');
+          }
+          , page: true,
+        });
+        //自定义表单验证规则
+        form.verify({
+          //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+          loginName: [
+            /[^\u4e00-\u9fa5]+/
+            , '登录名不能是中文',
+          ],
+        });
+
+        //批量删除
+        $('#batchDelete').click(function() {
+          let checkStatus = table.checkStatus('QRcode-table');
+          let data = checkStatus.data;
+          if (data == '') {
+            layer.msg('请选择要删除的用户', function() {
+              //关闭后的操作
+            });
+          } else {
+            layer.confirm('确定批量删除这些用户？', function(index) {
+              let userIds = '';
+              let usersCount = 0;
+              for (var i = 0; i < data.length; i++) {
+                userIds = userIds + data[i].id + ',';
+                usersCount++;
+              }
+              //去掉最后一个 ，
+              userIds = userIds.substr(0, userIds.length - 1);
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok') {
+                  _reload();
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`删除失败，${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              getFromWS('Home/QRcode/delQRcode.template',
+                  'ids=' + userIds + '$^@^$usersCount=' + usersCount, obj, Result);
+
+            });
+          }
+        });
+
+        //生成二维码
+        $('#_share').click(function() {
+          let checkStatus = table.checkStatus('QRcode-table');
+          let data = checkStatus.data;
+          if (data == '') {
+            layer.msg('请选择要生成二维码的机构', function() {
+              //关闭后的操作
+            });
+          }
+          else if (data.length == 1) {
+            let text = data[0].text;
+            let width = data[0].width;
+            let height = data[0].height;
+            document.getElementById("qrcode").innerHTML = "";
+            let qrcode = new QRCode(document.getElementById("qrcode"), {
+              width : width,
+              height : height
+            });
+            qrcode.makeCode(text);
+              layer.open({
+                type: 1,
+                area: ['width', 'height'],
+                shadeClose: true, //点击遮罩关闭
+                title: '分享二维码',
+                content: $('#share'),
+              });
+          }else {
+            layer.msg('要生成二维码的机构一次只能点选一个', function() {
+              //关闭后的操作
+            });
+          }
+        });
+
+        //搜索
+        $('#search').click(function() {
+          _reload();
+        });
+
+        //新增二维码-弹出层
+        $('#addQRcode').click(function() {
+          let obj = new Array();
+          let Result = function() {
+            if (obj[0] != 'bad') {
+              //更新弹出层的表单
+              let id = parseInt(obj[0]) + 1;
+              $('#add-QRcode input[ name=\'ID\' ] ').val(id);
+            }
+          };
+          getFromWS('Home/QRcode/getCurMaxID.template', "", obj, Result);
+          layer.open({
+            type: 1,
+            area: ['360px', '330px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增二维码',
+            content: $('#add-QRcode'),
+            end:function() {
+              //当弹窗关闭时，清除掉信息
+              $('#add-QRcode input[ name=\'mark\' ] ').val("");
+              $('#add-QRcode input[ name=\'width\' ] ').val("");
+              $('#add-QRcode input[ name=\'height\' ] ').val("");
+              $('#add-QRcode input[ name=\'text\' ] ').val("");
+            }
+          });
+        });
+
+        table.on('tool(QRcode-table)', function(obj) {
+          let data = obj.data;
+          if (obj.event === 'edit') {
+            let obj = new Array();
+            let Result = function() {
+              if (obj[0] != 'bad') {
+                let personInfo = JSON.parse(obj[0]);
+                //更新弹出层的表单
+                $('#update-QRcode input[ name=\'ID\' ] ').val(personInfo[0].id);
+                $('#update-QRcode input[ name=\'mark\' ] ').val(personInfo[0].mark);
+                $('#update-QRcode input[ name=\'width\' ] ').val(personInfo[0].width);
+                $('#update-QRcode input[ name=\'height\' ] ').val(personInfo[0].height);
+                $('#update-QRcode input[ name=\'text\' ] ').val(personInfo[0].text);
+              }
+            };
+            getFromWS('Home/QRcode/loadQRcode.template', 'id=' + data.id, obj, Result);
+            layer.open({
+              type: 1,
+              area: ['360px', '330px'],
+              shadeClose: true, //点击遮罩关闭
+              title: '编辑二维码',
+              content: $('#update-QRcode'),
+              end:function() {
+                //当弹窗关闭时，清除掉信息
+                $('#update-QRcode input[ name=\'ID\' ] ').val("");
+                $('#update-QRcode input[ name=\'mark\' ] ').val("");
+                $('#update-QRcode input[ name=\'width\' ] ').val("");
+                $('#update-QRcode input[ name=\'height\' ] ').val("");
+                $('#update-QRcode input[ name=\'text\' ] ').val("");
+              }
+            });
+          }
+        });
+
+      });
+
+      //新增二维码-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addQRcode)', function(data) {
+            console.log(data.field);
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok$^@^$UPDATED=') {
+                  //新增成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              let postdata = 'id=' + data.field.ID + '$^@^$width=' + data.field.width +
+                  '$^@^$height=' + data.field.height + '$^@^$text=' + data.field.text +
+                  '$^@^$mark=' + data.field.mark;
+              getFromWS('Home/QRcode/addQRcode.template', postdata, obj, Result);
+          return false;
+        });
+      });
+
+      //编辑二维码-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(updateQRcode)', function(data) {
+          console.log(data.field);
+          let obj = new Array();
+          let Result = function() {
+            console.log(obj[0]);
+            if (obj[0] == 'ok') {
+              //修改成功
+              _reload();
+              //关闭最新的弹出层
+              layer.close(layer.index);
+            } else {
+              layer.msg(`失败,${obj[0]}`, function() {
+                //关闭后的操作
+              });
+            }
+          };
+          let postdata = 'id=' + data.field.ID + '$^@^$width=' + data.field.width +
+              '$^@^$height=' + data.field.height + '$^@^$text=' + data.field.text +
+              '$^@^$mark=' + data.field.mark;
+          getFromWS('Home/QRcode/updateQRcode.template', postdata, obj, Result);
+          return false;
+        });
+      });
+    </script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <h2>二维码</h2>
+        </div>
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="user-table">
+                <div class="table-header-btn QRcodeManage-btns" style="display: flex;align-items: center;padding: 4px 0">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn u-btn layui-btn-sm" id="addQRcode">新增二维码</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="batchDelete">批量删除</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="_share">生成二维码</button>
+                    </div>
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchInput" autocomplete="off"
+                                   placeholder="标题">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search">搜索</button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="QRcode-table" lay-filter="QRcode-table"></table>
+                <script type="text/html" id="QRcode-table-bar">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<!--新增二维码弹出层-->
+<div id="add-QRcode" class="add-QRcode" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">序号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="ID" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="mark" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">宽度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="width" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入数字"
+                    onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">高度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="height" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入数字"
+                    onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">网址</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="text" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-QRcode-btn" type="button"
+                lay-submit lay-filter="addQRcode">
+            确定
+        </button>
+    </form>
+</div>
+
+<!--编辑二维码弹出层-->
+<div id="update-QRcode" class="update-QRcode" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">序号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="ID" lay-verify="required" autocomplete="off"
+                           class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="mark" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">宽度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="width" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入数字"
+                    onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">高度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="height" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入数字"
+                    onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">网址</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="text" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="update-QRcode-btn" type="button"
+                lay-submit lay-filter="updateQRcode">
+            确定
+        </button>
+    </form>
+</div>
+<!--二维码弹出层-->
+<div id="share" class="share" style="display: none;">
+    <form class="layui-form">
+        <div id="qrcode">
+        </div>
+    </form>
+</div>
+</html>

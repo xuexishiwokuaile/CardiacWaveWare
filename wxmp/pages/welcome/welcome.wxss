@@ -1,0 +1,28 @@
+/* pages/welcome/welcome.wxss */
+page{
+    height: 100%;
+    width: 100%;
+    /* background: url("https://img.vim-cn.com/36/dc0fd5419e4cf2f56d6e65092529145c999f6c.png");
+    background-size: 100% 100% */
+}
+.welcome-img{
+    height: 100%;
+    width: 100%;
+}
+
+
+.container{
+    background-color: #f5f5f9;
+    justify-content: initial;
+}
+.save-btn{
+    width: 690rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    text-align: center;
+    margin-top:30rpx; 
+    border-radius: 6rpx;
+    box-sizing: border-box;
+    background-color: #e64340;
+    color:#fff;
+}

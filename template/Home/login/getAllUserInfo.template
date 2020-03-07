@@ -1,0 +1,18 @@
+<%
+	:sql = "select login_name,passwd,name,id,classification from st_passports where login_name = ?"
+	:x = changeRecordSet(:sql, S(:login_name))
+
+	=:x
+%>
+  $_@_$
+<%
+	=classification
+%>
+  $_@_$
+<%
+	=id
+%>
+  $_@_$
+<%
+	=name
+%>

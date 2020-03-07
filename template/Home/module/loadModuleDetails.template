@@ -1,0 +1,19 @@
+<%
+    debugMsg("[DEBUGMSG]:loadModuleDetails.template 位置:14:"+"传入模块的id==="+:id)
+    :sql_getModuleDetails = "SELECT ID,NAME,SORT,ENGNAME,PATH,INTRODUCTION FROM MODULE_COLUMNS WHERE ID = ?"
+    :resultRecord = changeRecordSet(:sql_getModuleDetails,S(:id))
+    If :resultRecord == "ok"
+        Repeat
+          :result_record_items = jsonAddItem("", "id", S(id))
+          :result_record_items = jsonAddItem(:result_record_items, "name", S(NAME))
+          :result_record_items = jsonAddItem(:result_record_items, "engname", S(ENGNAME))
+          :result_record_items = jsonAddItem(:result_record_items, "sort", S(SORT))
+          :result_record_items = jsonAddItem(:result_record_items, "path", S(PATH))
+          :result_record_items = jsonAddItem(:result_record_items, "introduction", S(INTRODUCTION))
+          :result_record_array = jsonAddArrayItem(:result_record_array, :result_record_items)
+        EndRepeat
+    Else
+        ="bad"
+    EndIf
+    =:result_record_array
+%>

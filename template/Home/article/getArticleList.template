@@ -1,0 +1,54 @@
+///通过ID获取文章
+<%If :operation=="getSomeArticle"
+	If :classification == 1
+		:querystr="select A.id, A.title, A.publisher, A.modify_date, A.content, A.on_top,A.on_public, A.article_type, A.pics, A.pic_id, A.appendix_id, B.name from article as A, columns as B where A.article_type=B.id and (B.id=? or B.parent_id=? or B.parent_id in (select id from columns where parent_id=?))  order by A.on_top desc,A.id desc"
+		changeRecordSet(:querystr,S(:typeId),S(:typeId),S(:typeId))
+	EndIf
+EndIf%>
+
+///获取所有文章,拼接成HTML
+<%If :operation=="getAllArticle"
+	If :classification == 1
+		:querystr="select A.id, A.title, A.publisher, A.modify_date, A.content, A.on_top,A.on_public, A.article_type, A.pics, A.pic_id, A.appendix_id, B.name from article as A, columns as B where A.article_type=B.id  order by A.on_top desc,A.id desc"
+		changeRecordSet(:querystr)
+	EndIf
+EndIf%>
+
+<%If recordCount()>0%>
+  <%:i=1%>
+     <%Repeat%>
+		<tr>
+			<td>
+				<input type="checkbox" name="articleCheckBox" class="cbr" value="<%=id%>">
+			</td>
+			<td>
+		      <%:recContent=replace(content,"'","\'")%>
+		      <%:recContent=replace(:recContent,"\r"," ")%>
+		      <%:recContent=replace(:recContent,"\n"," ")%>
+				<span  id="title<%=id%>" title="<%=title%>" style="display:none"> <%=title%></span>
+<%If on_top==1%>
+				<a href="../article/view.html?id=<%=id%>" target="_blank" title="<%=title%>" style="display:inline-block;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;color:red;"> <%=shortTitle(title,0,6)%></a>
+<%Else%>
+				<a href="../article/view.html?id=<%=id%>" target="_blank" title="<%=title%>" style="display:inline-block;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;color:#979898;"> <%=shortTitle(title,0,6)%></a>
+<%EndIf%>
+				<input style="display:none" id="content<%=id%>" value='<%=:recContent%>'>
+				<input style="display:none" id="picIds<%=id%>"  value='<%=pics%>'>
+				<input style="display:none" id="picId<%=id%>"  value='<%=pic_id%>'>
+				<input style="display:none" id="top<%=id%>"  value='<%=on_top%>'>
+				<input style="display:none" id="publics<%=id%>"  value='<%=on_public%>'>
+				<input style="display:none" id="appendixId<%=id%>"  value='<%=appendix_id%>'>
+			</td>
+			<td><span  id="publisher<%=id%>" title="<%=publisher%>"  style="display:inline-block;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;"><%=shortTitle(publisher,0,5)%></span></td>
+			<td><span  id="publishDate<%=id%>" title="<%=modify_date%>"  style="display:inline-block;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;"><%=modify_date%></span></td>
+			<td><span  id="name<%=id%>" title="<%=name%>"  style="display:inline-block;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;"><%=shortTitle(name,0,5)%></span>
+				<input id="type<%=id%>" value="<%=article_type%>" style="display:none">
+			</td>
+			<td style="white-space: nowrap;">
+			<a href="javascript:void(0);" class="btn btn-secondary btn-sm btn-icon icon-left" data-id="<%=id%>" onclick="setArticle('<%=id%>')">编辑</a>
+			<a class="btn btn-danger btn-sm btn-icon icon-left" data-toggle="modal" data-target="#deleteModal" data-id="<%=id%>">删除</a>
+			</td>
+		</tr>
+	<%EndRepeat%>
+<%EndIf%>
+
+

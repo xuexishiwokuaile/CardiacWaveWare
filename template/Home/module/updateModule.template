@@ -1,0 +1,8 @@
+<%
+    debugMsg("-----------")
+    debugMsg(:name)
+
+    :sql_saveModule = "UPDATE MODULE_COLUMNS SET NAME = ?,SORT = ?,ENGNAME = ?,PATH = ?,INTRODUCTION = ? WHERE ID = ?"
+    :resultRecord = execSQL(:sql_saveModule,S(:name),S(:sort),S(:engname),S(:path),S(:introduction),S(:id))
+    =:resultRecord
+%>

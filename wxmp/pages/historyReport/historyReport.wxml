@@ -1,0 +1,46 @@
+<view class="outer">
+    <view class="conclusion-btn">
+        <view class="histor-case btns-bg">
+            <text class="btns-text">检查结果</text> 
+        </view>
+        <view class="hr"></view>
+    </view>
+    <view class="items">
+        <view class="item" wx:for="{{items}}" wx:key="" bind:tap="showReport" data-reportid="{{item.medical_record_id}}">
+            <view class="item-name">{{clientName}}</view>
+            <view class="item-date">{{item.time}}</view>
+            <view class="item-conclusion">结论：阴性</view>
+            <view class="hr"></view>
+        </view>
+        <!-- <view class="item">
+            <view class="item-name">李勇</view>
+            <view class="item-date">2019-04-18 09:09:15</view>
+            <view class="item-conclusion">结论：阴性</view>
+            <view class="hr"></view>
+        </view>
+        <view class="item">
+            <view class="item-name">李勇</view>
+            <view class="item-date">2019-04-18 09:09:15</view>
+            <view class="item-conclusion">结论：阳性，心肌疲劳预警</view>
+            <view class="hr"></view>
+        </view>
+        <view class="item">
+            <view class="item-name">李勇</view>
+            <view class="item-date">2019-04-18 09:09:15</view>
+            <view class="item-conclusion">结论：阳性，心血管冠状粥样硬化，冠脉血液呈50%以下改变</view>
+            <view class="hr"></view>
+        </view>
+        <view class="item">
+            <view class="item-name">李勇</view>
+            <view class="item-date">2019-04-18 09:09:15</view>
+            <view class="item-conclusion">结论：阳性，心血管冠状粥样硬化风险</view>
+            <view class="hr"></view>
+        </view>
+        <view class="item">
+            <view class="item-name">李勇</view>
+            <view class="item-date">2019-04-18 09:09:15</view>
+            <view class="item-conclusion">结论：阳性，心血管冠状粥样硬化风险</view>
+            <view class="hr"></view>
+        </view> -->
+    </view>
+</view>

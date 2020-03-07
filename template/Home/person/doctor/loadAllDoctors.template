@@ -1,0 +1,37 @@
+<%
+	:sql_administrator = "SELECT st.* FROM st_passports st WHERE st.classification = ? ;"
+  :resultRecord = changeRecordSet(:sql_administrator,S(2))
+%>
+<table class="table table-bordered table-striped" id="example-4" >
+	<thead>
+		<tr>
+			<th class="no-sorting">
+			</th>
+			<th>编号</th>
+			<th>登录名</th>
+			<th>姓名</th>
+		</tr>
+	</thead>
+
+	<tbody class="middle-align">
+	  <%Repeat
+	   :sid = id%>
+	    ///循环主体
+	       <tr>
+             <td>
+                 <input type="checkbox" class="cbr" value="<%=:sid%>" name="isSubmitDoctor">
+             </td>
+             <td><%=id%></td>
+             <td><%=login_name%></td>
+             <td><%=name%></td>
+         </tr>
+	  <%EndRepeat%>
+	</tbody>
+</table>
+
+<script>
+	$("#example-4").dataTable({
+		order: []
+	});
+</script>
+

@@ -1,0 +1,23 @@
+<%
+  debugMsg("[DEBUGMSG]:saveArticle.template 位置:13:"+"传入的参数：栏目的ID，article_type="+:article_type+"=on_top="+:on_top+"=title="+:title+"=publisher="+:publisher)
+  debugMsg("[DEBUGMSG]:saveArticle.template 位置:14:"+"传入的参数：sort="+:sort+"=content="+:content+"=pic_id="+:pic_id+"=appendix_id="+:appendix_id+"=on_public="+:on_public)
+
+  If :fatherModule == "undefined"
+    :fatherModule = "0"
+  EndIf
+  ///If :sort == "00"
+  ///  :sql_getChildSort = "SELECT SORT FROM MODULE_COLUMNS WHERE PARENT_ID = ? ORDER BY SORT ASC"
+  ///  :result_getChildSort = changeRecordSet(:sql_getChildSort,S(:fatherModule))
+  ///  :i = 0
+  ///  Repeat
+  ///      :ArrayAllSort[:i] = SORT
+  ///      :i = :i + 1
+  ///  EndRepeat
+  ///  :sort = :ArrayAllSort[:i-1] + "1"
+  ///EndIf
+  :id = tuid()
+  :startDate = serverDate("yyyy-MM-dd hh:mm:ss")
+  :sql_saveModule = "INSERT INTO MODULE_COLUMNS(ID,NAME,PARENT_ID,SORT,ENGNAME,PATH,ICON,ORIGINAL,INTRODUCTION) VALUES (?,?,?,?,?,?,?,?,?)"
+  :resultRecord = execSQL(:sql_saveModule,S(:id),S(:moduleName),S(:fatherModule),S(:sort),S(:moduleEngname),S(:moduleUrl),S("layui-icon-rate"),S("1"),S(:moduleIntroduction))
+  =:resultRecord
+%>

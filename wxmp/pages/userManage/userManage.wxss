@@ -1,0 +1,83 @@
+/* pages/userManage/userManage.wxss */
+
+.hr {
+    border-top: 1px solid #f3f1f0; 
+    width: 680rpx;
+    margin: 0rpx auto;
+}
+
+.outer{
+    width: 750rpx;
+    display: flex;
+    flex-direction: column;
+}
+/* 搜索 */
+.search{
+    margin-bottom: 20rpx;
+}
+
+
+/* 顶部三个按钮 */
+.btns{
+    width: 700rpx;
+    display: flex;
+    justify-content: space-between;
+    font-size: 24rpx;
+    margin: 0 auto;
+    padding-bottom: 24rpx;
+}
+.btns-bg{
+    width: 200rpx;
+    height: 80rpx;
+    text-align: center;
+}
+.histor-case{
+    background: url("https://img.vim-cn.com/1f/d4090010db92a372d2f8e3c23fa7cfe3881785.png");
+    background-size: 200rpx;
+}
+.wave-playback{
+    background: url("https://img.vim-cn.com/3c/fdfd9ccfe09e1153892008c3e20ec8e210d8c6.png");
+    background-size: 200rpx;
+}
+.modify-info{
+    background: url("https://img.vim-cn.com/c8/d5068d432131b2d2714b9710850ba223c98fad.png");
+    background-size: 200rpx;
+}
+.btns-text{
+    height: 80rpx;
+    line-height: 74rpx;
+    color: #faf8f8;
+}
+
+.items{
+    width: 700rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto;
+}
+.item{
+    width: 700rpx;
+    display: flex;
+    align-items: center;
+    font-size: 30rpx;
+    color: #606064;
+    height: 176rpx;
+}
+.right-text{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 40rpx;
+}
+.left-logo image{
+    width: 100rpx;
+    height: 106rpx;
+    /* border: 1rpx solid red; */
+}
+.user-id{
+    color: #3ca3ff;
+    margin-left: 42rpx;
+}

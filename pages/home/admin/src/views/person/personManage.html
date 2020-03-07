@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人员管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--拦截未登录-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--Ztree-->
+    <script src="/assets/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css">
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <!--    验证码插件-->
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js"></script>
+    <!--    二维码插件-->
+    <script type="text/javascript" src="/assets/js/qrcode.min.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <script type="text/javascript">
+      let checkedItems = '';//存放选中栏目所有信息
+
+      $(function() {
+        //获取栏目信息
+        var setting = {
+          data: {
+            simpleData: {
+              enable: true,
+            },
+            key: {
+              name: 'classification',
+            },
+          },
+          async: {
+            enable: true,
+            type: 'get',
+            dataType: 'json',
+            url: '/Home/person/iLoadOrganization.template',
+            // dataFilter: filter
+          },
+          callback: {//请求成功后回调
+            onClick: onclickTree,//点击相关节点触发的事件
+            onAsyncSuccess: ztreeOnAsyncSuccess,//异步加载成功后执行的方法
+          },
+          view: {
+            showIcon: false,
+          },
+        };
+
+        //点击树触发的事件
+        function onclickTree(event, treeId, treeNode) {
+          checkedItems = treeNode; //当前节点的所有信息
+          $("#_classfication_id").val(checkedItems.id);
+          //重载表格
+          _reload();
+        };
+        //获取树成功后进行的回调操作
+        function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+          //展开树
+          expand_ztree(treeId);
+        };
+
+        function expand_ztree(treeId) {
+          var treeObj = $.fn.zTree.getZTreeObj(treeId);
+          treeObj.expandAll(true);
+        }
+
+        $.fn.zTree.init($('#person-tree'), setting);
+      });
+
+
+      /**
+       *返回当前classificaiton所指的页面
+       */
+      function _reload(){
+        // console.log(checkedItems);
+        let keywords = $('#searchInput').val();  //搜索的关键字
+        //重载表格
+        layui.use('table', function() {
+          var table = layui.table;
+          table.reload('person-table', {
+            url: '/Home/person/iLoadPersonLists.template',
+            where: { //设定异步数据接口的额外参数，任意设
+              classification_id: $("#_classfication_id").val(),
+              keywords: keywords,
+            }
+            , page: {
+              curr: 1, //重新从第 1 页开始
+            },
+          });
+        });
+      }
+      //关闭按钮
+      function _close(){
+        layer.close(layer.index);
+      }
+
+      //加载表格
+      let use = layui.use(['table', 'form', 'jquery'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var $ = layui.$;
+
+        table.render({
+          elem: '#person-table'
+          ,cellMinWidth: 260
+          , url: '/Home/person/iLoadPersonLists.template'
+          , cols: [
+            [
+              {type: 'checkbox', fixed: 'left'}
+              , {field: 'number', title: '序号', width: 80,align: 'center'}
+              , {field: 'classification', title: '类别', align: 'center', width:1}
+              , {field: 'id', title: 'ID', align: 'center'}
+              , {field: 'login_name', title: '用户名', align: 'center'}
+              , {field: 'name', title: '姓名', align: 'center'}
+              , {fixed: 'right', title: '操作', toolbar: '#person-table-bar', align: 'center', width:70},
+            ]]
+          , done: function () {
+            $("[data-field='classification']").css('display','none');
+          }
+          , page: true,
+        });
+        //自定义表单验证规则
+        form.verify({
+          //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+          loginName: [
+            /[^\u4e00-\u9fa5]+/
+            , '登录名不能是中文',
+          ],
+        });
+
+        //监听行工具事件
+        table.on('tool(person-table)', function(obj) {
+          var data = obj.data;
+          console.log(data.id);
+          if (obj.event === 'edit') {
+            //不同身份的用户，点击编辑，弹窗的表单是不同的
+            //编辑管理员
+            if (data.classification == undefined || data.classification == '1') {
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] != 'bad') {
+                  let personInfo = JSON.parse(obj[0]);
+                  console.log(personInfo);
+                  //更新弹出层的表单
+                  $('#add-admin input[ name=\'login_name\' ] ').val(personInfo[0].login_name);
+                  $('#add-admin input[ name=\'name\' ] ').val(personInfo[0].name);
+                  $('#add-admin input[ name=\'pwd1\' ] ').val(personInfo[0].passwd);
+                  $('#add-admin input[ name=\'pwd2\' ] ').val(personInfo[0].passwd);
+                  $('#add-admin input[ name=\'id\' ] ').val(personInfo[0].id);
+                }
+              };
+              getFromWS('Home/person/iGetPersonInfo.template', 'id=' + data.id + "$^@^$classification=" + data.classification, obj, Result);
+              layer.open({
+                type: 1,
+                area: ['360px', '330px'],
+                shadeClose: true, //点击遮罩关闭
+                title: '编辑管理员',
+                content: $('#add-admin'),
+                end:function() {
+                  //当弹窗关闭时，清除掉信息
+                  $('#add-admin input[ name=\'login_name\' ] ').val("");
+                  $('#add-admin input[ name=\'name\' ] ').val("");
+                  $('#add-admin input[ name=\'pwd1\' ] ').val("");
+                  $('#add-admin input[ name=\'pwd2\' ] ').val("");
+                  $('#add-admin input[ name=\'id\' ] ').val("");
+                }
+              });
+            } else if (data.classification == '2') {
+              //alert("编辑监测机构");
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] != 'bad') {
+                  let personInfo = JSON.parse(obj[0]);
+                  console.log(personInfo);
+                  //更新弹出层的表单
+                  $('#add-doctor input[ name=\'login_name\' ] ').val(personInfo[0].login_name);
+                  $('#add-doctor input[ name=\'name\' ] ').val(personInfo[0].name);
+                  $('#add-doctor input[ name=\'depart\' ] ').val(personInfo[0].department);
+                  $('#add-doctor input[ name=\'hospital\' ] ').val(personInfo[0].hospital);
+                  $('#add-doctor input[ name=\'position\' ] ').val(personInfo[0].position);
+                  $('#add-doctor input[ name=\'phone\' ] ').val(personInfo[0].phone);
+                  $('#add-doctor input[ name=\'pwd1\' ] ').val(personInfo[0].passwd);
+                  $('#add-doctor input[ name=\'pwd2\' ] ').val(personInfo[0].passwd);
+                  $('#add-doctor input[ name=\'id\' ] ').val(personInfo[0].id);
+                }
+              };
+              getFromWS('Home/person/iGetPersonInfo.template', 'id=' + data.id + "$^@^$classification=" + data.classification, obj, Result);
+              layer.open({
+                type: 1,
+                area: ['360px', '620px'],
+                shadeClose: true, //点击遮罩关闭
+                title: '编辑监测机构',
+                content: $('#add-doctor'),
+                end:function() {
+                  //当弹窗关闭时，清除掉信息
+                  $('#add-doctor input[ name=\'login_name\' ] ').val("");
+                  $('#add-doctor input[ name=\'name\' ] ').val("");
+                  $('#add-doctor input[ name=\'depart\' ] ').val("");
+                  $('#add-doctor input[ name=\'hospital\' ] ').val("");
+                  $('#add-doctor input[ name=\'position\' ] ').val("");
+                  $('#add-doctor input[ name=\'phone\' ] ').val("");
+                  $('#add-doctor input[ name=\'pwd1\' ] ').val("");
+                  $('#add-doctor input[ name=\'pwd2\' ] ').val("");
+                  $('#add-doctor input[ name=\'id\' ] ').val("");
+                }
+              });
+
+            } else if (data.classification == '3') {
+              //alert("编辑用户");
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] != 'bad') {
+                  let personInfo = JSON.parse(obj[0]);
+                  console.log(personInfo);
+                  //更新弹出层的表单
+                  $('#add-user input[ name=\'login_name\' ] ').val(personInfo[0].login_name);
+                  $('#add-user input[ name=\'name\' ] ').val(personInfo[0].name);
+                  $('#add-user input[ name=\'pwd1\' ] ').val(personInfo[0].passwd);
+                  $('#add-user input[ name=\'pwd2\' ] ').val(personInfo[0].passwd);
+                  $('#add-user input[ name=\'id\' ] ').val(personInfo[0].id);
+                  $('#add-user input[ name=\'phone\' ] ').val(personInfo[0].phone);
+                }
+              };
+              getFromWS('Home/person/iGetPersonInfo.template', 'id=' + data.id + "$^@^$classification=" + data.classification, obj, Result);
+              layer.open({
+                type: 1,
+                area: ['360px', '450px'],
+                shadeClose: true, //点击遮罩关闭
+                title: '编辑用户',
+                content: $('#add-user'),
+                end:function() {
+                  $('#add-user input[ name=\'login_name\' ] ').val("");
+                  $('#add-user input[ name=\'name\' ] ').val("");
+                  $('#add-user input[ name=\'pwd1\' ] ').val("");
+                  $('#add-user input[ name=\'pwd2\' ] ').val("");
+                  $('#add-user input[ name=\'id\' ] ').val("");
+                  $('#add-user input[ name=\'phone\' ] ').val("");
+                }
+              });
+            } else if (data.classification == '4') {
+              //alert("编辑监测员");
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] != 'bad') {
+                  let personInfo = JSON.parse(obj[0]);
+                  console.log(personInfo);
+                  //更新弹出层的表单
+                  $('#add-monitor input[ name=\'login_name\' ] ').val(personInfo[0].login_name);
+                  $('#add-monitor input[ name=\'name\' ] ').val(personInfo[0].name);
+                  $('#add-monitor input[ name=\'depart\' ] ').val(personInfo[0].department);
+                  $('#add-monitor input[ name=\'phone\' ] ').val(personInfo[0].phone);
+                  $('#add-monitor input[ name=\'pwd1\' ] ').val(personInfo[0].passwd);
+                  $('#add-monitor input[ name=\'pwd2\' ] ').val(personInfo[0].passwd);
+                  $('#add-monitor input[ name=\'id\' ] ').val(personInfo[0].id);
+                }
+              };
+              getFromWS('Home/person/iGetPersonInfo.template', 'id=' + data.id + "$^@^$classification=" + data.classification, obj, Result);
+              //加载机构select列表
+              let options = '';
+              let loadObj = new Array();
+              let loadResult = function() {
+                let departs = loadObj[0].split(',');
+                // console.log(departs);
+                for (let i = 0; i < departs.length; i++) {
+                  if (departs[i] != 0) {
+                    options += `<option value="${departs[i]}">${departs[i]}</option>`;
+                  }
+                }
+                $('#add-depart').html(options);
+                form.render('select'); //更新select
+              };
+              getFromWS('Home/hostpitals/iGetHostpitalList.template', '', loadObj, loadResult);
+              layer.open({
+                type: 1,
+                area: ['360px', '600px'],
+                shadeClose: true, //点击遮罩关闭
+                title: '编辑监测员',
+                content: $('#add-monitor'),
+                end:function() {
+                  $('#add-monitor input[ name=\'login_name\' ] ').val("");
+                  $('#add-monitor input[ name=\'name\' ] ').val("");
+                  $('#add-monitor input[ name=\'depart\' ] ').val("");
+                  $('#add-monitor input[ name=\'phone\' ] ').val("");
+                  $('#add-monitor input[ name=\'pwd1\' ] ').val("");
+                  $('#add-monitor input[ name=\'pwd2\' ] ').val("");
+                  $('#add-monitor input[ name=\'id\' ] ').val("");
+                }
+              });
+            }
+          }
+        });
+        //批量删除
+        $('#batchDelete').click(function() {
+          var checkStatus = table.checkStatus('person-table');
+          var data = checkStatus.data;
+          if (data == '') {
+            layer.msg('请选择要删除的用户', function() {
+              //关闭后的操作
+            });
+          } else {
+            layer.confirm('确定批量删除这些用户？', function(index) {
+              let userIds = '';
+              let usersCount = 0;
+              for (var i = 0; i < data.length; i++) {
+                userIds = userIds + data[i].id + ',';
+                usersCount++;
+              }
+              //去掉最后一个 ，
+              userIds = userIds.substr(0, userIds.length - 1);
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok') {
+                  _reload();
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`删除失败，${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              getFromWS('Home/person/user/iDeleteUsers.template',
+                  'ids=' + userIds + '$^@^$usersCount=' + usersCount, obj, Result);
+
+            });
+          }
+        });
+        //分享
+        $('#_share').click(function() {
+          var checkStatus = table.checkStatus('person-table');
+          var data = checkStatus.data;
+          if (data == '') {
+            layer.msg('请选择要分享的用户', function() {
+              //关闭后的操作
+            });
+          }
+          else if (data.length == 1) {
+            if ((data[0].classification == '2') || (data[0].classification == '4')) {
+              var wz = "http://sdev.whu.edu.cn/zf_wave/pages/home/medicalRecord/transfer.html?doctorId=";
+              var text = wz + data[0].id;
+              document.getElementById("qrcode").innerHTML = "";
+              new QRCode(document.getElementById("qrcode"), text);
+              layer.open({
+                type: 1,
+                area: ['260px', '300px'],
+                shadeClose: true, //点击遮罩关闭
+                title: '分享二维码',
+                content: $('#share'),
+              });
+            }else {
+              layer.msg('只有监测机构和监测员才能分享', function() {
+                //关闭后的操作
+              });
+            }
+          }else {
+            layer.msg('要分享的用户一次只能点选一个', function() {
+              //关闭后的操作
+            });
+          }
+        });
+        //搜索
+        $('#search').click(function() {
+          _reload();
+        });
+        //新增管理员-弹出层
+        $('#addAdmin').click(function() {
+          layer.open({
+            type: 1,
+            area: ['360px', '330px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增管理员',
+            content: $('#add-admin'),
+            end:function() {
+              //当弹窗关闭时，清除掉信息
+              $('#add-admin input[ name=\'login_name\' ] ').val("");
+              $('#add-admin input[ name=\'name\' ] ').val("");
+              $('#add-admin input[ name=\'pwd1\' ] ').val("");
+              $('#add-admin input[ name=\'pwd2\' ] ').val("");
+              $('#add-admin input[ name=\'id\' ] ').val("");
+            }
+          });
+        });
+        //新增监测机构-弹出层
+        $('#addDepart').click(function() {
+          layer.open({
+            type: 1,
+            area: ['360px', '620px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增监测机构',
+            content: $('#add-doctor'),
+            end:function() {
+              //当弹窗关闭时，清除掉信息
+              $('#add-doctor input[ name=\'login_name\' ] ').val("");
+              $('#add-doctor input[ name=\'name\' ] ').val("");
+              $('#add-doctor input[ name=\'depart\' ] ').val("");
+              $('#add-doctor input[ name=\'hospital\' ] ').val("");
+              $('#add-doctor input[ name=\'position\' ] ').val("");
+              $('#add-doctor input[ name=\'phone\' ] ').val("");
+              $('#add-doctor input[ name=\'pwd1\' ] ').val("");
+              $('#add-doctor input[ name=\'pwd2\' ] ').val("");
+              $('#add-doctor input[ name=\'id\' ] ').val("");
+            }
+          });
+        });
+        //新增监测员-弹出层
+        $('#addMonitor').click(function() {
+          //加载机构select列表
+          let options = '';
+          let obj = new Array();
+          let Result = function() {
+
+            let departs = obj[0].split(',');
+            // console.log(departs);
+            for (let i = 0; i < departs.length; i++) {
+              if (departs[i] != 0) {
+                options += `<option value="${departs[i]}">${departs[i]}</option>`;
+              }
+            }
+            ;
+            $('#add-depart').html(options);
+            form.render('select'); //更新select
+          };
+          getFromWS('Home/hostpitals/iGetHostpitalList.template', '', obj, Result);
+          layer.open({
+            type: 1,
+            area: ['360px', '580px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增监测员',
+            content: $('#add-monitor'),
+            end:function() {
+              $('#add-monitor input[ name=\'login_name\' ] ').val("");
+              $('#add-monitor input[ name=\'name\' ] ').val("");
+              $('#add-monitor input[ name=\'depart\' ] ').val("");
+              $('#add-monitor input[ name=\'phone\' ] ').val("");
+              $('#add-monitor input[ name=\'pwd1\' ] ').val("");
+              $('#add-monitor input[ name=\'pwd2\' ] ').val("");
+              $('#add-monitor input[ name=\'id\' ] ').val("");
+            }
+          });
+        });
+        //新增用户-弹出层
+        $('#addUser').click(function() {
+          layer.open({
+            type: 1,
+            area: ['360px', '460px'],
+            shadeClose: true, //点击遮罩关闭
+            title: '新增用户',
+            content: $('#add-user'),
+            end:function() {
+              $('#add-user input[ name=\'login_name\' ] ').val("");
+              $('#add-user input[ name=\'name\' ] ').val("");
+              $('#add-user input[ name=\'pwd1\' ] ').val("");
+              $('#add-user input[ name=\'pwd2\' ] ').val("");
+              $('#add-user input[ name=\'id\' ] ').val("");
+              $('#add-user input[ name=\'phone\' ] ').val("");
+            }
+          });
+        });
+      });
+      //新增管理员-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addAdmin)', function(data) {
+          console.log(data.field);
+          let pwd1 = data.field.pwd1;
+          let pwd2 = data.field.pwd2;
+          if (pwd1 == pwd2) {
+            //判断是 新增还是修改
+            let haveId = $('#add-admin input[ name=\'id\' ] ').val();
+            if (haveId == '') {
+              //新建
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok$^@^$UPDATED=') {
+                  //新增成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                  '$^@^$classification=' + 1 +
+                  '$^@^$passwd=' + data.field.pwd2;
+              getFromWS('Home/person/iAddAdmin.template', postdata, obj, Result);
+            } else {
+              //修改
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok') {
+                  //修改成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                  '$^@^$passwd=' + data.field.pwd2 + '$^@^$id=' + data.field.id;
+              getFromWS('Home/person/updateAdmin.template', postdata, obj, Result);
+            }
+
+          } else {
+            layer.msg('密码不一致', function() {
+              //关闭后的操作
+            });
+            return false;
+          }
+          return false;
+        });
+      });
+      //新增监测机构-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addDepart)', function(data) {
+          console.log(data.field);
+          let pwd1 = data.field.pwd1;
+          let pwd2 = data.field.pwd2;
+          if (pwd1 == pwd2) {
+            ///判断是 新增还是修改
+            let haveId = $('#add-doctor input[ name=\'id\' ] ').val();
+            //新建
+            if (haveId == '') {
+              //验证-验证码
+              let res = jQuery.verifyCode(data.field.phone, data.field.code);
+              if (res != '1') {   //1 表示验证成功
+                layer.msg('验证码错误或已失效', function() {
+                  //关闭后的操作
+                });
+                return false;
+              }else{
+                let obj = new Array();
+                let Result = function() {
+                  // console.log(obj[0]);
+                  if (obj[0] == 'ok') {
+                    //新增成功
+                    _reload();
+                    //关闭最新的弹出层
+                    layer.close(layer.index);
+                  } else {
+                    layer.msg(`失败,${obj[0]}`, function() {
+                      //关闭后的操作
+                    });
+                    return false;
+                  }
+                };
+                let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                    '$^@^$classification=' + 2 +
+                    '$^@^$passwd=' + data.field.pwd2 + '$^@^$hospital=' + data.field.hospital + '$^@^$depart=' +
+                    data.field.depart + '$^@^$phone=' + data.field.phone + '$^@^$position=' + data.field.position;
+                getFromWS('Home/person/doctor/iAddDoctor.template', postdata, obj, Result);
+              }
+            }
+            //修改
+            else{
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok') {
+                  //修改成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                  '$^@^$passwd=' + data.field.pwd2 + '$^@^$hospital=' + data.field.hospital + '$^@^$depart=' +
+                  data.field.depart + '$^@^$phone=' + data.field.phone + '$^@^$position=' + data.field.position + '$^@^$id=' + data.field.id;
+              getFromWS('Home/person/doctor/updateDoctor.template', postdata, obj, Result);
+            }
+          } else {
+            layer.msg('密码不一致', function() {
+              //关闭后的操作
+            });
+            return false;
+          }
+          return false;
+        });
+      });
+      //发送验证码(由于使用layui，layer弹出层是动态绑定的，所以点击事情绑定要这么写)
+      $(document).on('click', '.sendVerifyCode', function() {
+
+      });
+      //新增监测员-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addMonitor)', function(data) {
+          // console.log(data.field);
+          let pwd1 = data.field.pwd1;
+          let pwd2 = data.field.pwd2;
+          if (pwd1 == pwd2) {
+            //判断是新建还是修改
+            let haveId = $('#add-monitor input[ name=\'id\' ] ').val();
+            //新建
+            if (haveId == '') {
+              //验证-验证码
+              let res = jQuery.verifyCode(data.field.phone, data.field.code);
+              if (res != '1') {   //1 表示验证成功
+                layer.msg('验证码错误或已失效', function() {
+                  //关闭后的操作
+                });
+                return false;
+              } else {
+                let obj = new Array();
+                let Result = function() {
+                  // console.log(obj[0]);
+                  if (obj[0] == 'ok') {
+                    //新增成功
+                    _reload();
+                    //关闭最新的弹出层
+                    layer.close(layer.index);
+                  } else {
+                    layer.msg(`失败,${obj[0]}`, function() {
+                      //关闭后的操作
+                    });
+                    return false;
+                  }
+                };
+                let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                    '$^@^$classification=' + 4 +
+                    '$^@^$passwd=' + data.field.pwd2 + '$^@^$depart=' + data.field.depart + '$^@^$organization=' +
+                    data.field.organization + '$^@^$phone=' + data.field.phone;
+                getFromWS('Home/person/monitor/iAddMonitor.template', postdata, obj, Result);
+              }
+            }
+            else{
+              //修改
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok') {
+                  //修改成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              }
+              let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                  '$^@^$passwd=' + data.field.pwd2 + '$^@^$organization=' + data.field.organization + '$^@^$depart=' +
+                  data.field.depart + '$^@^$phone=' + data.field.phone + '$^@^$id=' + data.field.id;
+              getFromWS('Home/person/monitor/updateMonitor.template', postdata, obj, Result);
+            };
+
+          } else {
+            layer.msg('密码不一致', function() {
+              //关闭后的操作
+            });
+            return false;
+          }
+          return false;
+        });
+      });
+      //新增用户-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addUser)', function(data) {
+          // console.log(data.field);
+          let pwd1 = data.field.pwd1;
+          let pwd2 = data.field.pwd2;
+          if (pwd1 == pwd2) {
+            //判断是新建还是修改
+            let haveId = $('#add-user input[ name=\'id\' ] ').val();
+            //新建
+            if (haveId == '') {
+              //验证-验证码
+              let res = jQuery.verifyCode(data.field.phone, data.field.code);
+              if (res != '1') {   //1 表示验证成功
+                layer.msg('验证码错误或已失效', function() {
+                  //关闭后的操作
+                });
+                return false;
+              } else {
+                let obj = new Array();
+                let Result = function() {
+                  // console.log(obj[0]);
+                  if (obj[0] == 'ok') {
+                    //新增成功
+                    _reload();
+                    //关闭最新的弹出层
+                    layer.close(layer.index);
+                  } else {
+                    layer.msg(`失败,${obj[0]}`, function() {
+                      //关闭后的操作
+                    });
+                    return false;
+                  }
+                };
+                let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                    '$^@^$classification=' + 3 +
+                    '$^@^$passwd=' + data.field.pwd2 + '$^@^$phone=' + data.field.phone;
+                getFromWS('Home/person/user/addUser.template', postdata, obj, Result);
+              }
+            }
+            else{
+              //修改
+              let obj = new Array();
+              let Result = function() {
+                console.log(obj[0]);
+                if (obj[0] == 'ok') {
+                  //修改成功
+                  _reload();
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              };
+              let postdata = 'login_name=' + data.field.login_name + '$^@^$name=' + data.field.name +
+                  '$^@^$passwd=' + data.field.pwd2 + '$^@^$phone=' + data.field.phone + '$^@^$id=' + data.field.id;
+              getFromWS('Home/person/user/updateUser.template', postdata, obj, Result);
+            }
+
+          } else {
+            layer.msg('密码不一致', function() {
+              //关闭后的操作
+            });
+            return false;
+          }
+          return false;
+        });
+      });
+
+      /**
+       *
+       * @param strTelId
+       * 根据"获得验证码"按钮的ID值判断需要读取的手机号的ID值
+       */
+      function checkedSms(strTelId) {
+        // alert(strTelId)
+        let tel = $('#'+strTelId).val();
+        //正则表达式，匹配手机,号码段非严谨匹配
+        const regx = /^[1]([3-9])[0-9]{9}$/;
+        if (!regx.test(tel)) {
+          // layer.msg('手机号格式错误，请重新输入', function() {
+          //   //关闭后的操作
+          // });
+          alert(tel);
+          return;
+        }
+        layui.use(['jquery', 'form'], function() {
+          var form = layui.form;
+          //将按钮disable，开始倒计时
+          $('.sendVerifyCode').attr({disabled: 'disabled'});
+          form.render(); //刷新表单
+          let timesRun = 60;
+          const interval = setInterval(function() {
+            timesRun -= 1;
+            $('.sendVerifyCode').html(`${timesRun}秒再获取`);
+            if (timesRun === 0) {
+              clearInterval(interval);
+              $('.sendVerifyCode').html('获取验证码');
+              $('.sendVerifyCode').removeAttr('disabled');
+              form.render(); //刷新表单
+            }
+          }, 1000);
+        });
+        $('.sendVerifyCode').sendVerifyCode('/Home/smsCode/isms.template?operation=sendVerifyCode', tel);
+      }
+    </script>
+</head>
+<body>
+<input type="hidden" value="0" id="_classfication_id">
+<div class="layui-fluid">
+    <div class="layui-card u-table-outer">
+        <div class="layui-form layui-card-header">
+            <h2>人员管理</h2>
+        </div>
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="zTreeDemoBackground left" style="position: absolute;left: 10px;top: 10px;">
+                <ul id="person-tree" class="ztree"></ul>
+            </div>
+            <div class="user-table">
+                <div class="table-header-btn personManage-btns" style="display: flex;align-items: center;padding: 4px 0">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn u-btn layui-btn-sm" id="addAdmin">新增管理员</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="addDepart">新增监测机构</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="addMonitor">新增监测员</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="addUser">新增用户</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="batchDelete">批量删除</button>
+                        <button class="layui-btn u-btn layui-btn-sm" id="_share">分享</button>
+                    </div>
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchInput" autocomplete="off"
+                                   placeholder="用户名 / 姓名">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search">搜索</button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="person-table" lay-filter="person-table"></table>
+                <script type="text/html" id="person-table-bar">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<!--新增管理员弹出层-->
+<div id="add-admin" class="add-admin" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <!--            存放id，用来区分是新建还是修改-->
+            <div class="layui-inline" style="display: none;">
+                <div class="layui-input-inline">
+                    <input type="text" name="id" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="login_name" lay-verify="required|loginName" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd1" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd2" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-admin-btn" type="button"
+                lay-submit lay-filter="addAdmin">
+            确定
+        </button>
+    </form>
+</div>
+<!--新增监测机构弹出层-->
+<div id="add-doctor" class="add-doctor" style="display: none;">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <!--            存放id，用来区分是新建还是修改-->
+            <div class="layui-inline" style="display: none;">
+                <div class="layui-input-inline">
+                    <input type="text" name="id" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="login_name" lay-verify="required|loginName" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">医院</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="hospital" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">科室</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="depart" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">职位</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="position" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">手机号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="phone" lay-verify="" autocomplete="off"
+                           class="layui-input tel" id="tel_jg">
+                </div>
+            </div>
+            <div class="layui-inline" style="position: relative">
+                <label class="layui-form-label" >验证码</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="code" lay-verify="" autocomplete="off"
+                           class="layui-input u-input">
+                </div>
+                <div style="position: absolute;top: 4px;right: 10px">
+                    <button class="layui-btn u-btn layui-btn-sm layui-btn-normal sendVerifyCode" type="button" onclick="checkedSms('tel_jg')">
+                        获取验证码
+                    </button>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd1" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd2" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-doctor-btn" type="button"
+                lay-submit lay-filter="addDepart">
+            确定
+        </button>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" type="button" onclick="_close()">
+            关闭
+        </button>
+    </form>
+</div>
+<!--新增监测员弹出层-->
+<div id="add-monitor" class="add-monitor" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <!--            存放id，用来区分是新建还是修改-->
+            <div class="layui-inline" style="display: none;">
+                <div class="layui-input-inline">
+                    <input type="text" name="id" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="login_name" lay-verify="required|loginName" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">所属机构</label>
+                <div class="layui-input-inline">
+                    <select name="organization" id="add-depart" lay-verify="required">
+
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">部门</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="depart" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">手机号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="phone" lay-verify="phone" autocomplete="off"
+                           class="layui-input tel" id="tel_jc">
+                </div>
+            </div>
+            <div class="layui-inline" style="position: relative">
+                <label class="layui-form-label">验证码</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="code" lay-verify="自定义值" autocomplete="off"
+                           class="layui-input u-input">
+                </div>
+                <div style="position: absolute;top: 4px;right: 10px">
+                    <button class="layui-btn u-btn layui-btn-sm layui-btn-normal sendVerifyCode" type="button" onclick="checkedSms('tel_jc')">
+                        获取验证码
+                    </button>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd1" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd2" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-monitor-btn" type="button"
+                lay-submit lay-filter="addMonitor">
+            确定
+        </button>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" type="button" onclick="_close()">
+            关闭
+        </button>
+    </form>
+</div>
+<!--新增用户弹出层-->
+<div id="add-user" class="add-user" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <!--            存放id，用来区分是新建还是修改-->
+            <div class="layui-inline" style="display: none;">
+                <div class="layui-input-inline">
+                    <input type="text" name="id" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="login_name" lay-verify="required|loginName" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">手机号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="phone" lay-verify="required|phone" autocomplete="off"
+                           class="layui-input tel" id="tel_yh">
+                </div>
+            </div>
+            <div class="layui-inline" style="position: relative">
+                <label class="layui-form-label">验证码</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="code" lay-verify="" autocomplete="off"
+                           class="layui-input u-input">
+                </div>
+                <div style="position: absolute;top: 4px;right: 10px">
+                    <button class="layui-btn u-btn layui-btn-sm layui-btn-normal sendVerifyCode" type="button" onclick="checkedSms('tel_yh')">
+                        获取验证码
+                    </button>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd1" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd2" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-user-btn" type="button"
+                lay-submit lay-filter="addUser">
+            确定
+        </button>
+    </form>
+</div>
+<!--分享弹出层-->
+<div id="share" class="share" style="display: none;">
+    <form class="layui-form">
+        <div id="qrcode">
+        </div>
+    </form>
+</div>
+</html>

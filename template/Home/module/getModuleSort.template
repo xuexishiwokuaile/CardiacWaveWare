@@ -1,0 +1,25 @@
+<%
+    debugMsg("!!!")
+    debugMsg(:columnsId)
+    :sort = ""
+    ///选择的一定是父模块,获取子模块的所有sort值
+    :sql_getModuleSort = "SELECT SORT FROM MODULE_COLUMNS WHERE PARENT_ID = ? ORDER BY SORT ASC"
+    :result_getModuleSort = changeRecordSet(:sql_getModuleSort,S(:columnsId))
+    :i = 0
+    Repeat
+        :ArrayAllSort[:i] = SORT
+        :i = :i + 1
+    EndRepeat
+
+    ///存在子模块
+    If :result_getModuleSort == "ok"
+        :result_json = jsonAddItem("","sort",S(:ArrayAllSort[:i-1]))
+        :result_json_Array = jsonAddArrayItem("",:result_json)
+    Else
+    ///不存在子模块
+        :result_json = jsonAddItem("","sort","0")
+        :result_json_Array = jsonAddArrayItem("",:result_json)
+    EndIf
+
+    Exit :result_json_Array
+%>

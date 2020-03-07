@@ -1,0 +1,40 @@
+<%
+    /// 文 件 名：genData
+    /// 描    述：新建议相应的模拟数据(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/4/21 0021 23:53  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    :strNames="霍良俊,贺安宁,韦欣悦,胡宇寰,鲁平宁,奚丹丹,刁奕奕,程诗霜,何吉敏,尚明俊,洪嘉德,郝迎海,秦晗玥,苏蔓菁,刘映真,步惠心,司谷兰,萧荌荌,慕兰若,孙夏璇,索丹珍,隗志芳,周立夏,伊寄翠,林彩娟,郑雅香,蒋盼柳,傅怡金,朱怀蝶,梁尹夏,逢天菱,胡燕子,秦晗玥,訾熙熙,邴娴静,谢思茵,冷梓童,熊辰伶,钱柔怀,钟华池,桓尔丝,叶从雪,戈灵松,李从蓉,班融雪,越仙媛,申之玉,须雯华,尚柯拉,黎曼吟,罗思义,翟鹤梅,詹映波,文曼妮,璩欣可,段语彤,莘迎波,徐依波,屠友容,桂琪华,充茉莉,侯静慧,金宛畅,党甘雨,敖谷兰,罗睿琳,文端雅,益梦丝,程贝琳,司明轩,空思蕊,仰芮悦,符阳曦,燕锦诗,蔚婉静,钭妍妍,蔚睿好,巴新翰,伊鸿振,桓高卓,韩鸿博,熊理群,姚飞语,赵嘉懿,从承恩,贡永年,陈立人,孔黎明,越天纵,傅浩渺,扈凯歌,李坚成,杨建安,菱飞捷,薛嘉良,阴翰学,宫俊达,曹元魁,索冠玉,邹鸿云"
+    split(:strNames,",", &array)
+
+///    :i = 0
+///    While :i< arrayLength(&array)
+///      :n = randomString(10, 2)
+///      =:array[:n]
+///      :i= :i +1
+///    EndWhile
+  :sql = "SELECT rd.id FROM MEDICAL_RECORD rd, MEDICAL_RECORD_ANALYSIS an WHERE an.MEDICALRECORDID = RD.ID AND (an.CLIENTNAME=? OR an.CLIENTNAME=?)"
+  :strName1 = "沈家强"
+  :strName2 = "崔一"
+  :resultRecord = changeRecordSet(:sql,S(:strName1),S(:strName2))
+  :recordNum = recordCount()
+  Repeat
+    :n = randomString(10, 2)
+    :nameTemp = :array[:n]
+///    =:nameTemp+id
+
+    :sqlUpdateRecord = "UPDATE MEDICAL_RECORD SET clientName=? WHERE id=?"
+    execSQL(:sqlUpdateRecord,S(:nameTemp),S(id))
+
+    :sqlUpdateANALYSIS = "UPDATE MEDICAL_RECORD_ANALYSIS SET clientName=? WHERE MEDICALRECORDID=?"
+    execSQL(:sqlUpdateANALYSIS,S(:nameTemp),S(id))
+  EndRepeat
+  =:recordNum+"条记录。操作完成"
+
+
+
+%>

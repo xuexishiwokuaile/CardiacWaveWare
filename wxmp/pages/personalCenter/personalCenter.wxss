@@ -1,0 +1,244 @@
+/* pages/personalCenter/personalCenter.wxss */
+.outer{
+    margin: 0 auto; 
+    height: 100%; 
+    /* width: 700rpx; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.user-info-header{
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    height: 110rpx;
+    margin-bottom: 20rpx;
+}
+.user-logo image{
+    width: 100rpx;
+    height: 106rpx;
+    /* border: 1rpx solid red; */
+}
+.user-avatar{
+    width: 120rpx;
+    height: 114rpx;
+    overflow: hidden;
+    border-radius: 50%;
+    /* border:1rpx solid red; */
+}
+.user-id{
+    width: 250rpx;
+    /* word-break:break-all; */
+}
+.id-status{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 24rpx;
+    color: #000203;
+    margin: auto 30rpx;
+}
+.user-status{
+    color: #3ca3ff;
+    margin-top: 10rpx;
+}
+.purchase-history{
+    background: url("https://6a69-jiayukeji-6c6ff0-1258462011.tcb.qcloud.la/cardiacWave/purchaseHistory-btn.png?sign=45f8596b5c1859fbf4597e8681304ea9&t=1562589655");
+    background-size: 230rpx 72rpx;
+    background-repeat: no-repeat;
+    width: 230rpx;
+    height: 72rpx;
+    position: relative;
+    margin: auto 0;
+}
+.purchase-history-text{
+    color: #fefdfd;
+    font-size: 30rpx;
+    /* position: absolute; */
+    /* bottom: 12rpx; */
+    /* right: 20rpx; */
+    line-height: 72rpx;
+    margin-left: 90rpx;
+}
+.hr {
+    border-top: 1px solid #f3f1f0; 
+    width: 680rpx;
+    margin: 0rpx auto;
+}
+
+/* 三个按钮 */
+.info-btns{
+    width: 700rpx;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40rpx;
+}
+.info-btn{
+    text-align: center;
+}
+.info-btn image{
+    width: 120rpx;
+    height: 120rpx;
+    /* border: 1rpx solid red; */
+}
+.btn-text{
+    text-align: center;
+    color: #606064;
+    font-size: 35rpx;
+    /* border: 1rpx solid blue; */
+}
+
+
+/* 表单的内容 */
+.form-items {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60rpx;
+}
+
+.form-item {
+    display: flex;
+    width: 620rpx;
+    /* border: 1rpx solid blue; */
+    margin-bottom: 34rpx;
+    justify-content: space-between
+}
+.item{
+    display: flex;
+}
+
+.form-item-title {
+    color: #222222;
+    font-size: 40rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    margin-right: 20rpx;
+}
+
+/* placeholder-class */
+
+.placeholder-text {
+    color: #b2b2b2;
+    font-size: 28rpx;
+    line-height: 28rpx;
+    height: 28rpx;
+}
+
+.item input{
+    font-size: 32rpx;
+}
+
+.alignment-control{
+    padding-right: 8rpx;
+    /* border: 1rpx solid red; */
+}
+
+/* 姓名 */
+
+.name-input {
+    width: 200rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+    /* margin-right: 46rpx; */
+}
+
+/* 性别 */
+
+.sex-input {
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* 手机号 */
+
+.tel-input {
+    width: 210rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* 年龄 */
+.age-input{
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* 验证码 */
+
+.code {
+    width: 468rpx;
+    display: flex;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+.code-input {
+    width: 100rpx;
+    margin-right: 224rpx;
+}
+
+.get-code-btn {
+    color: #070707;
+    width: 100rpx;
+    font-size: 28rpx;
+}
+
+/* 机构 */
+
+.agency-input {
+    width: 460rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* 身高 */
+
+.height-input {
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+    margin-right: 70rpx;
+}
+
+/* 体重 */
+
+.weight-input {
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* 吸烟 */
+.smoke-input,
+.diabetes-input{
+    margin-right: 70rpx;
+}
+/* 饮酒 */
+.drink-input{
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+/* 糖尿病 */
+
+/* 高血压 */
+
+.smoke-input,  .diabetes-input, .hypertension-input {
+    width: 90rpx;
+    border-bottom: 1rpx solid #b2b2b2;
+}
+
+/* btn */
+
+.btn-area {
+    padding: 10rpx 0;
+    height: 66rpx;
+    width: 496rpx;
+}
+
+.btn-area button {
+    border-radius: 40rpx;
+    background-color: #5099ff;
+    color: #ffffff;
+    font-size: 30rpx;
+    border-color: #5099ff;
+}
+.btn-exit{
+    margin-top: 10rpx
+}

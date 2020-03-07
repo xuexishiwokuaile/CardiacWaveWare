@@ -1,0 +1,77 @@
+/* pages/nearbyHospital/nearbyHospital.wxss */
+
+.sm-title2 {
+    font-size: 30rpx;
+    padding: 0 30rpx 0 500rpx;
+}
+
+.items {
+    width: 750rpx;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+.items-bar {
+    width: 600rpx;
+    display: flex;
+    justify-content: space-between;
+    font-size: 30rpx;
+    padding-top: 34rpx;
+    margin: 0 auto;
+    /* border: 1rpx solid rebeccapurple; */
+}
+
+.location {
+    color: #5099ff;
+    border-bottom: 2rpx solid #5099ff;
+    padding-bottom: 34rpx;
+}
+
+/* 横线 */
+
+.hr {
+    border-top: 1px solid #f3f1f0;
+    width: 680rpx;
+    margin: 0rpx auto;
+}
+
+.item{
+    display: flex;
+    justify-content: flex-start;
+    font-size: 30rpx;
+    margin: 0 auto;
+    margin-bottom: 28rpx;
+    position: relative;
+}
+.hospital-img image{
+    width: 148rpx;
+    height: 118rpx;
+    padding-top: 34rpx;
+    margin-left: -140rpx;
+}
+
+.hospital-name{
+    color: #080808;
+    padding: 45rpx 0 0 22rpx;
+}
+.hospital-degree-device{
+    padding: 10rpx 0 0 22rpx;
+}
+.hospital-degree{
+    color:  #9c9a07;
+}
+.hospital-device{
+    margin-left: 30rpx;
+}
+.hospital-location-btn{
+    color: #5099ff;
+    padding: 26rpx 0 0 22rpx;
+}
+.hospital-distance{
+    /* border: 1rpx solid red; */
+    padding: 96rpx 0 0 0rpx;
+    /* margin-left: 80rpx; */
+    position: absolute;
+    right: -128rpx;
+}

@@ -1,0 +1,14 @@
+<view class="header-outer">
+    <view>
+        <view class="title">心脏高精度动力学分析系统</view>
+    </view>
+    <view>
+        <view class="sm-title">-25秒检测心脏堵塞率和心肌炎浸润情况</view>
+    </view>
+    <!-- <van-col span="24"><view class="sm-title2">远离高危疾病，全民护心行动</view></van-col> -->
+    <!-- 插槽，以适应不同的header -->
+    <view>
+        <slot></slot>
+    </view>
+    <text title1-position></text>
+</view>

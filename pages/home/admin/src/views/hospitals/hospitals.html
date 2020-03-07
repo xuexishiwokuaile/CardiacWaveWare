@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>心脏高精度电动力学分析系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-kindeditor.js"></script>
+    <!--  加载拦截系统-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--    验证码插件-->
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <!--其他-->
+    <script type="application/javascript" src="/assets/js/kindeditor/kindeditor-all.js"></script>
+    <script charset="utf-8" src="/assets/js/kindeditor/lang/zh-CN.js"></script>
+    <script type="text/javascript">
+      //加载表格
+      let use = layui.use(['table','form','upload', 'jquery','element'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+        var userId = localStorage.getItem('userId');
+        var userToken = localStorage.getItem('userToken');
+        var upload = layui.upload;
+        var $ = layui.$;
+        table.render({
+          elem: '#hospital-table'
+          , url: '/Home/hostpitals/listHostpitals.template'
+          , cols: [
+            [
+              {field: 'id', type: 'checkbox', fixed: 'center'}
+              , {field: 'cNumber', title: '编号',width:70, align: 'center'}
+              , {field: 'province', title: '省', width: 100, align: 'center'}
+              , {field: 'city', title: '城市', width: 100, align: 'center'}
+              , {field: 'name', title: '机构名称', width: 183,align: 'center', templet: '#badge'}
+              , {field: 'address', title: '详细地址',width: 350, align: 'center'}
+              , {field: 'longitude', title: '经度',width: 110, align: 'center'}
+              , {field: 'latitude', title: '纬度', width: 110,align: 'center'}
+              , {field: 'description', title: '描述',width: 270, align: 'center'}
+              , {field: 'remark', title: '备注',width: 140, align: 'center'},
+            ]]
+          , page: true,
+        });
+
+        //搜索
+        $('#search').click(function() {
+          var data = $('#searchUser').val();//搜索的关键字
+          //重载表格
+          layui.use('table', function() {
+            var table = layui.table;
+            table.reload('hospital-table', {
+              url: '/Home/hostpitals/listHostpitals.template',
+              where: { //设定异步数据接口的额外参数，任意设
+                keywords: data,
+              }
+              , page: {
+                curr: 1, //重新从第 1 页开始
+              },
+            });
+          });
+        });
+      });
+    </script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card u-table-outer">
+        <div class="layui-form layui-card-header">
+            <h2>医院列表</h2>
+        </div>
+    </div>
+    <div class="layui-card-body-no-tree card-outer" style="position: relative;padding:10px;">
+        <div class="user-table" style="z-index:999;">
+            <div class="table-header-btn" style="width: 100%;display: flex;align-items: center;padding: 4px 0">
+                <div class="search-outer" style="width: 100%">
+                    <div class="layui-inline" style="width: 70%">
+                        <input class="layui-input" name="id" id="searchUser" autocomplete="off" placeholder="机构名称/地址">
+                    </div>
+                    <button class="layui-btn" id="search" style="width: 200px">查询</button>
+                </div>
+            </div>
+            <table class="layui-hide" id="hospital-table" lay-filter="hospital-table"></table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

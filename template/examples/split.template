@@ -1,0 +1,9 @@
+///关于相应的split分隔字串相应的例子
+<%:str="a&b&c"%>
+<%split(:str,"&", &array)%>
+<%:i=0%>
+<%While :i< arrayLength(&array)%>
+  <%=:array[:i]%><br>
+  <%:i += 1%>
+<%EndWhile%>
+<%#include "examples/test.template"%>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Xenon Boostrap Admin Panel" />
+    <meta name="author" content="" />
+    <title>心脏高精度电动力学分析系统</title>
+    <link rel="stylesheet" href="/assets/css/fonts/linecons/css/linecons.css">
+    <link rel="stylesheet" href="/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-treeview.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/xenon-core.css">
+    <link rel="stylesheet" href="/assets/css/xenon-forms.css">
+    <link rel="stylesheet" href="/assets/css/xenon-components.css">
+    <link rel="stylesheet" href="/assets/css/xenon-skins.css">
+    <link rel="stylesheet" href="/assets/css/systemManage.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/StationJSLib-bak.js"></script>
+    <script type="text/javascript" src="http://static.runoob.com/assets/qrcode/qrcode.min.js"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.js"></script>
+
+
+</head>
+
+<body class="page-body">
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner" id="sidebar-menu-inner">
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <!--相应的顶部导航区相应的内容-->
+        <div id="nav-content-inner">
+        </div>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">病历分析</h1>
+                <p class="description">Medical Record Analysis</p>
+            </div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="main.html"><i class="fa-home"></i>Home</a>
+                    </li>
+                    <li>
+                        <a href="medicalRecordAnalysis.html">Medical Record Analysis</a>
+                    </li>
+                    <li class="active">
+                        <strong>Medical Record Analysis</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"></div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 class="school">
+                        病历分析
+                        <input  style="padding-top: 10px; padding-bottom: 10px; display: none" type="file" id="files" name="files[]" multiple/>
+                    </h4>
+                    <button type="button" class="btn btn-info" id="addMedicalRecordAnalysis" onclick="selectFile()">选择文件并导入病历分析结果</button>
+                    <!--<button type="button" class="btn btn-danger" id="exportAnalysisLists">导出病历分析结果列表</button>-->
+                </div>
+            </div>
+            <div class="panel-body" id="medicalRecordTable">
+                <table class="table table-bordered table-striped" id="table_record_analysis">
+                    <thead>
+                        <th>病人姓名</th>
+                        <th>检测时间</th>
+                        <th>定量峰值</th>
+                        <th>定量峰值结论</th>
+                        <th>定量峰值备注</th>
+                        <th>极性分布4</th>
+                        <th>极性分布5</th>
+                        <th>极性分布6</th>
+                        <th>极性分布结论</th>
+                        <th>极性分布备注</th>
+                    </thead>
+                </table>
+            </div>
+            <script type="text/javascript">
+
+              var opts = {
+                "closeButton": true,
+                "debug": false,
+                "positionClass": "toast-bottom-right",
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+              };
+
+              var date = new Date();
+              var year = date.getFullYear();
+              var month = date.getMonth()+1;
+              var day = date.getDate();
+              var hours = date.getHours();
+              var minutes = date.getMinutes();
+              if (minutes < 10){
+                minutes = "0" + minutes;
+              }
+              var seconds = date.getSeconds();
+              var ctime = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+
+              function handleFileSelect(evt) {
+                var files = evt.target.files; // FileList object
+                for (var i = 0;i < files.length;i++) {
+                  console.log(files.length);
+                  var f = files[i];
+                  uploadData(f,ctime);
+
+                }
+              }
+              document.getElementById('files').addEventListener('change', handleFileSelect, false);
+              function selectFile() {
+                document.getElementById("files").click();
+              }
+
+              function uploadData(f,ctime) {
+                var clientName = f.name;
+                var clientId = f.name;
+                var time = ctime;
+                var totalPeak = "";
+                var quantitativePeak = "";
+                var distributionone = "";
+                var distributiontwo = "";
+                var distributionthree = "";
+                var distributionfour = "";
+                var distributionfive = "";
+                var distributionsix = "";
+                console.log(clientName);
+                console.log(clientId);
+                var reader = new FileReader();
+                reader.onload = (function (f) {
+                  console.log(clientName);
+                  var text = this.result;
+                  text = text.replace(/[ ]/g,"");
+                  text = text.split("\n");
+                  if(text[2048] != "" && text[2048] != undefined){
+                    var finalResult = text[2048];
+                  }else{
+                    toastr.error("病历分析信息存在问题", "添加病历分析失败！", opts);
+                    return;
+                  }
+                  console.log(finalResult);
+                  finalResult = finalResult.split(",");
+                  console.log(finalResult);
+                  time = ctime;
+                  totalPeak = finalResult[0];
+                  quantitativePeak = finalResult[1];
+                  distributionone = finalResult[2];
+                  distributiontwo = finalResult[3];
+                  distributionthree = finalResult[4];
+                  distributionfour = finalResult[5];
+                  distributionfive = finalResult[6];
+                  distributionsix = finalResult[7];
+                  var obj = new Array();
+                  if (clientId == "" || clientName == "" || time == "" || totalPeak == "" || quantitativePeak == "" || distributionone == "" || distributiontwo == ""
+                      || distributionthree == "" || distributionfour == "" || distributionfive == "" || distributionsix == ""|| clientId == undefined || clientName == undefined || time == undefined || totalPeak == undefined || quantitativePeak == undefined || distributionone == undefined || distributiontwo == undefined
+                      || distributionthree == undefined || distributionfour == undefined || distributionfive == undefined || distributionsix == undefined || totalPeak == "-nan" || quantitativePeak == "-nan" || distributionone == "-nan" || distributiontwo == "-nan"
+                      || distributionthree == "-nan" || distributionfour == "-nan" || distributionfive == "-nan" || distributionsix == "-nan") {
+                    toastr.error("病历分析信息填写不完整", "添加病历分析失败！", opts);
+                    return;
+                  }
+                  var processResult = function () {
+                    if(obj[0]!="ok$^@^$UPDATED=")
+                    {
+                      toastr.error("添加病历分析失败！", opts);
+                      return;
+                    }
+                    else
+                    {
+                      toastr.success("添加完成", "添加病历分析成功！", opts);
+                      $('#files').val('');
+                    }
+                  }
+                  var postdata = "clientId=" + clientId +  "$^@^$clientName=" + clientName + "$^@^$time=" + time + "$^@^$totalPeak=" + totalPeak + "$^@^$quantitativePeak=" + quantitativePeak +"$^@^$distributionone=" + distributionone +"$^@^$distributiontwo=" + distributiontwo
+                      +"$^@^$distributionthree=" + distributionthree +"$^@^$distributionfour=" + distributionfour +"$^@^$distributionfive=" + distributionfive +"$^@^$distributionsix=" + distributionsix;
+                  console.log(postdata);
+                  getFromWS("Home/medicalRecordAnalysis/addAnalysis.template", postdata, obj, processResult);
+                });
+                reader.readAsText(f);
+              }
+
+            </script>
+        </div>
+        <footer class="main-footer sticky footer-type-1">
+            <div class="footer-inner">
+                <div class="footer-text">
+                    &copy; 2018
+                    <strong>heart</strong>
+                    </a> 心脏高精度电动力学分析系统 - Collect from <a href="http://sdev.whu.edu.cn/" title="网页模板" target="_blank">武汉大学</a>
+                </div>
+                <div class="go-up">
+                    <a href="#" rel="go-top">
+                        <i class="fa-angle-up"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+</div>
+<link rel="stylesheet" href="/assets/js/uikit/uikit.css">
+<link rel="stylesheet" href="/assets/js/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="/assets/js/multiselect/css/multi-select.css">
+<div class="bottom-script-inner" id="bottom-script-inner">
+</div>
+<script>
+  jQuery(document).ready(function($) {
+    var loadBottomScripts = function () {
+      loadFromWS("Home/bottomscripts.template","sid="+sessionStorage.getItem('loginName')+"$^@^$session="+getAllSessionItems()+"$^@^$path="+window.location.pathname,"bottom-script-inner");
+    };
+    loadFromWS("Home/menu/LeftSideMenu.template", "Item=系统管理$^@^$item=病历分析$^@^$loginName="+sessionStorage.getItem('loginName'), "sidebar-menu-inner");
+    //加载相应的公共页头
+    loadFromWS("Home/menu/topNavContent.template", "userName=" + sessionStorage.getItem('userName'), "nav-content-inner");
+    outParam = {};
+    //对应每列的值
+    columnsDataMap =[
+      {'data': 'clientname'},
+      {'data': 'time'},
+      {'data': 'quantitativepeak'},
+      {'data': 'peakNature',
+        render(data, type, full, meta){
+          return data == "阴性" ? data:`<font color="red">阳性</font>`
+        }
+      },
+      {'data': 'peakNatureExplain'},
+      {'data': 'distributionfour'},
+      {'data': 'distributionfive'},
+      {'data': 'distributionsix'},
+      {'data': 'distributionNature',render(data, type, full, meta){
+        return data == "阴性" ? data:`<font color="red">阳性</font>`
+      }},
+      {'data': 'distributionNatureExplain'}
+    ];
+
+    $("#table_record_analysis").zlDataTables("/Home/medicalRecordAnalysis/showAnalysisLists.template",outParam, columnsDataMap);
+  });
+
+  $('#exportAnalysisLists').on('click', function () {
+      window.location.href="/Home/medicalRecordAnalysis/getAnalysisListsExcel.template";
+  });
+
+</script>
+<!-- Bottom Scripts -->
+<script type="text/javascript" src="/Scripts/common/jquery.dataTables.whu.plugin.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/TweenMax.min.js"></script>
+<script src="/assets/js/resizeable.js"></script>
+<script src="/assets/js/joinable.js"></script>
+<script src="/assets/js/xenon-api.js"></script>
+<script src="/assets/js/xenon-toggles.js"></script>
+<script src="/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="/assets/js/toastr/toastr.min.js"></script>
+<script src="/assets/js/uikit/js/uikit.min.js"></script>
+<script src="/assets/js/bootstrap-treeview.min.js"></script>
+<script src="/assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/assets/js/selectboxit/jquery.selectBoxIt.min.js"></script>
+<script src="/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/assets/js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="/assets/js/mloading/jquery.mloading.css">
+<script src="/assets/js/select2/select2.min.js"></script>
+<script src="/assets/js/mloading/jquery.mloading.js"></script>
+</body>
+</html>

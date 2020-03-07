@@ -1,0 +1,28 @@
+<%
+:sql_select = "select login_name,passwd,name,id,classification from st_passports where login_name = ? and passwd = ?"
+	:result_select = changeRecordSet(:sql_select, S(:login_name),S(:passwd))
+	:login_name = login_name
+	:passwd = passwd
+	:name = name
+	:id = id
+	:classification = classification
+
+	:sql_selectDoctor = "SELECT hospital,department,position FROM doctor WHERE id=?"
+	:result_selectDoctor = changeRecordSet(:sql_selectDoctor,S(:id))
+	:hospital = hospital
+	:department = department
+	:position = position
+
+:result_callback = ""
+///判断说明：
+	If :result_select == "ok" && recordCount() > 0
+    :result_callback =jsonAddItem("","hospital",S(:hospital))
+    :result_callback =jsonAddItem(:result_callback,"department",S(:department))
+    :result_callback =jsonAddItem(:result_callback,"position",S(:position))
+	EndIf
+  :result_callback = jsonAddItem(:result_callback,"name",S(:name))
+  :result_callback = jsonAddItem(:result_callback,"status",S(:result_select))
+  :result_callback = jsonAddItem(:result_callback,"classification",S(:classification))
+  :result_callback = jsonAddItem(:result_callback,"id",S(:id))
+  =:result_callback
+%>

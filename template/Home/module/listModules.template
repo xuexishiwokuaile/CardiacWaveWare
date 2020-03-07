@@ -1,0 +1,74 @@
+<%#include "common/checkLoginFilterNew.template"%>
+<%
+    debugMsg("[DEBUGMSG]:getArticleList.template 位置:13:"+"page="+:page+"=limit="+:limit+"==keywords=="+:keywords+"=columnsId="+:columnsId)
+    ///是否传入了搜索的关键字
+    ///关键词在搜索框输入内容时传入，在表格重载时也会传入
+    If :keywords =="__error__"
+       :keywords = ""
+    EndIf
+    ///是否传入了模块栏目的ID
+    ///If :columnsId != "__error__" && :columnsId != 0
+        ///获取类型的数量
+       /// :sql_articleNum = "select ID from MODULE_ROLE where (ROLE like ?) and (MODULE_ID like ?)"
+        ///:resultRecord = changeRecordSet(:sql_articleNum,S("%"+:keywords+"%"),S("%,"+:columnsId+"%"))
+        ///:recordNum = recordCount()
+
+        ///获取全部信息
+        ///:sql_article = "select ID,ROLE from MODULE_ROLE where (ROLE like ?) and (MODULE_ID like ?) ORDER BY SORT ASC LIMIT ? OFFSET ?"
+       /// :resultRecord = changeRecordSet(:sql_article,S("%"+:keywords+"%"),S("%,"+:columnsId+"%"),S(:limit),S((:page-1)*:limit))
+
+    ///Else
+
+    ///获取类型的数量
+    :sql_articleNum = "select ID from MODULE_ROLE where (ROLE like ?)"
+    :resultRecord = changeRecordSet(:sql_articleNum,S("%"+:keywords+"%"))
+    :recordNum = recordCount()
+
+    ///获取全部信息
+    :sql_article = "select ID,ROLE from MODULE_ROLE where (ROLE like ?) ORDER BY SORT ASC LIMIT ? OFFSET ?"
+    :resultRecord = changeRecordSet(:sql_article,S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+    ///EndIf
+
+    ///保存信息
+    :i=0
+    Repeat
+        :ArrayAllId[:i]=ID
+        :ArrayAllRole[:i]=ROLE
+        :ArrayAllDisplay[:i] = DISPLAY
+        :i=:i+1
+    EndRepeat
+    :index = 0
+    :record_items_array = ""
+    :sql_display = "SELECT ID FROM MODULE_ROLE WHERE MODULE_ID LIKE ? AND ROLE = ?"
+    While :index < :i
+        ///获取显示选项
+        :result_display = changeRecordSet(:sql_display,S("%"+:columnsId+"%"),S(:ArrayAllRole[:index]))
+        If :result_display == "ok"
+            :display = "true"
+        Else
+            :display = "false"
+        EndIf
+        ///将获取到的数据封装成json
+        :record_items = jsonAddItem("", "role", S(:ArrayAllRole[:index]))
+        :record_items = jsonAddItem(:record_items,"LAY_CHECKED",:display)
+        :record_items_array = jsonAddArrayItem(:record_items_array, :record_items)
+        :index += 1
+    EndWhile
+    If :resultRecord == "ok"
+       ///ok
+       ///成功 返回状态码0
+       :code = 0
+       :result_records_items = jsonAddItem("","code",:code)
+       :result_records_items = jsonAddItem(:result_records_items,"data",:record_items_array)
+       :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+
+    Else
+        ///bad
+        /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+        :code = 0
+        :result_records_array="[]"
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    EndIf
+    =:result_records_items
+%>

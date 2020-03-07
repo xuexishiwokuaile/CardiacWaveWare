@@ -1,0 +1,27 @@
+.sidebar-menu{
+    width: 180px;
+}
+
+.sidebar-menu.fixed .sidebar-menu-inner{
+    width: 210px;
+}
+
+.page-container .main-content{
+    padding: 8px;
+}
+
+.page-container .main-content .page-title{
+    margin: -8px;
+}
+
+.user-info-navbar{
+    margin: -8px;
+}
+
+footer.main-footer{
+    margin: -8px;
+}
+
+.panel{
+    padding : 10px 15px;
+}

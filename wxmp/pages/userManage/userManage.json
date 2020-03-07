@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "wux-search-bar": "/components/dist/search-bar/index"
+  }
+}

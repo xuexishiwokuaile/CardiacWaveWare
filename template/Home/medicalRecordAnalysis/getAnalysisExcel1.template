@@ -1,0 +1,72 @@
+<%#include "common/commonFilter.template"%>
+<%
+  ///1. 根据相应的报表ID获取相应的报表类型
+  :content = "{0,0,\"病历分析编号\"}"
+  :content = :content# ",{0,1,\"病人编号\"}"
+  :content = :content# ",{0,2,\"病人姓名\"}"
+  :content = :content# ",{0,3,\"极性分布4\"}"
+  :content = :content# ",{0,4,\"极性分布5\"}"
+  :content = :content# ",{0,5,\"极性分布6\"}"
+  :content = :content# ",{0,6,\"极性分布结论\"}"
+  :content = :content# ",{0,7,\"极性分布分析备注\"}"
+  :content = :content# ",{0,8,\"定量峰值\"}"
+  :content = :content# ",{0,9,\"定量峰值结论\"}"
+  :content = :content# ",{0,10,\"定量峰值分析备注\"}"
+
+  :sql_lists = "SELECT * FROM MEDICAL_RECORD_ANALYSIS WHERE CAST(QUANTITATIVEPEAK AS DOUBLE)>'60000' OR CAST(DISTRIBUTIONFOUR AS DOUBLE)>'0.17' OR CAST(DISTRIBUTIONFIVE AS DOUBLE)>'0.15' OR CAST(DISTRIBUTIONSIX AS DOUBLE)>'0.09' AND 1=? LIMIT 10 OFFSET 10"
+  :result_lists = changeRecordSet(:sql_lists,S(1))
+  :recordNum = recordCount()
+
+  :m = 1
+    Repeat
+      ///循环主体
+      :quantitativepeak = quantitativepeak
+      :content = :content# ",{"#:m#",0,\""#id#"\"}"
+      :content = :content# ",{"#:m#",1,\""#clientId#"\"}"
+      :content = :content# ",{"#:m#",2,\""#clientName#"\"}"
+      :content = :content# ",{"#:m#",3,\""#distributionfour#"\"}"
+      :content = :content# ",{"#:m#",4,\""#distributionfive#"\"}"
+      :content = :content# ",{"#:m#",5,\""#distributionsix#"\"}"
+      :content = :content# ",{"#:m#",8,\""#:quantitativepeak#"\"}"
+      ///极性分布判断：
+      If distributionfour>0.17 || distributionfive>0.15 || distributionsix>0.09
+          ///阳性
+          :content = :content# ",{"#:m#",6,\"阳性\"}"
+          :content = :content# ",{"#:m#",7,\"心肌炎，心肌病 ，心肌组织可出现炎症细 胞浸润 ，心肌细胞变性，坏死，纤维组织增生，进行性肌营养不良等 。\"}"
+      Else
+          ///阴性
+          :content = :content# ",{"#:m#",6,\"阴性\"}"
+          :content = :content# ",{"#:m#",7,\"极性分布暂无问题。\"}"
+      EndIf
+
+      ///定量峰值分布判断：
+      If :quantitativepeak > 60000
+          ///阳性
+          :content = :content# ",{"#:m#",9,\"阳性\"}"
+          ///具体分类
+          If :quantitativepeak >= 60000 && :quantitativepeak < 100000
+              ///60000 ~ 150000
+              :content = :content# ",{"#:m#",10,\"心肌疲劳预警\"}"
+          Else
+              If :quantitativepeak >= 100000 && :quantitativepeak < 150000
+                  ///100000 ~ 150000
+                  :content = :content# ",{"#:m#",10,\"输出冠脉粥样硬化风险\"}"
+              Else
+                  ///150000 以上
+                  :content = :content# ",{"#:m#",10,\"冠脉粥样硬化，冠脉血流状态50%以下改变高度风险\"}"
+              EndIf
+            EndIf
+      Else
+          ///阴性
+          :content = :content# ",{"#:m#",9,\"阴性\"}"
+          :content = :content# ",{"#:m#",10,\"定量峰值暂无问题。\"}"
+      EndIf
+       :m = :m + 1
+       debugMsg("=========="#:m)
+    EndRepeat
+
+  :title = "病历分析阳性人员列表及简要分析"
+
+  :filename = :title#".xls"
+  generateAndDownloadExcelFile(:filename,:content)
+%>

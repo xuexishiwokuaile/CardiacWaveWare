@@ -1,0 +1,30 @@
+<%
+    /// 文 件 名：wxAuthorizeReturn.template
+    /// 描    述：授权返回对应的结果(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/30 0030 0:07  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+ debugMsg("[DEBUGMSG]:wxAuthorizeReturn.template 位置:13:"+"换取回来的code:"+:code)
+ :_USER_WEIXIN_GZ_APP_appID="wxea78f2e6198b2d73"
+ :_USER_WEIXIN_GZ_APP_appsecret="301fc60a56470e43e7ffe5a98e0df998"
+ :txt = executeRemoteService("api.weixin.qq.com","sns/oauth2/access_token?appid="+:_USER_WEIXIN_GZ_APP_appID+"&secret="+:_USER_WEIXIN_GZ_APP_appsecret+"&code="+:code+"&grant_type=authorization_code","",443,"https")
+ debugMsg("[DEBUGMSG]:wxAuthorizeReturn.template 位置:17:"+"https://api.weixin.qq.com/sns/oauth2/access_token?appid="+:_USER_WEIXIN_GZ_APP_appID+"&secret="+:_USER_WEIXIN_GZ_APP_appsecret+"&code="+:code+"&grant_type=authorization_code")
+/// =:txt
+  :openId = JSON_GetObjectItem(:txt, "openid")
+  ///判断说明：
+  If :openId == ""
+      ///判断主体
+      ="未发现相应的openId"
+  Else
+      ///分支主体
+      =:openId
+  EndIf
+
+
+%>

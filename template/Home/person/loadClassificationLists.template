@@ -1,0 +1,20 @@
+<%
+	:sql = "select id, classification,types from cardiac_classification where type=? ORDER BY cast(id as integer)"
+	:x = changeRecordSet(:sql, S("administrator"))
+%>
+<label for="field-4" class="control-label">级别</label>
+	<select class="form-control" id="addclassification">
+	<option></option>
+	<optgroup label="管理员">
+	    <%Repeat%>
+	       <option value= "<%=id%>"><%=classification%></option>
+	    <%EndRepeat%>
+	</optgroup>
+	<optgroup label="用户">
+		<%:x = changeRecordSet(:sql, S("user"))%>
+		<%Repeat%>
+	       <option value= "<%=id%>"><%=classification%></option>
+	    <%EndRepeat%>
+	</optgroup>
+	</select>
+

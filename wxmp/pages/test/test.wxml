@@ -1,0 +1,10 @@
+<view class="outer">
+    <view class="container">
+        <ff-canvas id="column-dom" canvas-id="column" opts="{{ opts }}"></ff-canvas>
+    </view>
+    <!-- <view class="btns">
+        <view>按钮1</view>
+        <view>按钮2</view>
+        <view>按钮3</view>
+    </view> -->
+</view>

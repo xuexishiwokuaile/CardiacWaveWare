@@ -1,0 +1,70 @@
+<%
+  #include "common/commonFilter.template"
+  #include "apply_report/monthSelectCss.template"
+%>
+<%
+  :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult FROM medical_record WHERE clientId=?"
+  :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:clientId))
+
+debugMsg(":clientId=============="#S(:clientId)
+
+%>
+
+<table class="table table-bordered table-striped" id="example-2" >
+	<thead>
+		<tr>
+			<th class="no-sorting">
+				<input type="checkbox" class="cbr">
+			</th>
+			<th>检查时间</th>
+			<th>所在医院</th>
+			<th>主治医生</th>
+			<th>检查结果</th>
+			<th>快捷操作</th>
+		</tr>
+	</thead>
+
+	<tbody class="middle-align">
+    <%Repeat%>
+    <%:s_bid = bid%>
+    <tr id = "<%=id%>">
+      <td>
+        <input type="checkbox" class="cbr" value="<%=:s_bid%>" name="isSubmit">
+      </td>
+      <td>
+        <%=checkTime%>
+      </td>
+      <td>
+        <%=hospital%>
+      </td>
+      <td>
+        <%=doctorName%>
+      </td>
+      <td>
+        <%=checkResult%>
+      </td>
+      <%:s_title = title%>
+      <td>
+        <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left" onclick="editMedicalRecord('<%=id%>')">查看</a>
+        <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left" onclick="updateMedicalRecord('<%=id%>')">修改</a>
+        <a class="btn btn-danger btn-sm btn-icon icon-left" onclick="delMedicalRecord('<%=id%>')">删除</a>
+      </td>
+    </tr>
+    <%EndRepeat%>
+	</tbody>
+</table>
+
+<style>
+    .dataTables_filter{
+        float:right
+    }
+    .dataTables_paginate{
+        float:right
+    }
+</style>
+
+<script>
+	$("#example-2").dataTable({
+		order: []
+	});
+</script>

@@ -1,0 +1,108 @@
+<%
+      :sql_qrcodes="SELECT * FROM QRCODE WHERE 1=?"
+      :resultRecord = changeRecordSet(:sql_qrcodes,S(1))
+%>
+
+    <%Repeat%>
+      ///循环主体
+      <div class="row">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label id="labelwidth<%=id%>" class="control-label">宽度</label>
+                            <input type="text" id="width<%=id%>" value="<%=width%>" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label id="labelheight<%=id%>" class="control-label">高度</label>
+                            <input type="text" id="height<%=id%>" value="<%=height%>" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="labeltext<%=id%>" class="control-label">网址</label>
+                            <input type="text" id="text<%=id%>" value="<%=text%>" class="form-control"></input>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                     <div class="col-md-12">
+                        <div class="form-group">
+                           <label id="labelwidth<%=id%>" class="control-label">标题</label>
+                           <input type="text" id="width<%=id%>" value="<%=mark%>" class="form-control"></input>
+                        </div>
+                      </div>
+                 </div>
+                <div class="row">
+                   <div class="col-md-3">
+                       <div class="form-group">
+                           <button type="button" class="btn btn-info from-control"  id="editItem<%=id%>">重新生成二维码</button>
+                       </div>
+                   </div>
+                   <div class="col-md-1">
+                   </div>
+                   <div class="col-md-3">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-danger from-control"  id="removeItem<%=id%>">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6" id="code<%=id%>">
+            </div>
+            <script>
+                var width = <%=width%>;
+                var height = <%=height%>;
+                var text = <%=S(text)%>;
+                console.log(width+" "+height+" "+text);
+                console.log(<%=id%>);
+                var qrcode = new QRCode(document.getElementById("code<%=id%>"), {
+                    width : width,
+                    height : height
+                });
+                qrcode.makeCode(text);
+
+                $('#editItem<%=id%>').on('click', function () {
+                 var id = <%=id%>;
+                 var height = $("#height<%=id%>").val();
+                 var width = $("#width<%=id%>").val();
+                 var text = $("#text<%=id%>").val();
+                 var obj_edit = new Array();
+                 var processResult_edit = function () {
+                   if(obj_edit[0]!="ok"){
+                      toastr.error("修改二维码失败！", opts);
+                      return;
+                   }else{
+                       toastr.success("修改完成", "修改成功！", opts);
+                       setTimeout(function()
+                       {
+                         loadFromWS("Home/QRcode/loadQRCodes.template","", "loadQRCodes");
+                       }, 0);
+                   }
+                 }
+                  var postdata = "id=" + id + "$^@^$width=" + width + "$^@^$height=" + height + "$^@^$text=" + text;
+                  getFromWS("Home/QRcode/editCode.template", postdata, obj_edit, processResult_edit);
+               });
+
+               $('#removeItem<%=id%>').on('click', function () {
+                 console.log(1);
+                 var id = <%=id%>;
+                 var obj_del = new Array();
+                 var processResult_del = function () {
+                   toastr.success("删除完成", "删除成功！", opts);
+                   setTimeout(function()
+                   {
+                     loadFromWS("Home/QRcode/loadQRCodes.template","", "loadQRCodes");
+                   }, 0);
+                 }
+                  var postdata = "id=" + id;
+                  console.log(7777);
+                  getFromWS("Home/QRcode/delCode.template", postdata, obj_del, processResult_del);
+               });
+            </script>
+      </div>
+      <br></br>
+    <%EndRepeat%>
+

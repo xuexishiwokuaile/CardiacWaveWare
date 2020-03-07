@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="心脏高精度动力学分析系统"/>
+    <meta name="author" content=""/>
+    <script>
+      //防止非超级管理员用户直接输入网址访问该网页
+      //防止未登录直接输入网址访问该网页
+      var userId = localStorage.getItem('userId');
+      var userToken = localStorage.getItem('userToken');
+      var classification = localStorage.getItem('classification');
+      var loginName = localStorage.getItem('loginName');
+      if(!userId || !userToken || !classification || !loginName ){
+
+        location.href="login.html";
+      }
+      else{
+        if (loginName != "admin"){
+          location.href="userInfo.html";
+        }
+      }
+
+    </script>
+    <title>天门地名服务后台管理</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic"/>
+    <link rel="stylesheet" href="assets/css/fonts/linecons/css/linecons.css"/>
+    <link rel="stylesheet" href="assets/css/fonts/fontawesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="assets/css/xenon-core.css"/>
+    <link rel="stylesheet" href="assets/css/xenon-forms.css"/>
+    <link rel="stylesheet" href="assets/css/xenon-components.css"/>
+    <link rel="stylesheet" href="assets/css/xenon-skins.css"/>
+    <link rel="stylesheet" href="assets/css/foundsDeclareList.css"/>
+
+    <link rel="stylesheet" href="/scripts/htmleditor/themes/default/default.css" />
+
+
+    <script src="assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/scripts/uploadfile.js"></script>
+    <script type="text/javascript" src="/scripts/htmleditor/kindeditor.js"></script>
+    <script type="text/javascript" src="/scripts/htmleditor/lang/zh_CN.js"></script>
+</head>
+
+<body class="page-body">
+<style>
+    .editorgan{
+        margin-right:10px;
+        float: right;
+    }
+</style>
+<script type="text/javascript">
+  function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+      return unescape(r[2]);
+    }
+    return null;
+  }
+
+  //保持(被选中的)侧边栏高亮
+  function keepActive(){
+    $("#a_columnManagement").parent().addClass('active');
+  }
+  jQuery(document).ready(function ($) {
+
+    var html = new Array();
+    var htmlResult = function(){
+      $("#main-menu").append(html[0]);
+      keepActive();
+    }
+    getFromWS("maintain/getNav.template","loginName="+loginName, html, htmlResult);
+
+    $(".user-info-menu #loginName").html(loginName);
+
+    var obj_tree = new Array();
+    var processResult_tree = function () {
+      if(obj_tree[0].length>0){
+        var jd = obj_tree[0].replace(/\'/g, '\"');
+        var jsonData = jd.replace(/&/g, '\'');
+        //alert(jsonData);
+        jsonData = jsonData.substr(0, jsonData.length - 1);//去掉最后一个逗号
+        var str = '[' + jsonData + ']';
+        var zNodes = JSON.parse(str);//[{},{},....,{}]
+
+        //alert(str);
+        var newTree = new Array();
+
+        var firstTree = new Array();
+        //var secondTree = new Array();
+        for (var i = 0; i < zNodes.length; i++) {
+          var json = {};
+          json['text'] = zNodes[i].text;
+          json['id'] = zNodes[i].id;
+          json['nodes'] = new Array;
+          newTree.push(json);
+          //alert(json['text'] +  json['id']+ json['nodes']);
+        }	//将所有的{}放入newTree中
+
+        for(var i = 0; i < zNodes.length; i++){
+          if (zNodes[i].pId == 0) {//如果是一级的栏目 -----
+            //alert("一级栏目："+zNodes[i].id);
+            firstTree.push(newTree[i]);
+          }
+        }
+        for(var j=0;j<firstTree.length;j++){
+          for(var i = 0; i < zNodes.length; i++){
+            if (zNodes[i].pId == firstTree[j].id) {//如果是二级的栏目 -----
+              firstTree[j].nodes.push(newTree[i]);
+            }
+          }
+        }
+        for(var k=0;k<firstTree.length;k++){
+          for(var j=0;j<firstTree[k].nodes.length;j++){//如果是三级的栏目 -----
+            for(var i = 0; i < zNodes.length; i++){
+              if (zNodes[i].pId == firstTree[k].nodes[j].id) {
+                firstTree[k].nodes[j].nodes.push(newTree[i]);
+              }
+            }
+          }
+        }
+
+        var allcolumnData = JSON.stringify(firstTree);
+        var alength=0;alength=allcolumnData.length;
+        //alert(" allcolumnData Length: "+alength);
+        $('#treeview-selectable').treeview({
+          data: allcolumnData,
+          backColor: '#fff',
+          borderColor: '#eeeeee',
+          nodeIcon: 'glyphicon glyphicon-indent-left',
+          selectedBackColor: '#efebeb',
+          selectedColor: '#8f1fdc',
+          showIcon: true,
+          showTags: false,
+          levels: 3,
+        });
+        //$('#treeview-selectable').treeview('expandAll', { levels: 1, silent: true });
+        $('#treeview-selectable').treeview('expandAll',{levels:4,silent:true});
+
+
+      }
+    }
+    getFromWS("maintain/getColumns.template", "operation=getAllColumns", obj_tree, processResult_tree);
+
+    //将一级栏目数量传到此页面（陈）
+    var obj_count = new Array();
+    var processResult_count = function () {
+      $('#firstColumCount').val(obj_count[0]);
+    }
+    getFromWS("maintain/getColumns.template", "operation=getFirstColumCount", obj_count, processResult_count);
+  });
+
+</script>
+
+<div class="page-container">
+    <div class="sidebar-menu toggle-others fixed">
+        <div class="sidebar-menu-inner">
+            <header class="logo-env">
+                <div class="logo">
+                    <a href="articleManagement.html" class="logo-expanded">
+                        <img src="assets/images/logo@2x.png" width="100" alt=""/></a>
+                    <a href="articleManagement.html" class="logo-collapsed">
+                        <img src="assets/images/logo-collapsed@2x.png" width="40" alt=""/></a>
+                </div>
+                <div class="mobile-menu-toggle visible-xs">
+                    <a href="#" data-toggle="user-info-menu">
+                        <i class="fa-bell-o"></i>
+                        <span class="badge badge-success">7</span></a>
+                    <a href="#" data-toggle="mobile-menu">
+                        <i class="fa-bars"></i>
+                    </a>
+                </div>
+            </header>
+            <ul id="main-menu" class="main-menu">
+
+            </ul>
+        </div>
+    </div>
+    <div class="main-content">
+        <!-- User Info, Notifications and Menu Bar -->
+        <nav class="navbar user-info-navbar" role="navigation">
+            <ul class="user-info-menu left-links list-inline list-unstyled">
+                <li class="hidden-sm hidden-xs">
+                    <a href="#" data-toggle="sidebar">
+                        <i class="fa-bars"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="user-info-menu right-links list-inline list-unstyled">
+                <li class="dropdown user-profile">
+                    <a href="#" data-toggle="dropdown">
+                        <img src="assets/images/user-4.png" alt="user-image" class="img-circle img-inline userpic-32"
+                             width="28"/>
+                        <span id="loginName"></span></a>
+                </li>
+                <li>
+                    <a href="#" onclick="logout()">
+                        <i class="fa-power-off" style="color:red;font-size:18px;"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="page-title">
+            <div class="title-env">
+                <h1 class="title">栏目管理</h1>
+                <p class="description">management of column</p></div>
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="articleManagement.html">
+                            <i class="fa-home"></i>Home</a>
+                    </li>
+                    <li class="active">
+                        <strong>management of column</strong></li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="panel-heading">
+                    <!--
+                                        <a href="javascript:void(0);" class="btn btn-secondary btn-icon btn-icon-standalone"
+                                           style="margin-left:0">
+                                            <i class="fa-plus" style="font-size:17px"></i>
+                                            <span onclick="setArticle(0)">新增栏目</span>
+                                        </a>-->
+
+                    <!--修改了 新增一级栏目的事件-->
+                    <input type="hidden" value="" id="firstColumCount" />
+                    <a href="javascript:;" onclick="addmodal0();" class="btn btn-secondary btn-icon btn-icon-standalone" style="margin-left:0;margin-bottom:20px">
+                        <i class="fa-plus" style="font-size:17px"></i>
+                        <span>新增栏目</span>
+                    </a>
+
+                    <div id="treeview-selectable" class=""></div>
+
+
+                </div>
+            </div>
+            <footer class="main-footer sticky footer-type-1">
+                <div class="footer-inner">
+                    <div class="footer-text">&copy; 2017
+                        <strong>地名服务</strong>
+                        <a href="#" target="_blank">天门市地名管理系统</a>- Collect from
+                        <a href="#" title="天门市民政局" target="_blank">天门市民政局</a></div>
+                    <div class="go-up">
+                        <a href="#" rel="go-top">
+                            <i class="fa-angle-up"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+  //新增一级栏目的事件（陈）
+  function addmodal0(){
+    var firstColumCount=$('#firstColumCount').val();
+    addmodal('0',firstColumCount);
+  }
+
+  //添加子节点（陈）
+  function addmodal(nid,count) {//以nid为父亲结点，创建子结点
+    $('#addmodal').modal('show');//count为nid的子栏目数量
+    var newcount = (parseInt(count))*10;//设置sort的默认值为10，20，30.....
+    $("#columnSort").val(newcount);
+
+    $('#addsave').on('click', function () {
+      var columnName = $("#columnName").val().replace(/\s/g,"");
+      var columnSort = $("#columnSort").val();
+      var flag = true;
+      if (columnName == undefined || ""==columnName) {
+        alert("输入不能为空！");
+        flag = false;
+      }
+      if (/(^-[0-9]*[1-9][0-9]*$)/.test(columnSort)) {
+        alert("栏目排序必须为非负整数");
+        flag = false;
+      }
+      if (flag == false) return;
+      var obj_add = new Array();
+      var processResult_add = function () {
+        alert("执行结果："+obj_add[0]);
+        location.reload(true);
+      }
+      getFromWS("maintain/saveColumn.template", "operation=newColumn$^@^$name=" + columnName + "$^@^$parent_id=" + nid + "$^@^$sort=" + columnSort , obj_add, processResult_add);
+      $('#addmodal').modal('hide');
+    })
+  }
+  //删除子结点
+  function deleteModalshow(nid) {
+    $('#deleteModal').modal('show');
+
+    $('#removeItem').on('click', function () {
+      var obj_delete = new Array();
+      var processResult_delete = function () {
+        alert("执行结果："+obj_delete[0]);
+        location.reload(true);
+      }
+      getFromWS("maintain/saveColumn.template", "operation=deleteColumn$^@^$id=" + nid, obj_delete, processResult_delete);
+
+      $('#deleteModal').modal('hide');
+
+    })
+  }
+  //修改子结点栏目名称和排序（陈）
+  function digmodal(nid,name,nsort) {
+    $('#newName').val(name);
+    $('#newSort').val(nsort);
+    $('#editmodal').modal('show');
+
+    $('#editsave').on('click', function () {
+      //alert(nid);
+      var flag = true;
+      var newName = $("#newName").val().replace(/\s/g,"");
+      var newSort = $("#newSort").val();
+      if(name == newName && nsort ==newSort)
+      {
+        alert("请先修改数据，再提交");
+        flag = false;
+      }
+      if (/(^-[0-9]*[1-9][0-9]*$)/.test(newSort)) {
+        alert("栏目排序必须为非负整数");
+        flag = false;
+      }
+      if (newName == undefined) {
+        alert("输入不能为空！");
+        flag = false;
+      }
+      if (flag == false) return;
+
+      //仅修改栏目排序
+      if(name == newName){
+        //alert("仅修改栏目排序");
+        var obj_update = new Array();
+        var processResult_update = function () {
+          alert("执行结果："+obj_update[0]);
+          location.reload(true);
+        }
+        getFromWS("maintain/saveColumn.template","operation=editColumnOnlySort$^@^$id=" + nid + "$^@^$sort=" + newSort, obj_update, processResult_update);
+      }
+      //修改栏目名称和排序
+      else if(name != newName){
+        //alert("修改栏目名称和排序");
+        var obj_update = new Array();
+        var processResult_update = function () {
+          alert("执行结果："+obj_update[0]);
+          location.reload(true);
+        }
+        getFromWS("maintain/saveColumn.template", "operation=editColumn$^@^$id=" + nid + "$^@^$name=" + newName+ "$^@^$sort=" + newSort, obj_update, processResult_update);
+      }
+      $('#editmodal').modal('hide');
+
+    })
+  }
+
+</script>
+
+<div class="modal fade" id="addmodal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">添加栏目</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">栏目名称</label>
+                            <input type="text" class="form-control" id="columnName" name='columnName'>
+                            <!--新增排序字段（陈）-->
+                            <label for="field-5" class="control-label">栏目排序</label>
+                            <input type="text" class="form-control" id="columnSort" value="0" name='columnName'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="addsave">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editmodal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">修改栏目名称</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="field-5" class="control-label">栏目名称</label>
+                            <input type="text" class="form-control" id="newName" name='departmentname'>
+                            <!--新增排序字段（陈）-->
+                            <label for="field-5" class="control-label">栏目排序</label>
+                            <input type="text" class="form-control" id="newSort" name='departmentname'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="editsave">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header noborder">
+
+                <h4 class="modal-title">确定删除？</h4>
+            </div>
+            <div class="modal-footer noborder">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" style="margin-left:40px" id="removeItem">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Imported styles on this page -->
+
+<link rel="stylesheet" href="assets/js/datatables/dataTables.bootstrap.css"/>
+<link rel="stylesheet" href="assets/css/bootstrap-treeview.css">
+<script src="assets/js/bootstrap-treeview.min.js"></script>
+
+<!-- Bottom Scripts -->
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/TweenMax.min.js"></script>
+<script src="assets/js/resizeable.js"></script>
+<script src="assets/js/joinable.js"></script>
+<script src="assets/js/xenon-api.js"></script>
+<script src="assets/js/xenon-toggles.js"></script>
+<script src="assets/js/datatables/js/jquery.dataTables.min.js"></script>
+<!-- Imported scripts on this page -->
+<script src="assets/js/datatables/dataTables.bootstrap.js"></script>
+<script src="assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+<script src="assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+
+<script src="assets/js/toastr/toastr.min.js"></script>
+<!-- JavaScripts initializations and stuff -->
+<script src="assets/js/xenon-custom.js"></script>
+</body>
+
+</html>

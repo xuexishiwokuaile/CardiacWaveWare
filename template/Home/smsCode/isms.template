@@ -1,0 +1,188 @@
+    /// 文 件 名：sms
+    /// 描    述：sms测试(用一句话描述该文件做什么)  
+    /// 项目名称：20190309      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/3/10 10:12  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    /// =executeRemoteService("v.juhe.cn","sms/send?mobile=17371292909&tpl_id=138317&tpl_value=%23code%23%3D43512&key=bef38c6a45c757540da85b48cbf8e90a","",80)
+
+<%
+///生成验证码，写入数据库，删除所有手机号的失效验证码
+If :operation == "sendVerifyCode"
+    :code = randomString(10,4)
+    :startDate = serverDate("yyyy-MM-dd hh:mm:ss")  ///2019-03-11 20:09:06
+    :host="v.juhe.cn"
+    :port=80
+    :path="sms/send?mobile="+:tel+"&tpl_id=138317&tpl_value=%23code%23%3D"+:code+"&key=bef38c6a45c757540da85b48cbf8e90a"
+    ///将手机号、随机数、时间写入数据库
+    :id=tuid()
+    :sql = "insert into smscode(id,phone,code,senddate) values(?,?,?,?)"
+    :x = changeRecordSet(:sql, S(:id),S(:tel),S(:code),S(:startDate))
+    ///如果写入数据库了，先删除所有手机号的失效验证码，再发送短信
+    If :x == "ok"
+       :sql="SELECT id,code,senddate FROM smscode"
+       :x = changeRecordSet(:sql)
+       :i=0
+       Repeat
+         :ArrayAllId[:i]=id
+         :ArrayAllCode[:i]=code
+         :ArrayAllSendDate[:i]=senddate
+         :i=:i+1
+       EndRepeat
+       ///获取 年
+       :NowYear = serverDate("yyyy")
+       ///获取 月
+       :NowMonth = serverDate("MM")
+       ///获取 日
+       :NowDay = serverDate("dd")
+       ///获取 时
+       :NowHour = serverDate("hh")
+       ///获取 分
+       :NowMinute = serverDate("mm")
+       ///循环判断每一个失效的验证码
+       :i = :i -1
+       While :i >= 0
+          ///获取 年
+          :year = mid(:ArrayAllSendDate[:i],0,4)
+          ///获取 月和日
+          :monthAndDay = mid(:ArrayAllSendDate[:i],5,5)
+          ///获取 月
+          :month = mid(:monthAndDay,0,2)
+          ///获取 日
+          :day = mid(:monthAndDay,3,5)
+          ///获取 时分秒
+          :hourAndMinute = mid(:ArrayAllSendDate[:i],11,12)
+          ///获取 时
+          :hour = mid(:hourAndMinute,0,2)
+          ///获取 分和秒
+          :minuteAndSecond = mid(:hourAndMinute,3,5)
+          ///获取 分
+          :minute = mid(:minuteAndSecond,0,2)
+           :isInvalidCode = 'false'
+           ///若年月日不对，已失效
+           If :year!=:NowYear || :month!=:NowMonth || :day!=:NowDay
+               :isInvalidCode = 'true'
+           EndIf
+           ///时 相等，比较分钟，大于15分钟，已失效
+           If :NowHour == :hour
+               If :NowMinute - :minute > 15
+                   :isInvalidCode = 'true'
+               EndIf
+           EndIf
+           ///时 相差1 ，判断是否跨 点
+           If :NowHour != :hour
+              If :NowHour - :hour == 1
+                  If :minute - :NowMinute < 15
+                     :isInvalidCode = 'true'
+                  EndIf
+              EndIf
+              :isInvalidCode = 'true'
+           EndIf
+           ///如果验证码失效，则从数据库中删除此条记录
+           If :isInvalidCode == 'true'
+                :sql = "DELETE FROM smscode WHERE CODE = ?"
+                changeRecordSet(:sql, S(:ArrayAllCode[:i]))
+           EndIf
+           :i = :i - 1
+       EndWhile
+       ///发送验证码
+       executeRemoteService(:host,:path,"",:port)
+    EndIf
+EndIf
+%>
+
+
+<%
+///验证  手机号和验证码   返回0，没有相关数据  返回1，验证成功  返回2，验证码失效
+If :operation == "compareVerifyCode"
+   ///获取当前时间
+   ///获取 年
+   :NowYear = serverDate("yyyy")
+   ///获取 月
+   :NowMonth = serverDate("MM")
+   ///获取 日
+   :NowDay = serverDate("dd")
+   ///获取 时
+   :NowHour = serverDate("hh")
+   ///获取 分
+   :NowMinute = serverDate("mm")
+
+   :sql = "SELECT senddate,code FROM SMSCODE WHERE PHONE = ? ORDER BY senddate desc"
+   :x = changeRecordSet(:sql, S(:tel))
+   :i=0
+    Repeat
+      :ArrayAllId[:i]=id
+      :ArrayAllCode[:i]=code
+      :ArrayAllSendDate[:i]=senddate
+      :i=:i+1
+    EndRepeat
+    ///如果查到了对应的数据，先对比验证码是否是最近一次获取的，再对比是否超时
+    If :x == "ok"
+       ////判断验证码是否是最新一次获取的
+       debugMsg("===="#:ArrayAllCode[0]#"===="#:code)
+       If :ArrayAllCode[0] != :code
+           ///验证码失效，直接返回，不进行后续操作
+           debugMsg("[DEBUGMSG]:isms.template 位置:128:"+"------------------------------------------------")
+           =2
+       Else
+           ///解析用户获取验证码时，写入数据库的时间，进行对比，是否超时
+            ///获取 年
+            :year = mid(:ArrayAllSendDate[0],0,4)
+            ///获取 月和日
+            :monthAndDay = mid(:ArrayAllSendDate[0],5,5)
+            ///获取 月
+            :month = mid(:monthAndDay,0,2)
+            ///获取 日
+            :day = mid(:monthAndDay,3,5)
+            ///获取 时分秒
+            :hourAndMinute = mid(:ArrayAllSendDate[0],11,12)
+            ///获取 时
+            :hour = mid(:hourAndMinute,0,2)
+            ///获取 分和秒
+            :minuteAndSecond = mid(:hourAndMinute,3,5)
+            ///获取 分
+            :minute = mid(:minuteAndSecond,0,2)
+
+            :isInvalidCode = 'false'
+            debugMsg("[DEBUGMSG]:isms.template 位置:150:"+":isInvalidCode"+:isInvalidCode)
+             If :year!=:NowYear || :month!=:NowMonth || :day!=:NowDay
+                 :isInvalidCode = 'true'
+                 debugMsg("[DEBUGMSG]:isms.template 位置:153:"+":isInvalidCode"+:isInvalidCode)
+             EndIf
+             If :NowHour == :hour
+                 If :NowMinute - :minute > 15
+                     :isInvalidCode = 'true'
+                     debugMsg("[DEBUGMSG]:isms.template 位置:158:"+":isInvalidCode"+:isInvalidCode)
+                 EndIf
+             EndIf
+             If :NowHour != :hour
+                If :NowHour - :hour == 1
+                    If :minute - :NowMinute < 15
+                       :isInvalidCode = 'true'
+                       debugMsg("[DEBUGMSG]:isms.template 位置:165:"+":isInvalidCode"+:isInvalidCode)
+                    EndIf
+                EndIf
+                :isInvalidCode = 'true'
+                debugMsg("[DEBUGMSG]:isms.template 位置:169:"+":isInvalidCode"+:isInvalidCode)
+             EndIf
+            ///用数字进行返回原因是  ajax 如果返回的是非数字，就会走error
+            debugMsg("[DEBUGMSG]:isms.template 位置:172:"+":isInvalidCode"+:isInvalidCode)
+            If :isInvalidCode == 'true'
+                ///验证码失效
+                debugMsg("[DEBUGMSG]:isms.template 位置:169:"+"============================")
+                =2
+            Else
+                ///验证成功
+                =1
+            EndIf
+       EndIf
+    Else
+        ///没有查到数据
+        =0
+    EndIf
+EndIf
+%>
+

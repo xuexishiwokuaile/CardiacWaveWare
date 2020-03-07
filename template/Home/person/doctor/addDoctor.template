@@ -1,0 +1,16 @@
+<%
+    :sqlStr="select * from st_passports where login_name=?"
+    :x=changeRecordSet(:sqlStr,S(:login_name))
+///    如果没有重复注册哪么就退回"bad"开始注册，否则要求重复注册
+    If :x == "bad"
+    debugMsg("[DEBUGMSG]:addDoctor.template 位置:6:"+:classification)
+    :sqlStr="insert into st_passports(id,login_name,passwd,classification,name,number) values(?,?,md5(?),?,?,?)"
+    :x=execSQL(:sqlStr,S(:id),S(:login_name),S(:passwd),S(:classification),S(:name),S(:number))
+    :sqlDoc="insert into doctor(id,name,hospital,department,position,phone) values(?,?,?,?,?,?)"
+    :x=execSQL(:sqlDoc,S(:id),S(:name),S(:hospital),S(:department),S(:position),S(:phone))
+    =:x
+    Else
+    :x="rpt"
+    =:x
+    EndIf
+%>

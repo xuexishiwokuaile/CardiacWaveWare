@@ -1,0 +1,11 @@
+///关于使用padleft的相应例子
+<%#include "common/commonFunction.template"%>
+
+<%:num = 123456>
+
+///如果不足8位自动补允到8位，不足的位置补允0
+<%:ln = "WHRJGC"#padLeft(:num,8,"0")%>
+
+<%=:ln%>
+
+

@@ -1,0 +1,53 @@
+///<%#include "common/checkLoginFilterNew.template"%>
+<%
+    debugMsg("[DEBUGMSG]:listRecord.template 位置:13:"+"当前第几页："+:currentPage+"。第页共多少条："+:pageSize+"。开始是多少条："+:start+"搜索关键词："+:keyWord)
+    If :start == "__error__"
+        :start = (:currentPage-1)*:pageSize
+    EndIf
+    If :keyWord == "__error__"
+        :keyWord = ""
+    EndIf
+
+    ///计算共有多少条数据
+    :sql_recordsTotal = "SELECT id FROM MEDICAL_RECORD_ANALYSIS WHERE clientname LIKE ?"
+    :totalSql = changeRecordSet(:sql_recordsTotal,S("%"+:keyWord+"%"))
+    :totalItems = recordCount();
+
+    :sql_Records = "SELECT * FROM MEDICAL_RECORD_ANALYSIS WHERE clientname LIKE ? ORDER BY time DESC LIMIT ?,?"
+    :result_Records = changeRecordSet(:sql_Records,S("%"+:keyWord+"%"),S(:start),S(:pageSize))
+
+    :result_records_array=""
+
+    ///查询结果ok或bad：
+    If :result_Records == "ok"
+        ///ok
+        Repeat
+            ///每次循环存入一条病历信息
+            :result_records_item = jsonAddItem("", "clientname", S(clientname))
+            :result_records_item = jsonAddItem(:result_records_item, "id", S(id))
+            :result_records_item = jsonAddItem(:result_records_item, "time", S(time))
+            :result_records_item = jsonAddItem(:result_records_item, "quantitativepeak", S(quantitativepeak))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionfour", S(distributionfour))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionfive", S(distributionfive))
+            :result_records_item = jsonAddItem(:result_records_item, "distributionsix", S(distributionsix))
+            :result_records_item = jsonAddItem(:result_records_item, "medicalRecordId", S(medicalRecordId))
+            :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+        EndRepeat
+        ///成功 返回状态码0
+        :code = 0
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    Else
+        /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+        :code = 0
+        :result_records_array="[]"
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    EndIf
+
+    :result_records_items = jsonAddItem(:result_records_items, "currentPage", :currentPage)
+    :result_records_items = jsonAddItem(:result_records_items, "pageSize", :pageSize)
+    :result_records_items = jsonAddItem(:result_records_items, "start", :start)
+    :result_records_items = jsonAddItem(:result_records_items, "total", :totalItems)
+    =:result_records_items
+%>

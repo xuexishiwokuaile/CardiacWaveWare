@@ -1,0 +1,233 @@
+/* reset */
+
+body,
+ol,
+ul,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+th,
+td,
+dl,
+dd,
+form,
+fieldset,
+legend,
+input,
+textarea,
+select {
+	margin: 0;
+	padding: 0
+}
+
+body {
+	font: 28px"方正悠黑", "Arial Narrow", HELVETICA;
+	background: #fff;
+	-webkit-text-size-adjust: 100%;
+	width: 1080px;
+	height: 1526px;
+	margin: 0 auto;
+	/* 水平居中 */
+	background-image: url("../imgs/bg-log.png");
+}
+
+a {
+	color: #2d374b;
+	text-decoration: none
+}
+
+a:hover {
+	color: #cd0200;
+	text-decoration: underline
+}
+
+em {
+	font-style: normal
+}
+
+li {
+	list-style: none
+}
+
+img {
+	border: 0;
+	vertical-align: middle
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0
+}
+
+p {
+	word-wrap: break-word
+}
+
+
+/* outer */
+.outer {
+	width: 1080px;
+	display: flex;
+	flex-direction: column;
+
+}
+
+/* header */
+.header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	/* align-items: center; */
+}
+
+.header-top {
+	width: 1080px;
+	display: flex;
+	margin: 20px 0 6px 0;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.barcode img {
+	width: 30%;
+}
+.date{
+	font-size: 20px;
+}
+.header-title {
+	font-family: "华文行楷";
+	font-size: 54px;
+	margin-bottom: 60px;
+	margin-left: 280px;
+}
+
+.header-info {
+	width: 1080px;
+	display: flex;
+	justify-content: space-around;
+
+}
+
+.header-line {
+	height: 1px;
+	border-top: 1px solid black ;
+	margin: 24px 0 0 0;
+	width: 1080px;
+}
+
+
+/* container */
+.container {
+	width: 1080px;
+	display: flex;
+	flex-direction: column;
+	margin: 46px 0 0 45px;
+}
+
+.basic-situation {
+	display: flex;
+	flex-direction: column;
+
+}
+
+.basic-info {
+	display: flex;
+
+}
+
+.basic {
+	margin-right: 40px;
+}
+
+.height,
+.weight,
+.smoking{
+	margin-right: 56px;
+}
+
+
+/* 行间距 */
+.detection-parameter,
+.peak-situation div,
+.peak-conclusion div,
+.polarity-distribution-title,
+.polarity-distribution-item1,
+.polarity-distribution-item2,
+.report-conclusion,
+.polarity-conclusion div{
+	margin-top: 14px;
+}
+
+/* 段间距 */
+.peak-situation,
+.peak-conclusion,
+.polarity-distribution,
+.polarity-conclusion,
+.remarks{
+	margin-top: 42px;
+}
+
+
+.report-conclusion {
+	color: #ff111f;
+}
+
+.peak-conclusion-title{
+	padding-right: 182px;
+}
+
+.polarity-distribution-title{
+	padding-right: 142px;
+}
+.polarity-distribution-item1,
+.polarity-distribution-item2 {
+	display: flex;
+}
+
+.polarity-distribution-item {
+	padding-right: 130px;
+}
+
+.remarks{
+	line-height:44px;
+	padding-right: 62px;
+}
+
+/* footer */
+.footer {
+	width: 1080px;
+	display: flex;
+	align-items: flex-end;
+	margin: 64px 0 66px 0;
+	font-family: "华文行楷";
+	font-size: 30px;
+}
+.text{
+	margin: 0 0 0 44px;
+	
+}
+.text div{
+	margin: 8px 0 0 0;
+}
+.jishu2{
+	padding-left:196px;
+}
+.footer-spacing{
+	letter-spacing: 14px;
+}
+
+.qrcode{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 280px;
+	margin-left: 60px;
+}
+.qrcode img{
+	width: 50%;
+}

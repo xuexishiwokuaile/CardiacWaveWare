@@ -1,0 +1,27 @@
+<%
+    /// 文 件 名：test_analysis
+    /// 描    述：分析健康的数据和病患的数据(用一句话描述该文件做什么)  
+    /// 项目名称：out_cardic      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/20 16:58  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+    debugMsg("[DEBUGMSG]:iGetSrcWaveData.template 位置:12:"+"medicalRecordId:"+:medicalRecordId)
+
+    :sql = "SELECT waveformid,clientName,checkTime FROM medical_record WHERE id=?"
+    :resultRecord = changeRecordSet(:sql,S(:medicalRecordId))
+    :recordNum = recordCount()
+
+    :txt = executeRemoteService("127.0.0.1","/one/downloadFile.spe?dtype=Sqldb&mode=attachment&fileid="+waveformid,"",80)
+    =:txt
+    ="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    split(:txt,"\r",&arrayData)
+    debugMsg("[DEBUGMSG]:test_analysis.template 位置:24:"+":arrayData[0]==========="+:arrayData[0])
+    =:arrayData[0]
+
+%>

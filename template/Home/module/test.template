@@ -1,0 +1,9 @@
+<%
+    If :id == "0" && :up == "1"
+        :json_item = jsonAddItem("","name","1")
+        :json_item = jsonAddItem(:json_item,"value","2")
+        :json_array = jsonAddArrayItem("",:json_item)
+    EndIf
+
+    Exit :json_array
+%>

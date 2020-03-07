@@ -1,0 +1,186 @@
+<%
+    /// 文 件 名：listMedicalRecord
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/9 22:39  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+       If :keywords == "__error__"
+          :keywords = ""
+        EndIf
+/// mr,client c WHERE mr.clientId = c.id AND
+      ///如果是管理员就应该看到所有数据
+      If :classification == 1
+         :sql_get_record_count = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND (mr.number LIKE ? OR mr.clientName LIKE ?)"
+         :resultRecord = changeRecordSet(:sql_get_record_count,S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+         :recordNum = recordCount()
+         :sql_get_record = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND (mr.number LIKE ? OR mr.clientName LIKE ?) ORDER BY mr.id  DESC LIMIT ? OFFSET ?"
+         :resultRecord = changeRecordSet(:sql_get_record,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      EndIf
+
+      ///如果是医生就只能看到自己名下的监察员的所有患者
+      If :classification == 2
+         :sql_get_record_count = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.doctorId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?)"
+         :resultRecord = changeRecordSet(:sql_get_record_count,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+         :recordNum = recordCount()
+         :sql_get_record = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.doctorId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?) ORDER BY mr.id  DESC LIMIT ? OFFSET ?"
+         :resultRecord = changeRecordSet(:sql_get_record,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      EndIf
+
+      ///如果是患者就只能看到自己
+      If :classification == 3
+         :sql_get_record_count = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.clientId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?)"
+         :resultRecord = changeRecordSet(:sql_get_record_count,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+         :recordNum = recordCount()
+         :sql_get_record = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.clientId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?) ORDER BY mr.id  DESC LIMIT ? OFFSET ?"
+         :resultRecord = changeRecordSet(:sql_get_record,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      EndIf
+
+      ///如果是监察员就只能看到自己名下的所有患者
+      If :classification == 4
+         :sql_get_record_count = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.monitorId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?)"
+         :resultRecord = changeRecordSet(:sql_get_record_count,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+         :recordNum = recordCount()
+         :sql_get_record = "SELECT * FROM client c, medical_record mr WHERE mr.clientId = c.id AND mr.monitorId = ? AND (mr.number LIKE ? OR mr.clientName LIKE ?) ORDER BY mr.id  DESC LIMIT ? OFFSET ?"
+         :resultRecord = changeRecordSet(:sql_get_record,S(:doctorId),S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+      EndIf
+      :result_records_array=""
+      If :resultRecord == "ok"
+         Repeat
+           ///循环主体
+           :result_records_item = jsonAddItem("", "number", S(number))
+           :result_records_item = jsonAddItem(:result_records_item, "blood", S(blood))
+           :result_records_item = jsonAddItem(:result_records_item, "picture", S(picture))
+           :result_records_item = jsonAddItem(:result_records_item, "checkResult", S(checkResult))
+           :result_records_item = jsonAddItem(:result_records_item, "blood", S(blood))
+           :result_records_item = jsonAddItem(:result_records_item, "name", S(clientName))
+           :result_records_item = jsonAddItem(:result_records_item, "hospital", S(hospital))
+           :result_records_item = jsonAddItem(:result_records_item, "doctor", S(doctorName))
+           :result_records_item = jsonAddItem(:result_records_item, "time", S(checkTime))
+           :result_records_item = jsonAddItem(:result_records_item, "id", S(id))
+           :result_records_item = jsonAddItem(:result_records_item, "clientId", S(clientId))
+           :result_records_item = jsonAddItem(:result_records_item, "height", S(height))
+           :result_records_item = jsonAddItem(:result_records_item, "weight", S(weight))
+           :result_records_item = jsonAddItem(:result_records_item, "gender", S(gender))
+           :result_records_item = jsonAddItem(:result_records_item, "smoke", S(smoking))
+           :result_records_item = jsonAddItem(:result_records_item, "drink", S(drinking))
+           :result_records_item = jsonAddItem(:result_records_item, "hypertension", S(hypertension))
+           :result_records_item = jsonAddItem(:result_records_item, "diabetes", S(diabetes))
+           :result_records_item = jsonAddItem(:result_records_item, "checkResult", S(checkResult))
+           :result_records_item = jsonAddItem(:result_records_item, "picture", S(picture))
+           :result_records_item = jsonAddItem(:result_records_item, "isUpdate", S(isUpdate))
+           :result_records_item = jsonAddItem(:result_records_item, "isChecked", S(isChecked))
+           :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item
+         EndRepeat
+
+       ///成功 返回状态码0
+      :code = 0
+      :result_records_items = jsonAddItem("","code",:code)
+      :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+     Else
+         /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+         :code = 0
+         :result_records_array="[]"
+         :result_records_items = jsonAddItem("","code",:code)
+         :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+     EndIf
+         :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+         =:result_records_items
+
+
+///      ///根据doctorId查询医院名称
+///      :sql_selectHospital = "SELECT hospital FROM doctor WHERE id = ?"
+///      :result_medicalRecords = changeRecordSet(:sql_selectHospital,S(:doctorId))
+///      debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:10:"+"===result_medicalRecords"+:result_medicalRecords)
+///      :hospital = hospital
+///      debugMsg(":hospital=================="#:hospital)
+///      If :result_medicalRecords == "bad"
+///          /// 通过doctorId  在 doctor 表中找不到记录 ， 说明该Id 是 monitorId
+///          /// 先通过monitorId 查出该monitor邀请的所有 clientId
+///          :sql_client_id = "SELECT ID FROM CLIENT WHERE MONITOR_ID = ?"
+///          :resultRecord = changeRecordSet(:sql_client_id,S(:doctorId))
+///          :recordNum = recordCount()
+///          :i = 0
+///          Repeat
+///            ///保存client的id
+///            :ArrayAllId[:i]=id
+///            :i += 1
+///          EndRepeat
+///          /// 再通过client的Id  从 medical_record中查询病案
+///            :j = 0
+///             While :j <= :recordNum - 1
+///                :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate,isChecked FROM medical_record WHERE clientid=? ORDER BY id DESC"
+///                :resultRecord = changeRecordSet(:sql_medicalRecords,S(:ArrayAllId[:j]))
+///              :j += 1
+///                debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:38:"+"j==========================="+:j)
+///             EndWhile
+///      Else
+///              ///  :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate FROM medical_record WHERE hospital=? ORDER BY CASE WHEN isUpdate='true' THEN 1 WHEN isUpdate='false' THEN 2 END,CAST(number AS BIGINT) DESC"
+///                :sql_medicalRecords = "SELECT id,clientName,clientId,doctorName,doctorId,hospital,checkTime,checkResult,number,isUpdate,isChecked FROM medical_record WHERE hospital=? ORDER BY id DESC"
+///                :result_medicalRecords = changeRecordSet(:sql_medicalRecords,S(:hospital))
+///                debugMsg(":clientId=============="#clientId)
+///      EndIf
+///     /// 搜索的关键字 keywords
+///        debugMsg("[DEBUGMSG]:loadClientRecords.template 位置:48:"+"page="+:page+"=limit="+:limit+"==keywords=="+:keywords)
+///
+///
+///        ///是否传入了搜索的关键字
+///        If :keywords =="__error__"
+///           :keywords = ""
+///        EndIf
+///
+//////            :sql_get_record_count = "SELECT * FROM medical_record mr,client c WHERE mr.clientId = c.id AND (number LIKE ? OR clientName LIKE ?)"
+//////            :resultRecord = changeRecordSet(:sql_get_record_count,S("%"+:keywords+"%"),S("%"+:keywords+"%"))
+//////            :recordNum = recordCount()
+///
+///            :sql_get_record = "SELECT * FROM medical_record WHERE (number LIKE ? OR clientName LIKE ?) ORDER BY id  DESC LIMIT ? OFFSET ?"
+///            :resultRecord = changeRecordSet(:sql_get_record,S("%"+:keywords+"%"),S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+///            :result_records_array=""
+///
+///        If :resultRecord == "ok"
+///            Repeat
+///              ///循环主体
+///              :result_records_item = jsonAddItem("", "number", S(number))
+///              :result_records_item = jsonAddItem(:result_records_item, "blood", S(blood))
+///              :result_records_item = jsonAddItem(:result_records_item, "picture", S(picture))
+///              :result_records_item = jsonAddItem(:result_records_item, "checkResult", S(checkResult))
+///              :result_records_item = jsonAddItem(:result_records_item, "blood", S(blood))
+///              :result_records_item = jsonAddItem(:result_records_item, "name", S(clientName))
+///              :result_records_item = jsonAddItem(:result_records_item, "hospital", S(hospital))
+///              :result_records_item = jsonAddItem(:result_records_item, "doctor", S(doctorName))
+///              :result_records_item = jsonAddItem(:result_records_item, "time", S(checkTime))
+///              :result_records_item = jsonAddItem(:result_records_item, "id", S(id))
+///              :result_records_item = jsonAddItem(:result_records_item, "height", S(height))
+///              :result_records_item = jsonAddItem(:result_records_item, "weight", S(weight))
+///              :result_records_item = jsonAddItem(:result_records_item, "gender", S(gender))
+///              :result_records_item = jsonAddItem(:result_records_item, "smoke", S(smoking))
+///              :result_records_item = jsonAddItem(:result_records_item, "drink", S(drinking))
+///              :result_records_item = jsonAddItem(:result_records_item, "hypertension", S(hypertension))
+///              :result_records_item = jsonAddItem(:result_records_item, "diabetes", S(diabetes))
+///              :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item
+///
+///            EndRepeat
+///
+///
+///            ///成功 返回状态码0
+///            :code = 0
+///            :result_records_items = jsonAddItem("","code",:code)
+///            :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+///        Else
+///            /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+///            :code = 0
+///            :result_records_array="[]"
+///            :result_records_items = jsonAddItem("","code",:code)
+///            :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+///        EndIf
+///        :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+///
+///        debugMsg("[DEBUGMSG]:nloadClientRecords.template 位置:86:"+"END:================")
+///
+///        =:result_records_items
+%>

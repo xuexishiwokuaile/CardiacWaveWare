@@ -1,0 +1,9 @@
+.statisticStart{width: 100%!important}
+.keng{width: 5.5%!important}
+.statisticDate{padding:10px 0}
+.statisticResult{display: none;}
+.statisticResult .table > thead > tr > td:after, .table > thead > tr > th:after{
+      bottom: 0;
+    height: 0;
+}
+.statisticResult  .table > tfoot > tr > td:after, .table > tfoot > tr > th:after{height: 0}

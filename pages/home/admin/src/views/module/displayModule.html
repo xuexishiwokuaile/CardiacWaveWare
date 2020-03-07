@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>模块管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!--layui配置 -->
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--拦截未登录-->
+    <script type="text/javascript" src="/pages/home/admin/src/layuiadmin/layui/lay/modules/table.js"></script>
+    <!--Ztree-->
+    <script src="/assets/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css">
+    <!--zoolina系统基础系统配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <!--其他-->
+    <script type="application/javascript" src="/assets/js/kindeditor/kindeditor-all.js"></script>
+    <script charset="utf-8" src="/assets/js/kindeditor/lang/zh-CN.js"></script>
+
+    <style>
+        .ztree li span.button.switch {height:23px}
+        .card-outer {
+            display: flex;
+        }
+
+        .article-table {
+            padding: 20px;
+            font-size: 14px;
+            width: 50%;
+            z-index: 1;
+        }
+
+        .layui-table-tool-temp {
+            display: flex;
+        }
+
+        .layui-table-cell {
+            height: auto !important;
+            white-space: normal !important;
+        }
+
+        .editor-user {
+            padding: 20px;
+        }
+
+        .layui-form-selected dl {
+            width: 120px;
+        }
+        .add-article {
+            padding: 20px 20px 10px 20px;
+        }
+        .table-header-btn{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .layui-btn-container .layui-btn {
+            margin-bottom: 0px!important;
+        }
+
+        .layui-form-item .layui-input-inline{
+            width: 240px!important;
+        }
+
+        .file-input-position{
+            margin-top: 5px;
+        }
+
+        .appendix-list-title{
+            /*margin-top: -10px;*/
+        }
+        .appendix-list a{
+            color: #0000FF;
+            cursor: pointer;
+        }
+        .checkColumn{
+            margin-top: 40px;
+            margin-left: 100px;
+        }
+
+    </style>
+    <script type="text/javascript">
+        let checkedColumn = '';//存放选中栏目所有信息
+        let checkedColumnId = '';
+        let checkedColumnParentId = '';
+        let editor = "";   //富文本编辑器
+        $(function() {
+            //获取栏目信息
+            var setting = {
+                data: {
+                    simpleData: {
+                        enable: true,
+                    },
+                },
+                async: {
+                    enable: true,
+                    type: 'get',
+                    dataType: 'json',
+                    url: '/Home/module/getModules.template',
+                    // dataFilter: filter
+                },
+                callback: {//请求成功后回调
+                    onClick: onclickTree,//点击相关节点触发的事件
+                    onAsyncSuccess: ztreeOnAsyncSuccess,//异步加载成功后执行的方法,展开所有节点
+                },
+                view:{
+                    showIcon: false,
+                }
+            };
+
+            //点击树触发的事件
+            function onclickTree(event, treeId, treeNode) {
+                // alert (treeNode);
+
+                checkedColumn = treeNode; //当前节点的所有信息
+                checkedColumnId = treeNode.id; //当前节点的id
+                checkedColumnParentId = treeNode.pId; //当前节点的pid
+                $("#_columns_id").val(checkedColumn.id);
+                // alert (checkedColumnId);                checkedColumn = treeNode; //当前节点的所有信息
+
+                //重载表格
+                _reload();
+            }
+
+            //获取树成功后进行的回调操作
+            function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+                //只显示所有一级栏目
+                var zTree_Menu = $.fn.zTree.getZTreeObj("tree");
+                var node = zTree_Menu.getNodeByParam("id",0);//获取指定ID的节点
+                zTree_Menu.expandNode(node, true, false);//指定选中ID节点展开
+            }
+            $.fn.zTree.init($('#tree'), setting);
+        });
+
+        //重载表格
+        function _reload() {
+            layui.use('table', function () {
+                let keywords = $('#searchInput').val();
+                var table = layui.table;
+                table.reload('articleTable', {
+                    url: '/Home/module/listModules.template',
+                    where: { //设定异步数据接口的额外参数，任意设
+                        keywords: keywords,
+                        columnsId: $("#_columns_id").val(),
+                    }
+                    , page: {
+                        curr: 1, //重新从第 1 页开始
+                    },
+                });
+            });
+        }
+
+        //加载table
+        layui.use(['table', 'form', 'jquery'], function() {
+            var table = layui.table;
+            var form = layui.form;
+            var $ = layui.$;
+
+            table.render({
+                elem: '#articleTable'
+                , url: '/Home/module/listModules.template'
+                , cols: [
+                    [
+                        {type: 'checkbox', fixed: 'left'}
+                        , {field: 'role', title: '类型', width: 520,align: 'center'},
+                    ]]
+                , page: true,
+            });
+
+            //新增模块-弹出
+            $("#addModule").click(function() {
+                var isFather = null;
+                $.ajax(
+                    {
+                        async:false,
+                        type:"post",
+                        url:"/Home/module/moduleInsert.template",
+                        dataType:"json",
+                        data:{columnsId:checkedColumn.id},
+                        success:function (data) {
+                            isFather = data[0].isFather;
+                        },
+                    }
+                );
+                if(isFather == "false")
+                {
+                    layer.msg("不允许添加到该模块")
+                }
+                else
+                {
+                    layer.open({
+                        type: 1,
+                        area: ['840px', '660px'],
+                        shadeClose: true, //点击遮罩关闭
+                        title: '新增模块',
+                        content: $('#add-article'),
+                        zIndex:80,
+                    });
+                }
+
+            });
+            //选择栏目-点击
+            $(".checkColumn").click(function() {
+                //关闭当前弹窗
+                layer.close(layer.index);
+                //赋值
+                $("#add-article-column").val(checkedColumn.name);
+                $("#add-article-column").attr("data-columnId",checkedColumn.id);
+                var isFather = null;
+                //判断所选模块是否为父模块
+                $.ajax(
+                    {
+                        async:false,
+                        type:"post",
+                        url:"/Home/module/moduleInsert.template",
+                        dataType:"json",
+                        data:{columnsId:checkedColumn.id},
+                        success:function (data) {
+                            isFather = data[0].isFather;
+                        },
+                    }
+                );
+                if (isFather == "false"){
+                    layer.msg("不允许选择该栏目", function() {
+                        //关闭后的操作
+                    });
+                    $("#add-article-column").val("");
+                    $("#add-article-column").attr("data-columnId","");
+                }
+
+            });
+            // 监听新建模块-提交
+            layui.use(['jquery', 'form'], function() {
+                var form = layui.form;
+
+                //监听提交
+                form.on('submit(addArticle)', function(data) {
+                    //获取栏目的ID
+                    let columnId = $("#add-article-column").attr("data-columnId");
+                    //新建模块
+                    let saveObj = new Array();
+                    let ResultSave = function(){
+                        if(saveObj[0] == "ok$^@^$UPDATED="){
+                            layer.close();
+                            window.location.reload();
+                        }else {
+                            layer.msg("错误", function() {
+                                //关闭后的操作
+                            });
+                            return false;
+                        }
+                    };
+                    getFromWS("/Home/module/addModule.template","moduleName="+data.field.moduleName+"$^@^$moduleEngname="+data.field.moduleEngname+"$^@^$fatherModule="+checkedColumn.id+"$^@^$sort="+data.field.moduleSort+"$^@^$moduleUrl="+data.field.moduleUrl+"$^@^$moduleIntroduction="+data.field.moduleIntroduction,saveObj,ResultSave);
+                    return false;
+                });
+            });
+
+            //删除模块
+            $("#deleteModule").click(function () {
+                var columnsId = $("#_columns_id").val();
+                var isFather = null;
+                //判断所选模块是否为父模块
+                $.ajax(
+                    {
+                        async:false,
+                        type:"post",
+                        url:"/Home/module/moduleIsFather.template",
+                        dataType:"json",
+                        data:{columnsId:$("#_columns_id").val()},
+                        success:function (data) {
+                            isFather = data[0].isFather;
+                        },
+                    }
+                );
+                if(columnsId=='0')
+                {
+                    layer.msg('请选择要删除的模块！', function() {
+                        //关闭后的操作
+                    });
+                }
+                else if(isFather=="true")
+                {
+                    layer.msg('无法删除！', function() {
+                        //关闭后的操作
+                    });
+                }
+                else
+                {
+                    layer.confirm('确定删除？',function (index) {
+                        let obj = new Array();
+                        let Result = function () {
+                            if(obj[0] == "ok$^@^$UPDATED="){
+                                layer.close();
+                                window.location.reload();
+                            }else{
+                                layer.msg('删除失败',function () {
+                                    //关闭后的操作
+                                });
+                            }
+                        };
+                        getFromWS('/Home/module/delModule.template', 'columnsId='+ columnsId,obj,Result);
+                        layer.close(index);
+                    });
+                }
+            });
+
+            //修改模块可见性
+            $("#changeModule").click(function() {
+                var checkStatus = table.checkStatus('articleTable');
+                var data = checkStatus.data;
+                var isFather = null;
+                //检测当前点击的模块是否为父模块
+                ///向后台发送columnsId
+                $.ajax(
+                    {
+                        async:false,
+                        type:"post",
+                        url:"/Home/module/moduleInsert.template",
+                        dataType:"json",
+                        data:{columnsId:$("#_columns_id").val()},
+                        success:function (data) {
+                            isFather = data[0].isFather;
+                        },
+                    }
+                );
+
+                if (data == '') {
+                    layer.msg('请选择要显示的类型', function() {
+                        //关闭后的操作
+                    });
+                }
+                //判断是不是父模块
+                else if (isFather =="true")
+                {
+                    layer.msg('无法修改！', function() {
+                        //关闭后的操作
+                    });
+                }
+                else{
+                    layer.confirm('确定这样修改？', function(index) {
+                        let moduleRoles = '';
+                        let moduleCount = 0;
+                        for (var i = 0; i < data.length; i++) {
+                            moduleRoles = moduleRoles + data[i].role + ',';
+                            moduleCount++;
+                        }
+                        let obj = new Array();
+                        let Result = function() {
+                            if (obj[0] == 'ok') {
+                                _reload();
+                                layer.close(layer.index);
+                            }else{
+                                layer.msg('修改失败', function() {
+                                    //关闭后的操作
+                                });
+                            }
+                        };
+                        getFromWS('/Home/module/updateModules.template',
+                            'roles=' + moduleRoles + '$^@^$moduleCount=' + moduleCount + '$^@^$columnsId=' + $("#_columns_id").val(), obj, Result);
+                        layer.close(index);
+                    });
+                }
+            });
+            //搜索
+            $("#search").click(function() {
+                var data = $('#searchInput').val();
+                //重载表格
+                layui.use('table', function() {
+                    var table = layui.table;
+                    table.reload('articleTable', {
+                        url: '/Home/module/listModules.template',
+                        where: { //设定异步数据接口的额外参数，任意设
+                            keywords: data,
+                        }
+                        , page: {
+                            curr: 1, //重新从第 1 页开始
+                        },
+                    });
+                });
+            });
+        });
+
+        layui.use('element', function(){
+            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+            //监听导航点击
+            element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });
+        });
+    </script>
+</head>
+<body>
+<ul class="layui-nav" style="background: white">
+    <li class="layui-nav-item"><a href="newModule.html" style="color: black">信息管理</a></li>
+    <li class="layui-nav-item"><a href="" style="color:black">可见性管理</a></li>
+</ul>
+
+<input type="hidden" value="0" id="_columns_id">
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <h2>模块管理</h2>
+        </div>
+        <div class="layui-card-body card-outer">
+            <div class="zTreeDemoBackground left">
+                <ul id="tree" class="ztree"></ul>
+            </div>
+            <div class="article-table">
+                <div class="table-header-btn">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-sm" id="addModule" >新增模块</button>
+                        <button class="layui-btn layui-btn-sm" id="deleteModule">删除模块</button>
+                        <button class="layui-btn layui-btn-sm" id="changeModule">修改模块可见性</button>
+                    </div>
+                    <div class="search-outer">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="searchInput" autocomplete="off"
+                                   placeholder="类型名称">
+                        </div>
+                        <button class="layui-btn layui-btn-sm" id="search">搜索</button>
+                    </div>
+                </div>
+                <!--表格-标题-自定义的模板-->
+                <script type="text/html" id="titleTpl">
+                    {{# if(d.on_top == 1){ }}
+                    {{d.title}}<i class="layui-icon layui-icon-praise" style="color: #FF5722;font-size: 13px;margin-left: 6px"></i>
+                    {{# }else{ }}
+                    {{d.title}}
+                    {{# } }}
+                </script>
+                <table class="layui-hide" id="articleTable" lay-filter="articleTable"></table>
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/Scripts/StationJSLib-kindeditor.js"></script>
+</body>
+<!--新增、修改文章-弹出层-->
+<div id="add-article" class="add-article" style="display: none;z-index: -1!important;">
+    <form class="layui-form add-depart-from-position">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">模块名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="moduleName" required lay-verify="required" placeholder="请输入模块名称"
+                           autocomplete="off" class="layui-input" id="moduleName">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">英文名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="moduleEngname" required lay-verify="required" placeholder="请输入模块英文名称"
+                           autocomplete="off" class="layui-input" id="moduleEngname">
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">模块简介</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="moduleIntroduction" required lay-verify="required" placeholder="请输入简介"
+                           autocomplete="off" class="layui-input" id="moduleIntroduction">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label" decode="true">排列位置</label>
+                <div class="layui-input-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" name="moduleSort" required lay-verify="number" placeholder="请输入排序(00表示插入到最后位置)"
+                               autocomplete="off" class="layui-input" id="moduleSort">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">模块链接</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="moduleUrl" required lay-verify="required" placeholder="请输入链接"
+                           autocomplete="off" class="layui-input" id="moduleUrl">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block add-depart-button-position">
+                <button class="layui-btn" lay-submit lay-filter="addArticle" style="margin-left: 250px">确定</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="selectColumn" class="selectColumn" style="display: none;">
+    <div class="zTreeDemoBackground left">
+        <ul id="selectColumnTree" class="ztree"></ul>
+    </div>
+    <button type="button" class="layui-btn layui-btn-sm checkColumn">确定</button>
+</div>
+</html>

@@ -1,0 +1,7 @@
+<%
+    :sql_deldoctors = "DELETE FROM ST_PASSPORTS WHERE ID IN(?);"
+    :resultRecord = execSQL(:sql_deldoctors,S(:submitIds))
+
+    :sql_del = "DELETE FROM doctor WHERE ID IN(?);"
+    :resultRecord = execSQL(:sql_del,S(:submitIds))
+%>

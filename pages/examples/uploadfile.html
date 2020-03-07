@@ -1,0 +1,117 @@
+<html>
+<HEAD>
+<Meta http-equiv="Content-Type" Content="text/html; Charset=utf-8">
+<TITLE>上传文件的例子</TITLE>
+<link rel="stylesheet" type="text/css" href="/CSS/hiAlert/alert.css">
+<script type="text/javascript" src="/Scripts/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+<script type="text/javascript" src="/Scripts/uploadfile.js"></script>
+<script type="text/javascript" src="/Scripts/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="/Scripts/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/Scripts/jquery.alert.js"></script>
+
+
+<script type="text/javascript">
+    function checkLogin(){
+      var dealResult=function(obj){
+        alert(obj[0])
+        if(obj[0]=="ok"){
+            $("#loginArea")[0].style.display="none";
+            $("#performUpload")[0].style.display="";
+        }
+        else{
+            $("#loginArea")[0].style.display="";
+            $("#performUpload")[0].style.display="none";
+        }
+      }
+      remoteService("CoreService/checkLogin",dealResult);
+    }
+    function sendLogin(){
+        var passResult=function(results){
+          if(results[0].substring(0,6)=="failed"){
+              alert("登录失败："+results[0].substring(7));
+          }
+          else{
+            localStorage.setItem('userId',results[0]);
+            localStorage.setItem('userToken',results[1]);
+            localStorage.setItem('classification',results[2]);
+            localStorage.setItem('loginName',results[3]);
+            $("#loginArea")[0].style.display="none";
+            $("#performUpload")[0].style.display="";
+          }
+        };
+        var loginName= $("#loginName").val();
+        var passwd = $("#passwd").val();
+        login(loginName,passwd,passResult);
+    }
+    function dologout(){
+        var userId = localStorage.getItem('userId');
+        var userToken = localStorage.getItem('userToken');
+        if(!userId || !userToken)
+            return;
+        var callBack = function(){
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('classification');
+            localStorage.removeItem('loginName');            
+            $("#loginArea")[0].style.display="";
+            $("#performUpload")[0].style.display="none";
+        };
+        logout(userId,userToken,callBack);        
+    }
+    function message(fid){
+        var h = $("#msg").html();
+        h += ":"+fid;
+        $("#msg").html(h);
+    }
+
+    function uploadAccessory(){
+        var uploadNext=function(fid){
+           message(fid);
+           uploadToDatabase("popup_message #sfile2",message,"databaseType=Sqldb");
+           hiClose();
+           $("#deletefile")[0].style.display="";           
+        };
+        uploadToDatabase("popup_message #sfile1",uploadNext,"databaseType=Sqldb");
+    }
+    function deleteAccessory(){
+        var h = $("#msg").html();
+        var fileid1 = h.split(":")[1];
+        var fileid2 = h.split(":")[2];
+        eraseFileInDatabase(fileid1);
+        eraseFileInDatabase(fileid2);
+        $("#msg").html("");
+        $("#deletefile")[0].style.display="none";
+    }
+    $(function(){ checkLogin();});
+</script>
+</HEAD>
+<body>
+    这个例子希望用最简洁的方式，演示在zoolina中如何上传文件。<br>
+    用户必须在登录之后，才有资格上传文件。所以，第一步是检查用户是否登录。<br>
+    <br>
+    <div id="loginArea" style="display:none">
+        你还没有登录<br>
+        用户名：<input id="loginName" style="width:100px;height:18px;padding: 0px 0px;margin-bottom: 0px" type="text">
+        密码：<input id="passwd" type="password" style="width:100px;height:18px;padding: 0px 0px;margin-bottom: 0px">
+        <input type=button style="width:100px;font-size:12px;font-weight:normal;line-height:20px;" value="确认" onclick="javascript:sendLogin();"> 
+    </div>
+    <div id="performUpload" style="display:none">
+        你已经登录，可以选择上传文件或登出<br>
+        <input type=button style="width:120px;font-size:12px;font-weight:normal;line-height:20px;" value="点击上传文件" onclick="javascript:hiBox('#modifybox','',250,200,'','.a_close');"> 
+        &nbsp;&nbsp;<input type=button style="width:100px;font-size:12px;font-weight:normal;line-height:20px;" value="登出" onclick="javascript:dologout();"> 
+    </div>
+    <div>
+        <div id="msg"> </div>
+        <div id="deletefile" style="display:none">
+            点击按钮删除刚才上传的文件
+            <input type="button" value="删除" onclick = "javascript:deleteAccessory();">
+        </div>
+    </div>
+    <div id="modifybox" style="display:none; align:center">
+      文件1： <input id="sfile1" name="sfile1" type="file" multiple="multiple" style="height:22px;width:200px" /><br>
+      文件2： <input id="sfile2" name="sfile2" type="file" multiple="multiple" style="height:22px;width:200px" /><br>
+      <input id="up" type="button" value="上传" onclick = "javascript:uploadAccessory();">
+    </div>
+</body>
+</html>

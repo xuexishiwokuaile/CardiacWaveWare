@@ -1,0 +1,39 @@
+<view class="outer">
+    <header-cmp>
+        <!-- 插槽 -->
+        <text class="sm-title2">文章 广告 视频</text>
+        <view class="title2-bottom"></view>
+    </header-cmp>
+    <!-- 级联选择器 -->
+    <wux-cascader visible="{{ visible1 }}" default-value="{{ value1 }}" title="所在地区" options="{{ options1 }}" bind:close="onClose1" bind:change="onChange1" />
+    <view class="items">
+        <view class="items-bar">
+            <view class="location" bind:tap="chooseCity">{{chooseCity}}{{ title1 }}</view>
+            <view class="distance">距离</view>
+        </view>
+        <view class="hr"></view>
+        <view wx:for="{{hospitalLists}}" wx:key="" style="display:flex;flex-direction: column;align-items: center">
+            <view class="item">
+                <view class="hospital-img">
+                    <image src="cloud://jiayukeji-6c6ff0.6a69-jiayukeji-6c6ff0/cardiacWave/hospital.png" />
+                </view>
+                <view class="hospital-description">
+                    <view class="hospital-name">{{item.name}}</view>
+                    <view class="hospital-degree-device">
+                        <text class="hospital-degree">三级甲等</text>
+                        <text class="hospital-device">CT：FORCE</text>
+                    </view>
+                    <view class="hospital-location-btn" bind:tap="navigation" data-addr="{{item.address}}">我要导航</view>
+                </view>
+                <view class="hospital-distance">{{item.distance}}KM</view>
+            </view>
+            <view class="hr"></view>
+            <!--  -->
+        </view>
+        <wux-divider wx:if="{{isBottom}}">
+            <view class="loadmore">
+                <text class="text">到底啦</text>
+            </view>
+        </wux-divider>
+    </view>
+</view>

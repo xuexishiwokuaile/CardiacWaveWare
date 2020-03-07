@@ -1,0 +1,11 @@
+<%=javaExample("zhang 3 & Lee 4")%>
+<br>
+<%=javaRoutine@ZoolinaTemplateApi(S("hello"),S("world"))%>
+<br>
+<%=add@ZoolinaTemplateApi(11,24)%>
+
+debugMsg("[DEBUGMSG]:javacode.template 位置:9:"+"222222222222222222222")
+
+<%=getCurrentFormatTime@JLStringHandler(S("yyyy-MM-dd HH:mm:ss"))%>
+
+debugMsg("[DEBUGMSG]:javacode.template 位置:9:"+"1111111111111111111")

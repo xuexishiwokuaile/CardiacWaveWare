@@ -1,0 +1,48 @@
+<%
+    /// 文 件 名：listCode
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：html      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/21 15:00  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%#include "common/checkLoginFilterNew.template"%>
+<%
+    ///是否传入了搜索的关键字
+    If :keywords =="__error__"
+       :keywords = ""
+    EndIf
+    :sql_get_all_QRcode_count = "SELECT * FROM qrcode WHERE mark like ?"
+    :resultRecord = changeRecordSet(:sql_get_all_QRcode_count,S("%"+:keywords+"%"))
+    :recordNum = recordCount()
+    ///分页
+    :sql_get_QRcode = "SELECT * FROM qrcode WHERE mark like ? ORDER BY CAST (id as integer) LIMIT ? OFFSET ?"
+    :resultRecord = changeRecordSet(:sql_get_QRcode,S("%"+:keywords+"%"),S(:limit),S((:page-1)*:limit))
+    :result_records_array=""
+    If :resultRecord == "ok"
+        Repeat
+          ///循环主体
+          :result_records_item = jsonAddItem("", "id", S(id))
+          :result_records_item = jsonAddItem(:result_records_item,"mark",S(mark))
+          :result_records_item = jsonAddItem(:result_records_item,"width",S(width))
+          :result_records_item = jsonAddItem(:result_records_item,"height",S(height))
+          :result_records_item = jsonAddItem(:result_records_item,"text",S(text))
+          :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+        EndRepeat
+        ///成功 返回状态码0
+        :code = 0
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    Else
+        /// 下面操作的目的是  配合前端layui框架  在table中显示  无数据
+        :code = 0
+        :result_records_array="[]"
+        :result_records_items = jsonAddItem("","code",:code)
+        :result_records_items = jsonAddItem(:result_records_items,"data",:result_records_array)
+    EndIf
+    :result_records_items = jsonAddItem(:result_records_items,"count",:recordNum)
+    =:result_records_items
+%>

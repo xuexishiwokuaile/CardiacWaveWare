@@ -1,0 +1,4 @@
+<%
+    :sql_delrecords = "DELETE FROM medical_record_analysis WHERE ID IN("#:submitIds#")"
+    :resultRecord = execSQL(:sql_delrecords)
+%>

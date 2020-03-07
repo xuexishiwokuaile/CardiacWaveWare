@@ -1,0 +1,10 @@
+/**app.wxss**/
+
+/* header文字的样式 */
+.sm-title2{
+  font-size: 30rpx;
+  padding: 0 30rpx 0 300rpx;
+}
+.title2-bottom{
+  height: 10rpx;
+}

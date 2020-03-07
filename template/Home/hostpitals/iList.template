@@ -1,0 +1,76 @@
+<%
+    /// 文 件 名：list
+    /// 描    述：列出所有当前系统中保留的医院信息(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/3/7 19:55  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    debugMsg("[DEBUGMSG]:listRecord.template 位置:11:"+"当前第几页："+:currentPage+"。第页共多少条："+:pageSize+"。开始是多少条："+:start+"传过来的参数："+:userToken+"搜索关键词："+:keyWord)
+
+    ///多长距离内的数据(50公里内的医院)
+    :m_dist = 50000
+
+    ///如果没有关键词，哪么就直接返回空白
+    If :keyWord=="__error__"
+        ///判断主体
+        :keyWord=""
+    EndIf
+
+    ///计算相应的启始页码
+    debugMsg("[DEBUGMSG]:iList.template 位置:23:"+":longitude=="+:longitude+"====:latitude="+:latitude)
+    ///判断说明：
+    If :longitude=="__error__" && :latitude=="__error__"
+        ///计算共有多少条数据
+        :sql_recordsTotal = "SELECT id FROM hospitals WHERE (name LIKE ? OR city LIKE ? OR province LIKE ? OR description LIKE ?)"
+        :totalSql = changeRecordSet(:sql_recordsTotal,S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"))
+        :totalItems = recordCount();
+
+        :sql_Records = "SELECT id,cnumber,name,address,province,city,longitude,latitude,remark,name_eng,description FROM hospitals WHERE (name LIKE ? OR city LIKE ? OR province LIKE ? OR description LIKE ?) ORDER BY cast(cnumber as integer) LIMIT ?,? "
+        :result_Records = changeRecordSet(:sql_Records,S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"),S(:start),S(:pageSize))
+    Else
+        ///计算共有多少条数据
+        :sql_recordsTotal = "SELECT id FROM HOSPITALS AS h WHERE (name LIKE ? OR city LIKE ? OR province LIKE ? OR description LIKE ?) AND (6378137*2*ASIN(SQRT(POWER(SIN(("+:latitude+"-h.LATITUDE)*ACOS(-1)/360),2) +COS("+:latitude+"*ACOS(-1)/180)*COS(h.LATITUDE*ACOS(-1)/180)*POWER(SIN(("+:longitude+"-h.LONGITUDE)*ACOS(-1)/360),2)))<"+:m_dist+")";
+        :totalSql = changeRecordSet(:sql_recordsTotal,S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"))
+        ///总数
+        :totalItems = recordCount()
+
+        debugMsg("[DEBUGMSG]:iList.template 位置:41:"+":totalItems"+:totalItems)
+
+        :sql_Records = "SELECT id,cnumber,name,address,province,city,longitude,latitude,remark,name_eng,description FROM hospitals as h WHERE (name LIKE ? OR city LIKE ? OR province LIKE ? OR description LIKE ?) AND (6378137*2*ASIN(SQRT(POWER(SIN(("+:latitude+"-h.LATITUDE)*ACOS(-1)/360),2) +COS("+:latitude+"*ACOS(-1)/180)*COS(h.LATITUDE*ACOS(-1)/180)*POWER(SIN(("+:longitude+"-h.LONGITUDE)*ACOS(-1)/360),2)))<"+:m_dist+") ORDER BY (6378137*2*ASIN(SQRT(POWER(SIN(("+:latitude+"-h.LATITUDE)*ACOS(-1)/360),2) +COS("+:latitude+"*ACOS(-1)/180)*COS(h.LATITUDE*ACOS(-1)/180)*POWER(SIN(("+:longitude+"-h.LONGITUDE)*ACOS(-1)/360),2)))) LIMIT ?,? "
+        :result_Records = changeRecordSet(:sql_Records,S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S("%"+:keyWord+"%"), S(:start),S(:pageSize))
+    EndIf
+
+    :result_records_array=""
+    ///查询结果ok或bad：
+        If :result_Records == "ok"
+            ///ok
+            Repeat
+                ///每次循环存入一条病历信息
+                :result_records_item = jsonAddItem("", "id", S(id))
+                :result_records_item = jsonAddItem(:result_records_item, "cnumber", S(cnumber))
+                :result_records_item = jsonAddItem(:result_records_item, "name", S(name))
+                :result_records_item = jsonAddItem(:result_records_item, "address", S(address))
+                :result_records_item = jsonAddItem(:result_records_item, "province", S(province))
+                :result_records_item = jsonAddItem(:result_records_item, "city", S(city))
+                :result_records_item = jsonAddItem(:result_records_item, "longitude", S(longitude))
+                :result_records_item = jsonAddItem(:result_records_item, "latitude", S(latitude))
+                :result_records_item = jsonAddItem(:result_records_item, "remark", S(remark))
+                :result_records_item = jsonAddItem(:result_records_item, "name_eng", S(name_eng))
+                :result_records_item = jsonAddItem(:result_records_item, "description", S(description))
+                :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+            EndRepeat
+        EndIf
+
+    ///bad
+    :result_records_items = jsonAddItem("", "data", :result_records_array)
+    :result_records_items = jsonAddItem(:result_records_items, "currentPage", :currentPage)
+    :result_records_items = jsonAddItem(:result_records_items, "pageSize", :pageSize)
+    :result_records_items = jsonAddItem(:result_records_items, "start", :start))
+    :result_records_items = jsonAddItem(:result_records_items, "total", :totalItems)
+    =:result_records_items
+
+///    debugMsg(:result_records_items)
+%>

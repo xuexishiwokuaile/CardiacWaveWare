@@ -1,0 +1,13 @@
+<%
+    /// 文 件 名：testAdd.template
+    /// 描    述：测试对应的加减小数点问题(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-ucha      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2018/12/05 14:58  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2018 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    :a = 123
+    =:a
+%>

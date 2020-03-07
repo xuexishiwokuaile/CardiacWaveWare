@@ -1,0 +1,21 @@
+<%
+    /// 文 件 名：wxJsonTran
+    /// 描    述：相应的json转成对应的json数据，并转成相应的JSON对象，并获取相应的值(用一句话描述该文件做什么)  
+    /// 项目名称：cardiac      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/11 0011 10:37  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    :data=jsonAddItem("","key1",'value1')
+    :data=jsonAddItem(:data,"key2",3)
+    :data=jsonAddItem(:data,"key3",S("value4"))
+    =:data
+
+    ="<br/>"
+
+    =JSON_GetObjectItem(:data, "key2")
+
+
+%>

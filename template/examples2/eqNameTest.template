@@ -1,0 +1,22 @@
+<%
+    /// 文 件 名：eqNameTest
+    /// 描    述：测试相应的名字(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-ucha      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2018/12/29 15:01  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2018 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+
+<%
+  :tname="杨西敏"
+  :name="杨西敏"
+  If :tname == :name
+      ="相等"
+  EndIf
+  If :tname != :name
+        ="不相等"
+  EndIf
+%>

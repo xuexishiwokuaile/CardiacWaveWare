@@ -1,0 +1,33 @@
+<%
+    /// 文 件 名：loadQRcode
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：html      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/22 10:59  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+    debugMsg("[DEBUGMSG]:selQRcode.template 位置:0007:"+"传入的参数为：id="+:id)
+    :sql_get_QRcode = "SELECT * FROM qrcode WHERE id =?"
+    :resultRecord = changeRecordSet(:sql_get_QRcode,S(:id))
+    :result_records_array=""
+    If :resultRecord=="ok"
+         Repeat
+            :result_record_item=jsonAddItem("", "id", S(id))
+            :result_record_item=jsonAddItem(:result_record_item, "mark", S(mark))
+            :result_record_item=jsonAddItem(:result_record_item, "width", S(width))
+            :result_record_item=jsonAddItem(:result_record_item, "height", S(height))
+            :result_record_item=jsonAddItem(:result_record_item, "text", S(text))
+            :result_records_array = jsonAddArrayItem(:result_records_array, :result_record_item)
+         EndRepeat
+        :result_records_array = jsonAddArrayItem(:result_records_array, :result_records_item)
+        =:result_records_array
+    Else
+        ="bad"
+    EndIf
+
+
+%>

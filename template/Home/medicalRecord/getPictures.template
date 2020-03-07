@@ -1,0 +1,15 @@
+<%
+    ///程序代码
+    :sql_selectPictures = "SELECT picture FROM medical_record WHERE id=?"
+    :result_selectPictures = changeRecordSet(:sql_selectPictures,S(:id))
+    :recordNum = recordCount()
+
+    =:result_selectPictures
+%>
+$_@_$
+<%
+    =picture
+
+debugMsg("picture======================"#picture)
+
+%>

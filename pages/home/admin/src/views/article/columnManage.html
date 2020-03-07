@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>栏目管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/pages/home/admin/src/layuiadmin/style/admin.css" media="all">
+    <script src="/pages/home/admin/src/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <!--Ztree-->
+    <script src="/assets/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css">
+    <!--zoolina基础配置-->
+    <script type="text/javascript" src="/Scripts/StationJSLib.js"></script>
+    <script type="text/javascript" src="/Scripts/common/zoolina.page.whu.plug.new.js"></script>
+    <!--    自定义样式-->
+    <link rel="stylesheet" href="/assets/css/admin-customize-style.css">
+    <style>
+        .ztree li span.button.switch {height:23px}
+    </style>
+    <script type="text/javascript">
+      let checkedItems = '';//存放选中栏目所有信息
+      $(function() {
+        //获取栏目信息
+        var setting = {
+          data: {
+            simpleData: {
+              enable: true,
+            },
+            key: {
+              name: 'name',
+              pId: 'pId'
+            },
+          },
+          async: {
+            enable: true,
+            type: 'get',
+            dataType: 'json',
+            url: '/Home/article/loadAllColumn.template',
+          },
+          callback: {//请求成功后回调
+            onClick: onclickTree,//点击相关节点触发的事件
+            onAsyncSuccess: ztreeOnAsyncSuccess,//异步加载成功后执行的方法
+          },
+          view: {
+            showIcon: false,
+          },
+        };
+        //点击树触发的事件
+        function onclickTree(event, treeId, treeNode) {
+          checkedItems = treeNode; //当前节点的所有信息
+        };
+
+        //获取树成功后进行的回调操作
+        function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+          //展开树
+          expand_ztree(treeId);
+        };
+
+        function expand_ztree(treeId) {
+          var treeObj = $.fn.zTree.getZTreeObj(treeId);
+          treeObj.expandAll(true);
+        }
+        $.fn.zTree.init($('#column-tree'), setting);
+      });
+
+      layui.use('layer', function() {
+        var layer = layui.layer;
+        //编辑栏目信息-弹出层
+        $('#editColumn').click(function() {
+          if (checkedItems == '') {
+            layer.msg('请先点击需要编辑的栏目', function() {
+              //关闭后的操作
+            });
+          }
+          else if (checkedItems.id == 0) {
+            layer.msg('当前栏目不允许修改', function() {
+              //关闭后的操作
+            });
+          }else {
+            let obj = new Array();
+            let Result = function() {
+              if (obj[0] != 'bad') {
+                let personInfo = JSON.parse(obj[0]);
+                //更新弹出层的表单
+                $('#edit-Column input[ name=\'edit_name\' ] ').val(personInfo[0].name);
+                $('#edit-Column input[ name=\'edit_sort\' ] ').val(personInfo[0].sort);
+              }
+            };
+            getFromWS('Home/article/loadColumn.template', 'id=' + checkedItems.id, obj, Result);
+            layer.open({
+              type: 1,
+              area: ['360px', '210px'],
+              shadeClose: true, //点击遮罩关闭
+              title: '编辑栏目信息',
+              content: $('#edit-Column'),
+            });
+          }
+        });
+
+        //新增栏目信息-弹出层
+        $('#addColumn').click(function() {
+          if (checkedItems == '') {
+            layer.msg('请先选择新增栏目希望放在哪个已有栏目下', function() {
+              //关闭后的操作
+            });
+          }else {
+            let obj = new Array();
+            let Result = function() {
+              if (obj[0] != 'bad') {
+                //更新弹出层的表单
+                $('#add-Column input[ name=\'add_sort\' ] ').val(obj[0]);
+              }
+            };
+            getFromWS('Home/article/getMaxSort.template', 'id=' + checkedItems.id, obj, Result);
+            layer.open({
+              type: 1,
+              area: ['360px', '210px'],
+              shadeClose: true, //点击遮罩关闭
+              title: '新增栏目信息',
+              content: $('#add-Column'),
+            });
+          }
+        });
+
+        //删除栏目信息
+        $('#deleteColumn').click(function() {
+          if (checkedItems == '') {
+            layer.msg('请先点击需要删除的栏目', function() {
+              //关闭后的操作
+            });
+          }else if (checkedItems.id == 0) {
+            layer.msg('当前栏目不允许删除', function() {
+              //关闭后的操作
+            });
+          }else {
+            let obj = new Array();
+            let Result = function() {
+              if (obj[0] == 'ok') {
+                //修改成功
+                //关闭最新的弹出层
+                layer.close(layer.index);
+                window.location.reload();
+              } else {
+                layer.msg(`失败,${obj[0]}`, function() {
+                  //关闭后的操作
+                });
+              }
+            };
+            getFromWS('Home/article/delColumn.template', 'id=' + checkedItems.id, obj, Result);
+          }
+        });
+
+      });
+
+      //编辑栏目信息-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //点击确定提交修改的信息
+        form.on('submit(updateColumn)', function() {
+          let name = $('#edit-Column input[ name=\'edit_name\' ] ').val();
+          let sort = $('#edit-Column input[ name=\'edit_sort\' ] ').val();
+          $(function (){
+            // isNaN()函数 把空串 空格 以及NUll 按照0来处理 所以先去除
+            if(sort == "" || sort ==null){
+              layer.msg('请填写数字', function() {
+                //关闭后的操作
+              });
+            }
+            else if(!isNaN(sort)){
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok') {
+                  //修改成功
+                  //关闭最新的弹出层
+                  layer.close(layer.index);
+                  window.location.reload();
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                    //关闭后的操作
+                  });
+                }
+              }
+              let postdata = 'name=' + name + '$^@^$sort=' + sort + '$^@^$id=' + checkedItems.id;
+              getFromWS('Home/article/updateColumn.template', postdata, obj, Result);
+            }else{
+              layer.msg('请填写数字', function() {
+                //关闭后的操作
+              });
+            }
+          });
+        });
+      });
+
+      //新增栏目信息-提交
+      layui.use(['jquery', 'form'], function() {
+        var form = layui.form;
+        //点击确定提交新增的信息
+        form.on('submit(addColumn)', function() {
+          let name = $('#add-Column input[ name=\'add_name\' ] ').val();
+          let sort = $('#add-Column input[ name=\'add_sort\' ] ').val();
+          $(function (){
+            // isNaN()函数 把空串 空格 以及NUll 按照0来处理 所以先去除
+            if(sort == "" || sort ==null){
+              layer.msg('请填写数字', function() {
+                //关闭后的操作
+              });
+            }
+            else if(!isNaN(sort)){
+              let obj = new Array();
+              let Result = function() {
+                if (obj[0] == 'ok') {
+                //修改成功
+                //关闭最新的弹出层
+                layer.close(layer.index);
+                window.location.reload();
+                } else {
+                  layer.msg(`失败,${obj[0]}`, function() {
+                   //关闭后的操作
+                  });
+                }
+              }
+              let postdata = 'name=' + name + '$^@^$sort=' + sort + '$^@^$parent_id=' + checkedItems.id;
+              getFromWS('Home/article/addColumn.template', postdata, obj, Result);
+            }else{
+              layer.msg('请填写数字', function() {
+                //关闭后的操作
+              });
+            }
+          });
+        });
+      });
+    </script>
+</head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-card u-table-outer">
+        <div class="layui-form layui-card-header">
+            <h2>栏目管理</h2>
+        </div>
+
+        <div class="layui-card-body card-outer" style="position: relative;">
+            <div class="table-header-btn personManage-btns" style="display: flex;align-items: center;padding: 4px 0">
+                <div class="layui-btn-container">
+                    <button class="layui-btn u-btn layui-btn-sm" id="addColumn">新增栏目</button>
+                    <button class="layui-btn u-btn layui-btn-sm" id="editColumn">编辑栏目</button>
+                    <button class="layui-btn u-btn layui-btn-sm" id="deleteColumn">删除栏目</button>
+                </div>
+            </div>
+            <div class="zTreeDemoBackground left" style="...">
+                <ul id="column-tree" class="ztree"></ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+
+<div id="edit-Column" class="edit-Column" style="display: none">
+    <form class="layui-form" style="margin-top: 15px;">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">栏目名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="edit_name" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline" style="margin-top: 10px;">
+                <label class="layui-form-label">栏目排序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="edit_sort" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="update-column-btn" type="button"
+                    lay-submit lay-filter="updateColumn">
+                确定
+            </button>
+        </div>
+    </form>
+</div>
+
+<div id="add-Column" class="edit-Column" style="display: none">
+    <form class="layui-form" style="margin-top: 15px;">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">栏目名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="add_name" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline" style="margin-top: 10px;">
+                <label class="layui-form-label">栏目排序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="add_sort" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <button class="layui-btn u-btn layui-btn-sm layui-btn-normal u-btn-center" id="add-Column-btn" type="button"
+                    lay-submit lay-filter="addColumn">
+                确定
+            </button>
+        </div>
+    </form>
+</div>
+</html>

@@ -1,0 +1,21 @@
+<%
+/**
+ * 关于多行注释对应的测试类
+**/
+
+:str="///a&bigg&c"
+%>
+<%split(:str,"&", &array)%>
+<%:i=0%>
+<%While :i< arrayLength(&array)%>
+  <%=:array[:i]%><br>
+  <%:i= :i +1%> 
+<%EndWhile%>
+<br>
+<%:str="a  bid c"%>
+<%split(:str,"(\\s)+", &array,"rt")%>  ///using regular expression
+<%:i=0%>
+<%While :i< arrayLength(&array)%>
+  <%=:array[:i]%><br>
+  <%:i= :i +1%> 
+<%EndWhile%>

@@ -1,0 +1,8 @@
+<%
+///:sql = "UPDATE st_passports SET passwd = ? WHERE login_name =?"
+///:result = changeRecordSet(:sql,S(:passwd),S(:login_name))
+///debugMsg("--------"+:passwd+"-------------"+:result)
+///=:result
+
+="ok"
+%>

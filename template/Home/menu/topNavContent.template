@@ -1,0 +1,46 @@
+    <nav class="navbar user-info-navbar" role="navigation" style="margin-bottom: 10px;">
+          <ul class="user-info-menu left-links list-inline list-unstyled">
+
+        <!--上面左侧展开-->
+
+        <li class="hidden-sm hidden-xs">
+          <a href="#" data-toggle="sidebar">
+            <i class="fa-bars"></i>
+           </a>
+        </li>
+
+        <!--上面左侧展开-->
+        <!--上面左侧铃铛7-->
+
+      </ul>
+
+          <!--上边右侧头像姓名退出-->
+
+       <ul class="user-info-menu right-links list-inline list-unstyled">
+        <li class="dropdown user-profile">
+          <a href="userinfo.html" data-toggle="dropdown">
+            <!--<img src="/assets/images/user-4.png" alt="user-image" class="img-circle img-inline userpic-32"width="28"/>-->
+            <span> <%=:userName%></span>
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0);" onClick="exit()">
+            <i class="fa-power-off" style="color:red;font-size:18px;">
+            </i>
+          </a>
+        </li>
+      </ul>
+
+          <!--上边右侧头像姓名退出-->
+        </nav>
+       <script>
+        function exit(){
+          for (var i = sessionStorage.length - 1; i >= 0; i--) {
+			    	sessionStorage.removeItem(sessionStorage.key(i));
+			    }
+          var process_exit = function(){
+		        	location.href="/index.html";
+		      }
+				   logout(sessionStorage.getItem('userId'), sessionStorage.getItem('userToken'), process_exit);
+		   }
+       </script>

@@ -1,0 +1,32 @@
+<%
+    /// 文 件 名：deleteColumns
+    /// 描    述：删除栏目信息(用一句话描述该文件做什么)  
+    /// 项目名称：html      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/7/20 15:19  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+  :sql_select_columns = "SELECT * FROM columns WHERE parent_id = ?"
+  :resultSelColumnsRecord = changeRecordSet(:sql_select_columns,S(:id))
+  :sql_select_article = "SELECT * FROM article WHERE article_type = ?"
+  :resultSelArticleRecord = changeRecordSet(:sql_select_article,S(:id))
+  :sql_delete = "DELETE FROM columns WHERE id = ?"
+  If :resultSelColumnsRecord == "bad"
+    If :resultSelArticleRecord == "bad"
+      :resultDelRecord = execSQL(:sql_delete,S(:id))
+      If :resultDelRecord == "ok$^@^$UPDATED="
+        ="ok"
+      Else
+        =:resultStRecord
+      EndIf
+    Else
+      ="该栏目含有文章，请先在文章管理界面删除该栏目下的文章"
+    EndIf
+  Else
+    ="该栏目含有子栏目，请先删除该栏目下的子栏目"
+  EndIf
+%>

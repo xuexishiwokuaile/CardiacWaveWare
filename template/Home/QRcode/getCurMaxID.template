@@ -1,0 +1,6 @@
+<%
+      :sql_max="SELECT CAST(max(CAST(id AS int)) AS VARCHAR) AS NUM FROM QRCODE WHERE 1=?;"
+      :resultRecord = changeRecordSet(:sql_max,S(1))
+      :num = num
+      =:num
+%>

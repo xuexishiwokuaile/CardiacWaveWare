@@ -1,0 +1,81 @@
+
+///<%debugMsg("in getNav loginName is==========="#:loginName)%>
+<%If :loginName=="admin"%>
+
+<li >
+    <a href="userInfo.html" id="a_userInfo">
+        <i class="linecons-user"></i>
+        <span class="title">个人中心</span>
+        <div class="title" style="padding-left:30px">Personal Center</div>
+    </a>
+</li>
+
+<li>
+    <a href="articleManagement.html" id="a_articleManagement">
+        <i class="linecons-note"></i>
+        <span class="title">文章管理</span>
+        <div class="title" style="padding-left:30px">management of article</div>
+    </a>
+</li>
+<li>
+	<a href="columnManagement.html" id="a_columnManagement">
+		<i class="linecons-note"></i>
+		<span class="title">栏目管理</span>
+		<div class="title" style="padding-left:30px">management of column</div>
+	</a>
+</li>
+<li> 
+	<a href="pictureManagement.html" id="a_pictureManagement">
+		<i class="linecons-note"></i>
+		<span class="title">图片管理</span>
+		<div class="title" style="padding-left:30px">management of picture</div>
+	</a>
+</li>
+<li class="has-sub">
+	<a href="#">
+		<i class="linecons-user"></i>
+		<span class="title">系统管理</span>
+		<div class="title" style="padding-left:30px">management of people</div>
+	</a>
+
+	<ul id="personManagement">
+		<li>
+		 	<a href="personManagement.html" id="a_personManagement">
+			<span class="title">人员管理</span>
+			</a>
+		</li>
+</ul>
+
+    <ul id="roleManagement">
+		<li>
+		    <a href="roleManagement.html" id="a_roleManagement">
+			<span class="title">角色管理</span>
+		    </a>
+		</li>
+    </ul>
+</li>
+
+<%EndIf%>
+
+<%If :loginName!="admin"%>
+
+<li >
+    <a href="userInfo.html" id="a_userInfo">
+        <i class="linecons-user"></i>
+        <span class="title">个人中心</span>
+        <div class="title" style="padding-left:30px">Personal Center</div>
+    </a>
+   
+</li>
+
+
+<li>
+    <a href="articleManagement.html" id="a_articleManagement">
+        <i class="linecons-note"></i>
+        <span class="title">文章管理</span>
+        <div class="title" style="padding-left:30px">management of article</div>
+    </a>
+</li>
+
+<%EndIf%>
+

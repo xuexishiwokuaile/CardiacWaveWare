@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/assets/js/jquery-1.11.1.min.js" ></script>
+    <script src="/Scripts/common/jquery.smsCode.whu.plugin.js" ></script>
+    <script src="/Scripts/StationJSLib.js"></script>
+    <style>
+        .content{
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .input-outer{
+            display: flex;
+        }
+        .get-code{
+            padding: 2px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="content" class="content">
+        <div class="input-outer">
+            <div class="input">
+                <input type="text" placeholder="请输入手机号" id="tel" maxlength="11">
+            </div>
+            <div class="get-code">
+                <input type="button" value="获取验证码" id="sendVerifyCode">
+            </div>
+            <div></div>
+        </div>
+        <div>
+            <input type="text" placeholder="请输入验证码" id="inputVerifyCode">
+        </div>
+        <div class="btn">
+            <input type="button" value="提交" id="verifyCode">
+        </div>
+    </div>
+    <script>
+
+        //点击发送验证码
+        $("#sendVerifyCode").on("click", function() {
+          const tel = $("#tel").val();
+          //正则表达式，匹配手机,号码段非严谨匹配
+          const regx = /^[1]([3-9])[0-9]{9}$/;
+          if(! regx.test(tel)){
+            alert("手机号格式错误，请重新输入");
+            return;
+          }
+          //将按钮disable，开始倒计时
+          $("#sendVerifyCode").attr({ disabled: "disabled" });
+          let timesRun = 60;
+          const interval = setInterval(function(){
+            timesRun -= 1;
+            $("#sendVerifyCode").val(`${timesRun}秒再获取`)
+            if(timesRun === 0){
+              clearInterval(interval);
+              $("#sendVerifyCode").val("获取验证码")
+              $('#sendVerifyCode').removeAttr("disabled");
+            }
+          }, 1000);
+          $("#sendVerifyCode").sendVerifyCode("/Home/smsCode/isms.template?operation=sendVerifyCode",tel);
+        })
+
+        //提交，进行验证
+        $("#verifyCode").on("click", function() {
+          const tel = $("#tel").val();
+          const userVerifyCode = $("#inputVerifyCode").val();
+
+          if(code == "" || tel == ""){
+            alert("请输入验证码")
+            return;
+          }
+          $("#addClientSave").verifyCode(tel,userVerifyCode);
+        })
+
+    </script>
+</body>
+</html>

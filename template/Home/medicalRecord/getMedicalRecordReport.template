@@ -1,0 +1,112 @@
+<%#include "common/commonFunction.template"%>
+
+<%
+    /// 文 件 名：getMedicalRecordReport
+    /// 描    述：获取相应的报告信息(用一句话描述该文件做什么)  
+    /// 项目名称：zoolina-cardiac-wave      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/2/19 9:53  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+    debugMsg("[DEBUGMSG]:getMedicalRecordReport.template 位置:12:"+"medicalRecordId:"+:medicalRecordId+"。")
+
+    :personId = ""
+
+///    用户名
+    :personName = ""
+    ///手机号
+    :peronPhone = ""
+    ///性别
+    :personSex = ""
+    ///身高
+    :personHeight = ""
+    ///体重
+    :personWeight = ""
+    ///是否喝酒
+    :personDrinking = ""
+    ///是否吸烟
+    :personSmoking = ""
+    ///高血压
+    :personHypertension = ""
+    ///糖尿病
+    :personDiabetes = ""
+
+    ////相关的检查结果
+    :totalPeak = ""
+    :quantitativePeak = ""
+    :distributionone = ""
+    :distributiontwo = ""
+    :distributionthree = ""
+    :distributionfour = ""
+    :distributionfive = ""
+    :distributionsix = ""
+    :time = ""
+    :number = ""
+///    获取相应的图片
+    :picture = ""
+
+    :sqlRecordInfo = "SELECT totalPeak,quantitativePeak,distributionone,distributiontwo,distributionthree,distributionfour,distributionfive,distributionsix,time,number,re.clientid,re.picture FROM MEDICAL_RECORD re, MEDICAL_RECORD_ANALYSIS an WHERE re.id = an.MEDICALRECORDID AND re.id=? ORDER BY an.id DESC"
+    :resultRecordInfo = execSQL(:sqlRecordInfo,S(:medicalRecordId))
+    :totalPeak = getSplitPart2SqlResutl(:resultRecordInfo, 1)
+    :quantitativePeak = getSplitPart2SqlResutl(:resultRecordInfo, 2)
+    :distributionone = getSplitPart2SqlResutl(:resultRecordInfo, 3)
+    :distributiontwo = getSplitPart2SqlResutl(:resultRecordInfo, 4)
+    :distributionthree = getSplitPart2SqlResutl(:resultRecordInfo, 5)
+    :distributionfour = getSplitPart2SqlResutl(:resultRecordInfo, 6)
+    :distributionfive = getSplitPart2SqlResutl(:resultRecordInfo, 7)
+    :distributionsix = getSplitPart2SqlResutl(:resultRecordInfo, 8)
+    :time = getSplitPart2SqlResutl(:resultRecordInfo, 9)
+    :number=getSplitPart2SqlResutl(:resultRecordInfo, 10)
+    :personId=getSplitPart2SqlResutl(:resultRecordInfo, 11)
+    :picture=getSplitPart2SqlResutl(:resultRecordInfo, 12)
+
+    :sqlGetClientInfo = "SELECT name,login_name FROM st_passports st WHERE st.id=?"
+    :resultClientInfo = execSQL(:sqlGetClientInfo,S(:personId))
+    :personName = getSplitPart2SqlResutl(:resultClientInfo, 1)
+    :peronPhone = getSplitPart2SqlResutl(:resultClientInfo, 2)
+
+    :sqlGetClientInfo2 = "SELECT gender,height,weight,drinking,smoking,hypertension,diabetes FROM client WHERE id=?"
+    :resultClientInfo2 = execSQL(:sqlGetClientInfo2,S(:personId))
+    :personSex = getSplitPart2SqlResutl(:resultClientInfo2, 1)
+    :personHeight = getSplitPart2SqlResutl(:resultClientInfo2, 2)
+    :personWeight = getSplitPart2SqlResutl(:resultClientInfo2, 3)
+    :personDrinking = getSplitPart2SqlResutl(:resultClientInfo2, 4)
+    :personSmoking = getSplitPart2SqlResutl(:resultClientInfo2, 5)
+    :personHypertension = getSplitPart2SqlResutl(:resultClientInfo2, 6)
+    :personDiabetes = getSplitPart2SqlResutl(:resultClientInfo2, 7)
+
+///    debugMsg("[DEBUGMSG]:getMedicalRecordReport.template 位置:66:"+"totalPeak"+:totalPeak+".time"+:time+".number"+:number)
+
+    ///组装相应的JSON传递 到前台
+    ///每次循环存入一条病历信息
+        :result_records_item = jsonAddItem("", "personName", S(:personName))
+        :result_records_item = jsonAddItem(:result_records_item, "peronPhone", S(:peronPhone))
+        :result_records_item = jsonAddItem(:result_records_item, "personSex", S(:personSex))
+        :result_records_item = jsonAddItem(:result_records_item, "personHeight", S(:personHeight))
+        :result_records_item = jsonAddItem(:result_records_item, "personWeight", S(:personWeight))
+        :result_records_item = jsonAddItem(:result_records_item, "personDrinking", S(:personDrinking))
+        :result_records_item = jsonAddItem(:result_records_item, "personSmoking", S(:personSmoking))
+        :result_records_item = jsonAddItem(:result_records_item, "personHypertension", S(:personHypertension))
+        :result_records_item = jsonAddItem(:result_records_item, "personDiabetes", S(:personDiabetes))
+        :result_records_item = jsonAddItem(:result_records_item, "totalPeak", S(:totalPeak))
+        :result_records_item = jsonAddItem(:result_records_item, "quantitativePeak", S(:quantitativePeak))
+        :result_records_item = jsonAddItem(:result_records_item, "distributionone", S(:distributionone))
+        :result_records_item = jsonAddItem(:result_records_item, "distributiontwo", S(:distributiontwo))
+        :result_records_item = jsonAddItem(:result_records_item, "distributionthree", S(:distributionthree))
+        :result_records_item = jsonAddItem(:result_records_item, "distributionfour", S(:distributionfour))
+        :result_records_item = jsonAddItem(:result_records_item, "distributionfive", S(:distributionfive))
+        :result_records_item = jsonAddItem(:result_records_item, "distributionsix", S(:distributionsix))
+        :result_records_item = jsonAddItem(:result_records_item, "time", S(:time))
+        :result_records_item = jsonAddItem(:result_records_item, "number", S(:number))
+        :result_records_item = jsonAddItem(:result_records_item, "picture", S(:picture))
+
+        :result_records_array = jsonAddArrayItem(:result_records_array , :result_records_item)
+
+        ///bad
+        :result_records_items = jsonAddItem("", "data", :result_records_array)
+        =:result_records_items
+
+        debugMsg("[DEBUGMSG]:getMedicalRecordReport.template 位置:103:"+"result_records_items"+:result_records_items)
+%>

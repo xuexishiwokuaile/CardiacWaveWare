@@ -1,0 +1,8 @@
+<%
+      :sql_setIschecked = "UPDATE medical_record SET isChecked='false' WHERE id=?"
+      :result_sql_setIschecked = changeRecordSet(:sql_setIschecked,S(:id))
+
+      :result_callback = ""
+      :result_callback = jsonAddItem(:result_callback,"status",S(:result_sql_setIschecked))
+      =:result_callback
+%>

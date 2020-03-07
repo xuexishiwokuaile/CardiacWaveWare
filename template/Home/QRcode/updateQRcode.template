@@ -1,0 +1,17 @@
+<%
+    /// 文 件 名：updateQRcode
+    /// 描    述：(用一句话描述该文件做什么)  
+    /// 项目名称：html      
+    /// 作    者：武汉大学国家网络安全学院@沈家强    
+    /// 发布日期：2019/8/22 11:46  
+    /// 文件版本：V1.0 
+    /// 注意：本内容仅限于武汉大学国家网络安全学院陈刚教授团队内部传阅，禁止外泄以及用于其他的商业目
+    /// @Copyright: 2019 www.whu.edu.cn. All rights reserved. 
+    /// All rights Reserved, Designed By www.whu.edu.cn
+%>
+<%
+      :sql_updateQRcode = "UPDATE QRcode set width=?,height=?,text=?,mark=? WHERE id=?"
+      :result_sql_updateQRcode = changeRecordSet(:sql_updateQRcode,S(:width),S(:height),S(:text),S(:mark),S(:id))
+
+      =:result_sql_updateQRcode
+%>

@@ -1,0 +1,10 @@
+<%
+      :sql_max="SELECT CAST(max(CAST(number AS int)) AS VARCHAR) AS NUM FROM ST_PASSPORTS WHERE CLASSIFICATION=?"
+      :resultRecord = changeRecordSet(:sql_max,S(:classification))
+      :num = num
+      =:num
+
+      debugMsg("classification================"#:classification)
+      debugMsg("num================"#:num)
+
+%>
